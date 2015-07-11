@@ -157,8 +157,8 @@ class KeySet {
      */
     function remove($key) {
         for ($i = 0; $i < count($this->keys); $i++) {
-            if ($this->keys[i]->getSignature() == $key->getSignature()) {
-                unset($this->keys[i]);
+            if ($this->keys[$i]->getSignature() == $key->getSignature()) {
+                unset($this->keys[$i]);
                 return;
             }
         }

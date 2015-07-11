@@ -213,11 +213,11 @@ class RemoveCommand extends SelectKeyCommand {
         $key = $this->selectKey($input, $output);
 
         if ($key) {
-            $set->remove($key);
+            $this->set->remove($key);
 
             $output->writeln('Removed key: ' . $key->getKeyId());
 
-            file_put_contents($jwks_file, $this->saveKeySet($set));
+            file_put_contents($jwks_file, $this->saveKeySet($this->set));
         }
     }
 }

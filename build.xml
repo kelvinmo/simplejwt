@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="phar" basedir=".">
+    <target name="phar">
+        <pharpackage destfile="./bin/jwkstool.phar" basedir="./" stub="jwkstool_pharstub.php" compression="bzip2">
+            <fileset dir="./bin">
+                <include name="jwkstool.php" />
+            </fileset>
+            <fileset dir="./src/SimpleJWT">
+                <include name="**/**" />
+            </fileset>
+            <fileset dir="vendor">
+                <include name="autoload.php" />
+                <include name="composer/*" />
+                <include name="symfony/console/**/**" />
+                <exclude name="symfony/console/Tests/**/**" />
+            </fileset>
+        </pharpackage>
+    </target>
+</project>

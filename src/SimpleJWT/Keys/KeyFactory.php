@@ -63,7 +63,7 @@ class KeyFactory {
     );
     static $oid_map = array(
         RSAKey::OID => 'SimpleJWT\Keys\RSAKey',
-        ECKey::EC_OID = 'SimpleJWT\Keys\ECKey'
+        ECKey::EC_OID => 'SimpleJWT\Keys\ECKey'
     );
 
     /**

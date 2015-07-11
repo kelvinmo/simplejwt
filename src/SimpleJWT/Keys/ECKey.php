@@ -41,9 +41,9 @@ use SimpleJWT\Util\Util;
 /**
  * A class representing a public or private key in an elliptic curve key pair.
  */
-class RSAKey extends Key {
+class ECKey extends Key {
 
-    const KTY = 'RSA';
+    const KTY = 'EC';
 
     const PEM_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
 

@@ -3,7 +3,8 @@
     "description": "An simple JSON Web Token library for PHP.",
     "require": {
         "php": ">=5.3.9",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-hash": "*"
     },
     "require-dev": {
         "ext-bz2": "*",

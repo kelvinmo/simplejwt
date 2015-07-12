@@ -158,38 +158,30 @@ class ECKey extends Key {
     }
 
     public function isPublic() {
-        return !isset($this->data['p']);
+        return !isset($this->data['d']);
     }
 
     public function toPEM() {
+        $oid = $this->getOID($this->data['crv']);
+        if ($oid == null) throw new KeyException('Unrecognised EC curve');
+
         if ($this->isPublic()) {
             $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
                 ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                    ASN1Util::encodeDER(ASN1Util::SEQUENCE, ASN1Util::encodeOID(self::OID))
-                    . ASN1Util::encodeDER(ASN1Util::NULL_TYPE),
+                    ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID(self::EC_OID))
+                    . ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID($oid)),
                     false
                 ) .
-                ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00).
-                    ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                        ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
-                         . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['e'])),
-                        false
-                    )
-                ),
+                ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])),
             false);
 
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($der) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
             $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, 0)
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['e']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['d']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['p']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['q']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['dp']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['dq']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['qi'])),
+                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, chr(0x01))
+                . ASN1Util::encodeDER(ASN1Util::OCTET_STRING, Util::base64url_decode($this->data['d']))
+                . ASN1Util::encodeDER(0x00, ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID($oid)), false, ASN1Util::CONTEXT_CLASS)
+                . ASN1Util::encodeDER(0x01, ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])), false, ASN1Util::CONTEXT_CLASS),
             false);
 
             return wordwrap("-----BEGIN EC PRIVATE KEY-----\n" . base64_encode($der) . "\n-----END EC PRIVATE KEY-----\n", 64, "\n", true);
@@ -198,6 +190,13 @@ class ECKey extends Key {
 
     protected function getSignatureKeys() {
         return array('kty', 'crv', 'x', 'y');
+    }
+
+    private function getOID($crv) {
+        foreach (self::$curves as $oid => $params) {
+            if ($params['crv'] == $crv) return $oid;
+        }
+        return null;
     }
 }
 

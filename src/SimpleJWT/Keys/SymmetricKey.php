@@ -95,7 +95,7 @@ class SymmetricKey extends Key {
     }
 
     public function isPublic() {
-        return !isset($this->data['p']);
+        return false;
     }
 
     public function toPEM() {

@@ -39,9 +39,16 @@ namespace SimpleJWT\Util;
  * Utilities for interacting with ASN.1 data streams.
  */
 class ASN1Util {
+    const UNIVERSAL_CLASS = 0x00;
+    const APPLICATION_CLASS = 0x40;
+    const CONTEXT_CLASS = 0x80;
+    const PRIVATE_CLASS = 0xC0;
+
     const INTEGER_TYPE = 0x02;
     const BIT_STRING = 0x03;
+    const OCTET_STRING = 0x04;
     const NULL_TYPE = 0x05;
+    const OID = 0x06;
     const SEQUENCE = 0x10;
 
     /**
@@ -102,8 +109,8 @@ class ASN1Util {
      * constructed type
      * @return string the encoded object
      */
-    static function encodeDER($type, $value = '', $primitive = true) {
-        $tag_header = 0;
+    static function encodeDER($type, $value = '', $primitive = true, $class = 0) {
+        $tag_header = $class;
         if (!$primitive) $tag_header |= 0x20;
 
         // Type
@@ -182,21 +189,22 @@ class ASN1Util {
 
         // Subsequent octets
         foreach ($numbers as $num) {
-            if ($num < 0x7f) {
-                $oid .= chr($num);
+            if ($num == 0) {
+                $oid .= chr(0x00);
+                continue;
+            }
+            $pack = '';
+
+            while ($num) {
+                $pack .= chr(0x80 | ($num & 0x7f));
+                $num >>= 7;
+            }
+            $pack[0] = $pack[0] & chr(0x7f);
+
+            if (pack('V', 65534) == pack('L', 65534)) {
+                $oid .= strrev($pack); // Little endian machine - need to convert to big endian
             } else {
-                $pack = '';
-
-                while ($num) {
-                    $pack .= chr(0x80 | ($num & 0x7f));
-                    $num >>= 7;
-                }
-
-                if (pack('V', 65534) == pack('L', 65534)) {
-                    $oid .= strrev($pack); // Little endian machine - need to convert to big endian
-                } else {
-                    $oid .= $pack;
-                }
+                $oid .= $pack;
             }
         }
 

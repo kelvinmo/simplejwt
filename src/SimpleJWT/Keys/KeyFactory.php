@@ -55,7 +55,7 @@ class KeyFactory {
     static $jwk_kty_map = array(
         RSAKey::KTY => 'SimpleJWT\Keys\RSAKey',
         ECKey::KTY => 'SimpleJWT\Keys\ECKey',
-        'oct' => 'SimpleJWT\Keys\OctKey'
+        SymmetricKey::KTY => 'SimpleJWT\Keys\SymmetricKey'
     );
     static $pem_map = array(
         RSAKey::PEM_PRIVATE => 'SimpleJWT\Keys\RSAKey',
@@ -131,6 +131,10 @@ class KeyFactory {
                     }
                 }
             }
+        }
+
+        if (($format == 'base64url') || ($format == 'base64') || ($format == 'bin')) {
+            return new SymmetricKey($data, $format);
         }
 
         return null;

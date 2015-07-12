@@ -143,7 +143,7 @@ class RSAKey extends Key {
         if ($this->isPublic()) {
             $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
                 ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                    ASN1Util::encodeDER(ASN1Util::SEQUENCE, ASN1Util::encodeOID(self::OID))
+                    ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID(self::OID))
                     . ASN1Util::encodeDER(ASN1Util::NULL_TYPE),
                     false
                 ) .
@@ -159,7 +159,7 @@ class RSAKey extends Key {
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($der) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
             $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, 0)
+                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, chr(0))
                 . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
                 . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['e']))
                 . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['d']))

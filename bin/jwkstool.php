@@ -186,7 +186,7 @@ class ListKeysCommand extends Command {
 
             $ops = $key->getOperations();
             if ($ops == null) $ops = array();
-            $ops = explode(',', $ops);
+            $ops = implode(',', $ops);
 
             $table->addRow(array($id, $kty, $use, $ops));
         }

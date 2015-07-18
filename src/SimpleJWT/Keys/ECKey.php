@@ -54,10 +54,10 @@ class ECKey extends Key {
     const P521_OID = '1.3.132.0.35';
 
     static $curves = array(
-        self::P256_OID => array('crv' => 'P-256', 'len' => 65),
-        self::P256_OID2 => array('crv' => 'P-256', 'len' => 65),
-        self::P384_OID => array('crv' => 'P-384', 'len' => 97),
-        self::P521_OID => array('crv' => 'P-521', 'len' => 133),
+        self::P256_OID => array('crv' => 'P-256', 'len' => 64),
+        self::P256_OID2 => array('crv' => 'P-256', 'len' => 64),
+        self::P384_OID => array('crv' => 'P-384', 'len' => 96),
+        self::P521_OID => array('crv' => 'P-521', 'len' => 132),
     );
 
     /**
@@ -104,12 +104,12 @@ class ECKey extends Key {
                     $len = self::$curves[$curve]['len'];
 
                     $offset += ASN1Util::readDER($der, $offset, $point);  // BIT STRING - ECPoint
-                    if (strlen($point) != $len) throw new KeyException('Incorrect public key length: ' . strlen($point));
+                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect public key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid public key');  // W
 
-                    $x = substr($point, 1, ($len - 1) / 2);
-                    $y = substr($point, 1 + ($len - 1) / 2);
+                    $x = substr($point, 1, $len / 2);
+                    $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
                     $jwk['crv'] = self::$curves[$curve]['crv'];

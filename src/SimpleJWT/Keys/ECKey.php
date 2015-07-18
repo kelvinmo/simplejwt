@@ -48,12 +48,14 @@ class ECKey extends Key {
     const PEM_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
 
     const EC_OID = '1.2.840.10045.2.1';
-    const P256_OID = '1.3.132.0.10';
+    const P256_OID = '1.2.840.10045.3.1.7';
+    const P256_OID2 = '1.3.132.0.10';
     const P384_OID = '1.3.132.0.34';
     const P521_OID = '1.3.132.0.35';
 
     static $curves = array(
         self::P256_OID => array('crv' => 'P-256', 'len' => 65),
+        self::P256_OID2 => array('crv' => 'P-256', 'len' => 65),
         self::P384_OID => array('crv' => 'P-384', 'len' => 97),
         self::P521_OID => array('crv' => 'P-521', 'len' => 133),
     );
@@ -157,8 +159,22 @@ class ECKey extends Key {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
+    public function getSize() {
+        return 8 * strlen(Util::base64url_decode($this->data['x']));
+    }
+
     public function isPublic() {
         return !isset($this->data['d']);
+    }
+
+    public function getPublicKey() {
+        return new ECKey(array(
+            'kid' => $this->data['kid'],
+            'kty' => $this->data['kty'],
+            'crv' => $this->data['crv'],
+            'x' => $this->data['x'],
+            'y' => $this->data['y']
+        ), 'php');
     }
 
     public function toPEM() {

@@ -127,6 +127,14 @@ abstract class Key {
     }
 
     /**
+     * Returns the size of the key, in bits.  The definition of "size"
+     * is dependent on the key algorithm.
+     *
+     * @return int the size of the key in bits
+     */
+    abstract public function getSize();
+
+    /**
      * Determines wshether the key is a public key.
      *
      * A key is public if, and only if, it is an asymmetric key, and the key
@@ -135,6 +143,13 @@ abstract class Key {
      * @return bool true if the key is public
      */
     abstract public function isPublic();
+
+    /**
+     * Returns the public key.
+     *
+     * @return Key the public key, or null if the public key does not exist (e.g. is a symmetric key)
+     */
+    abstract public function getPublicKey();
 
     /**
      * Returns the underlying parameters for the key

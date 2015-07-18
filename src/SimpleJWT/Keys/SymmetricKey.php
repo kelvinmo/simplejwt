@@ -94,8 +94,16 @@ class SymmetricKey extends Key {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
+    public function getSize() {
+        return 8 * strlen($this->toBinary());
+    }
+
     public function isPublic() {
         return false;
+    }
+
+    public function getPublicKey() {
+        return null;
     }
 
     public function toPEM() {

@@ -172,7 +172,7 @@ class ListKeysCommand extends Command {
 
         $table = new Table($output);
         $table->setStyle('borderless');
-        $table->setHeaders(array('ID', 'Type', 'Use', 'Ops'));
+        $table->setHeaders(array('ID', 'Type', 'Size', 'Use', 'Ops'));
 
         foreach ($set->getKeys() as $key) {
             $id = $key->getKeyId();
@@ -181,6 +181,8 @@ class ListKeysCommand extends Command {
             $kty = $key->getKeyType();
             if (!$key->isPublic()) $kty .= '*';
 
+            $size = $key->getSize();
+
             $use = $key->getUse();
             if ($use == null) $use = '';
 
@@ -188,7 +190,7 @@ class ListKeysCommand extends Command {
             if ($ops == null) $ops = array();
             $ops = implode(',', $ops);
 
-            $table->addRow(array($id, $kty, $use, $ops));
+            $table->addRow(array($id, $kty, $size, $use, $ops));
         }
 
         $table->render();

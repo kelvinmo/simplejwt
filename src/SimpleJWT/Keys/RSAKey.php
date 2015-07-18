@@ -135,8 +135,22 @@ class RSAKey extends Key {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
+    public function getSize() {
+        // The modulus is a signed integer, therefore ignore the first byte
+        return 8 * (strlen(Util::base64url_decode($this->data['n'])) - 1);
+    }
+
     public function isPublic() {
         return !isset($this->data['p']);
+    }
+
+    public function getPublicKey() {
+        return new RSAKey(array(
+            'kid' => $this->data['kid'],
+            'kty' => $this->data['kty'],
+            'n' => $this->data['n'],
+            'e' => $this->data['e']
+        ), 'php');
     }
 
     public function toPEM() {

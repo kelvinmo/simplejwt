@@ -47,7 +47,7 @@ class Util {
      * @return string the encoded data
      * @link http://tools.ietf.org/html/rfc4648#section-5
      */
-    static public function base64url_encode($data, $pad = true) {
+    static public function base64url_encode($data, $pad = false) {
         $encoded = strtr(base64_encode($data), '+/', '-_');
         if (!$pad) $encoded = trim($encoded, '=');
         return $encoded;
@@ -80,6 +80,50 @@ class Util {
         $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
         for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
         return !$result;
+    }
+
+    /**
+     * Obtains a number of random bytes.  This function uses an entropy source specified
+     * in $rand_source or the OpenSSL or mcrypt extensions.  If
+     * $rand_source is not available, the mt_rand() PHP function is used.
+     *
+     * @param int $num_bytes the number of bytes to generate
+     * @return string a string containing random bytes
+     */
+    static function random_bytes($num_bytes, $rand_source = null) {
+        $is_windows = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+
+        if ($is_windows) {
+            // Windows
+            if (function_exists('mcrypt_create_iv') && version_compare(PHP_VERSION, '5.3.0', '>='))
+                return mcrypt_create_iv($num_bytes);
+
+            if (function_exists('openssl_random_pseudo_bytes') && version_compare(PHP_VERSION, '5.3.4', '>='))
+                return openssl_random_pseudo_bytes($num_bytes);
+        }
+
+        if (!$is_windows && function_exists('openssl_random_pseudo_bytes'))
+            return openssl_random_pseudo_bytes($num_bytes);
+
+        $bytes = '';
+        if ($f === null) {
+            if ($rand_source === null) {
+                $f = FALSE;
+            } else {
+                $f = @fopen($rand_source, "r");
+            }
+        }
+        if ($f === FALSE) {
+            $bytes = '';
+            for ($i = 0; $i < $num_bytes; $i += 4) {
+                $bytes .= pack('L', mt_rand());
+            }
+            $bytes = substr($bytes, 0, $num_bytes);
+        } else {
+            $bytes = fread($f, $num_bytes);
+            fclose($f);
+        }
+        return $bytes;
     }
 }
 

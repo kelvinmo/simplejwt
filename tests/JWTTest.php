@@ -1,0 +1,109 @@
+<?php
+
+use SimpleJWT\JWT;
+
+class JWTTest extends \PHPUnit_Framework_TestCase {
+
+    protected function getJWTClaims() {
+        return array(
+            "iss" => "joe",
+            "exp" => 1300819380,
+            "http://example.com/is_root" => true
+        );
+    }
+
+    protected function getPrivateKeySet() {
+        $set = new SimpleJWT\Keys\KeySet();
+
+        $set->add(new SimpleJWT\Keys\SymmetricKey(array(
+            "kty" => "oct",
+            "k" => "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
+            "kid" => "hmac"
+        ), 'php'));
+
+        $set->add(new SimpleJWT\Keys\RSAKey(array(
+            "kty" => "RSA",
+            "n" => "ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddxHmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMsD1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSHSXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdVMTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ",
+            "e" => "AQAB",
+            "d" => "Eq5xpGnNCivDflJsRQBXHx1hdR1k6Ulwe2JZD50LpXyWPEAeP88vLNO97IjlA7_GQ5sLKMgvfTeXZx9SE-7YwVol2NXOoAJe46sui395IW_GO-pWJ1O0BkTGoVEn2bKVRUCgu-GjBVaYLU6f3l9kJfFNS3E0QbVdxzubSu3Mkqzjkn439X0M_V51gfpRLI9JYanrC4D4qAdGcopV_0ZHHzQlBjudU2QvXt4ehNYTCBr6XCLQUShb1juUO1ZdiYoFaFQT5Tw8bGUl_x_jTj3ccPDVZFD9pIuhLhBOneufuBiB4cS98l2SR_RQyGWSeWjnczT0QU91p1DhOVRuOopznQ",
+            "p" => "4BzEEOtIpmVdVEZNCqS7baC4crd0pqnRH_5IB3jw3bcxGn6QLvnEtfdUdiYrqBdss1l58BQ3KhooKeQTa9AB0Hw_Py5PJdTJNPY8cQn7ouZ2KKDcmnPGBY5t7yLc1QlQ5xHdwW1VhvKn-nXqhJTBgIPgtldC-KDV5z-y2XDwGUc",
+            "q" => "uQPEfgmVtjL0Uyyx88GZFF1fOunH3-7cepKmtH4pxhtCoHqpWmT8YAmZxaewHgHAjLYsp1ZSe7zFYHj7C6ul7TjeLQeZD_YwD66t62wDmpe_HlB-TnBA-njbglfIsRLtXlnDzQkv5dTltRJ11BKBBypeeF6689rjcJIDEz9RWdc",
+            "dp" => "BwKfV3Akq5_MFZDFZCnW-wzl-CCo83WoZvnLQwCTeDv8uzluRSnm71I3QCLdhrqE2e9YkxvuxdBfpT_PI7Yz-FOKnu1R6HsJeDCjn12Sk3vmAktV2zb34MCdy7cpdTh_YVr7tss2u6vneTwrA86rZtu5Mbr1C1XsmvkxHQAdYo0",
+            "dq" => "h_96-mK1R_7glhsum81dZxjTnYynPbZpHziZjeeHcXYsXaaMwkOlODsWa7I9xXDoRwbKgB719rrmI2oKr6N3Do9U0ajaHF-NKJnwgjMd2w9cjz3_-kyNlxAr2v4IKhGNpmM5iIgOS1VZnOZ68m6_pbLBSp3nssTdlqvd0tIiTHU",
+            "qi" => "IYd7DHOhrWvxkwPQsRM2tOgrjbcrfvtQJipd-DlcxyVuuM9sQLdgjVk2oy26F0EmpScGLq2MowX7fhd_QJQ3ydy5cY7YIBi87w93IKLEdfnbJtoOPLUW0ITrJReOgo1cq9SbsxYawBgfp_gh6A5603k2-ZQwVK0JKSHuLFkuQ3U",
+            "kid" => "RSA"
+        ), 'php'));
+
+        $set->add(new SimpleJWT\Keys\ECKey(array(
+            "kty" => "EC",
+            "crv" => "P-256",
+            "x" => "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+            "y" => "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
+            "d" => "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI",
+            "kid" => "EC"
+        ), 'php'));
+
+        return $set;
+    }
+
+    protected function getPublicKeySet() {
+        $private = $this->getPrivateKeySet();
+        $set = new SimpleJWT\Keys\KeySet();
+
+        foreach ($private->getKeys() as $key) {
+            if ($key instanceof SimpleJWT\Keys\SymmetricKey) {
+                $set->add($key);
+            } else {
+                $set->add($key->getPublicKey());
+            }
+        }
+
+        return $set;
+    }
+
+    function testGenerateHMAC() {
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $jwt = new JWT(array('typ' => 'JWT', 'alg' => 'HS256'), $claims);
+        $token = $jwt->encode($set, null, false);
+        $this->assertEquals('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.0stp4GfJhgUSjqUtkZ1Hfmt1bvPKiHSzojeTw3sr7R8', $token);
+    }
+
+    function testGenerateRSA() {
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $jwt = new JWT(array('alg' => 'RS256'), $claims);
+        $token = $jwt->encode($set, null, false);
+        $this->assertEquals('eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.WLAkxL55suP-DBGVRHnJk-gT3-U_lVwUeINTxPx42MnneO4Q8Hv1A4331-BLHzSB3bRvoGtHv-IdMykYqGPi8PkdXGuBqJIkL9_HNb2YHtS_ALL2xYSUdHntxPcMr_2HHmVsePhYESlLpfW4wR2CKHXn13gQCjbZTXFwGyvuj_BH5ozpK0JdlttGQ7EL3Uetjv2143F-lI5w_Ttw4Ob4M8jsu7-K63MvqZvWexq3oBzmH4soLTSu84I63ZoyS7mxYvMxvCgV5Is8TGsY81pmyXMeMGb1GodaLrULnc5alz96fDekZYFT8mfuRVZP6Kmsu6MqsszPILY4YuWq6bSkXg', $token);
+    }
+
+    function testGenerateEC() {
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $jwt = new JWT(array('alg' => 'ES256'), $claims);
+        $token = $jwt->encode($set, null, false);
+
+        // Note that ECDSA generates a different signature every time, as a random
+        // number is used as part of the algorithm.
+        //$this->assertEquals('eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.MEQCIDeGcWWm3mZL--b9XTu-VYT_Tjt0EX7ELM7YzeFhdGqJAiBtnKcpHRbUs5SzGSRSJb3kyzAlCY3MGc-WSDppgpY1vQ', $token);
+    }
+
+    function testVerifyHMAC() {
+        $set = $this->getPublicKeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
+        $jwt = JWT::decode($token, $set, 'HS256');
+    }
+
+    function testVerifyRSA() {
+        $set = $this->getPublicKeySet();
+        $token = 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjbKBYNX4BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHlb1L07Qe7K0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZESc6BfI7noOPqvhJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrBp0igcN_IoypGlUPQGe77Rw';
+        $jwt = JWT::decode($token, $set, 'RS256');
+    }
+
+    function testVerifyEC() {
+        $set = $this->getPublicKeySet();
+        $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
+        $jwt = JWT::decode($token, $set, 'ES256');
+    }
+}
+?>

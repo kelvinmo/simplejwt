@@ -66,6 +66,7 @@ class AlgorithmFactory {
      * @throws \UnexpectedValueException if the algorithm cannot be created
      * (e.g. if it a required library is not present)
      * @return Algorithm the algorithm
+     * @throws \UnexpectedValueException if the algorithm is not supported
      */
     static public function create($alg) {
         foreach (self::$alg_map as $regex => $cls) {

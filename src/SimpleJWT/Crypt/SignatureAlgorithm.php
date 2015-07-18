@@ -48,6 +48,9 @@ interface SignatureAlgorithm {
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the base64url encoded signature
+     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * key(s) required for this operation
+     * @throws CryptException if there is an error in the cryptographic process
      */
     public function sign($data, $keys, $kid = null);
 
@@ -61,6 +64,9 @@ interface SignatureAlgorithm {
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return bool true if the signature is valid
+     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * key(s) required for this operation
+     * @throws CryptException if there is an error in the cryptographic process
      */
     public function verify($signature, $data, $keys, $kid = null);
 
@@ -74,6 +80,7 @@ interface SignatureAlgorithm {
      *
      * @param string the data to hash
      * @return string the base64url encoded short hash.
+     * @throws CryptException if there is an error in the cryptographic process
      */
     public function shortHash($data);
 }

@@ -136,7 +136,7 @@ class ECKey extends Key {
 
                     $offset += ASN1Util::readDER($der, $offset, $data);  // SEQUENCE[1]
                     $offset += ASN1Util::readDER($der, $offset, $point);  // BIT STRING - ECPoint
-                    if (strlen($point) != $len) throw new KeyException('Incorrect private key length: ' . strlen($point));
+                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
 

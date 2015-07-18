@@ -55,7 +55,7 @@ class AlgorithmFactory {
     private static $use_map = array(
         Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\SignatureAlgorithm',
         Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\EncryptionAlgorithm',
-        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm';
+        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm'
     );
 
     /**

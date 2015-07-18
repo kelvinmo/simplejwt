@@ -78,6 +78,7 @@ class KeyFactory {
      * @param string $data the key data
      * @param string $format the format
      * @return Key the key object
+     * @throws KeyException if an error occurs in reading the data
      */
     static public function create($data, $format = null) {
         // 1. Detect format
@@ -91,7 +92,7 @@ class KeyFactory {
             }
         }
 
-        if (($format == null) || ($format == 'auto')) throw new \InvalidArgumentException('Cannot detect key format');
+        if (($format == null) || ($format == 'auto')) throw new KeyException('Cannot detect key format');
 
         // 2. Decode JSON
         if ($format == 'json') {
@@ -112,7 +113,7 @@ class KeyFactory {
         if ($format == 'pem') {
             if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                 $der = base64_decode($matches[1]);
-                if ($der === FALSE) throw new \InvalidArgumentException('Cannot read PEM key');
+                if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
                 $offset = 0;
 

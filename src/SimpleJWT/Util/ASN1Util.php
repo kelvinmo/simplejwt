@@ -122,7 +122,7 @@ class ASN1Util {
 
         // Length
         $len = strlen($value);
-        if ($len < 0x7f) {
+        if ($len <= 0x7f) {
             $der .= chr($len);
         } else {
             $pack = '';

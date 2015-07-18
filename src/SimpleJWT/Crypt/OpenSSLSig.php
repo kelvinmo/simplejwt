@@ -115,6 +115,10 @@ class OpenSSLSig extends SHA2 {
             $r = ltrim($r, "\x00");
             $s = ltrim($s, "\x00");
 
+            // Now pad out r and s so that they are $key->getSize() bits long
+            $r = str_pad($r, $key->getSize() / 8, "\x00", STR_PAD_LEFT);
+            $s = str_pad($s, $key->getSize() / 8, "\x00", STR_PAD_LEFT);
+
             $binary = $r . $s;
         }
 
@@ -137,6 +141,10 @@ class OpenSSLSig extends SHA2 {
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
             // For ECDSA signatures, OpenSSL expects a ASN.1 DER SEQUENCE
             list($r, $s) = str_split($binary, (int) (strlen($binary) / 2));
+
+            // Trim leading zeros
+            $r = ltrim($r, "\x00");
+            $s = ltrim($s, "\x00");
 
             // Convert r and s from unsigned big-endian integers to signed two's complement
             if (ord($r[0]) > 0x7f) $r = "\x00" . $r;

@@ -37,6 +37,9 @@ namespace SimpleJWT\Util;
 
 /**
  * Utilities for interacting with ASN.1 data streams.
+ *
+ * Note that this class only implements a small subset of the ASN.1 DER, and should
+ * not be used as a general-purpose ASN.1 encoder/decoder.
  */
 class ASN1Util {
     const UNIVERSAL_CLASS = 0x00;

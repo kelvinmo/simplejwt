@@ -223,9 +223,13 @@ class JWT {
      */
     public function encode($keys, $kid = null, $include_iat = true, $alg = null, $format = self::COMPACT_FORMAT) {
         if ($alg != null) $this->headers['alg'] = $alg;
-        if ($include_iat )$this->headers['iat'] = time();
+        if ($include_iat) $this->headers['iat'] = time();
 
-        $signer = AlgorithmFactory::create($this->headers['alg']);
+        try {
+            $signer = AlgorithmFactory::create($this->headers['alg']);
+        } catch (\UnexpectedValueException $e) {
+            throw new CryptException($e->getMessage(), 0, $e);
+        }
         $protected = Util::base64url_encode(json_encode($this->headers));
         $payload = Util::base64url_encode(json_encode($this->claims));
         $signing_input = $protected . '.' . $payload;

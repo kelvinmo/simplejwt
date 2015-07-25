@@ -1,6 +1,11 @@
 <?php
 
-use SimpleJWT\JWT;
+namespace SimpleJWT;
+
+// Override time() in current namespace for testing
+function time() {
+    return 1300000000;
+}
 
 class JWTTest extends \PHPUnit_Framework_TestCase {
 
@@ -13,15 +18,15 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     }
 
     protected function getPrivateKeySet() {
-        $set = new SimpleJWT\Keys\KeySet();
+        $set = new Keys\KeySet();
 
-        $set->add(new SimpleJWT\Keys\SymmetricKey(array(
+        $set->add(new Keys\SymmetricKey(array(
             "kty" => "oct",
             "k" => "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
             "kid" => "hmac"
         ), 'php'));
 
-        $set->add(new SimpleJWT\Keys\RSAKey(array(
+        $set->add(new Keys\RSAKey(array(
             "kty" => "RSA",
             "n" => "ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddxHmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMsD1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSHSXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdVMTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ",
             "e" => "AQAB",
@@ -34,7 +39,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
             "kid" => "RSA"
         ), 'php'));
 
-        $set->add(new SimpleJWT\Keys\ECKey(array(
+        $set->add(new Keys\ECKey(array(
             "kty" => "EC",
             "crv" => "P-256",
             "x" => "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
@@ -48,10 +53,10 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
 
     protected function getPublicKeySet() {
         $private = $this->getPrivateKeySet();
-        $set = new SimpleJWT\Keys\KeySet();
+        $set = new Keys\KeySet();
 
         foreach ($private->getKeys() as $key) {
-            if ($key instanceof SimpleJWT\Keys\SymmetricKey) {
+            if ($key instanceof Keys\SymmetricKey) {
                 $set->add($key);
             } else {
                 $set->add($key->getPublicKey());
@@ -85,25 +90,56 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
 
         // Note that ECDSA generates a different signature every time, as a random
         // number is used as part of the algorithm.
-        //$this->assertEquals('eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.MEQCIDeGcWWm3mZL--b9XTu-VYT_Tjt0EX7ELM7YzeFhdGqJAiBtnKcpHRbUs5SzGSRSJb3kyzAlCY3MGc-WSDppgpY1vQ', $token);
+        $set2 = $this->getPublicKeySet();
+        $jwt2 = JWT::decode($token, $set2, 'ES256');
+        $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
 
     function testVerifyHMAC() {
         $set = $this->getPublicKeySet();
         $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
         $jwt = JWT::decode($token, $set, 'HS256');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
     function testVerifyRSA() {
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjbKBYNX4BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHlb1L07Qe7K0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZESc6BfI7noOPqvhJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrBp0igcN_IoypGlUPQGe77Rw';
         $jwt = JWT::decode($token, $set, 'RS256');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
     function testVerifyEC() {
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
         $jwt = JWT::decode($token, $set, 'ES256');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
+    }
+
+    function testAlgFailure() {
+        $this->setExpectedException('SimpleJWT\InvalidTokenException');
+        $set = $this->getPublicKeySet();
+        $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
+        $jwt = JWT::decode($token, $set, 'RS256'); // Error - should be ES256
+    }
+
+    function testSignatureFailure() {
+        $this->setExpectedException('SimpleJWT\InvalidTokenException');
+        $set = $this->getPublicKeySet();
+        $token = 'eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.NrP7T3zsezqVjBPI35nJBtIQeoOrsT7Rib5NdaOzpgM';
+        $jwt = JWT::decode($token, $set, 'HS256');
+    }
+
+    function testTimeFailure() {
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $claims['exp'] = 1;
+        $jwt = new JWT(array('typ' => 'JWT', 'alg' => 'HS256'), $claims);
+        $token = $jwt->encode($set, null, false);
+
+        $this->setExpectedException('SimpleJWT\InvalidTokenException');
+        $set2 = $this->getPublicKeySet();
+        $jwt2 = JWT::decode($token, $set2, 'HS256');
     }
 }
 ?>

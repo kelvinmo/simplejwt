@@ -156,12 +156,12 @@ class JWT {
         if (!$result) throw new InvalidTokenException('Incorrect signature', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
 
         // Check time, etc
-        if (isset($headers['nbf'])) {
-            if (time() < $headers['nbf'] + self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too early due to nbf header', InvalidTokenException::TOO_EARLY_ERROR, null, $headers['nbf']);
+        if (isset($claims['nbf'])) {
+            if (time() < $claims['nbf'] + self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too early due to nbf claim', InvalidTokenException::TOO_EARLY_ERROR, null, $claims['nbf']);
         }
 
-        if (isset($headers['exp'])) {
-            if (time() < $headers['exp'] - self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too late due to exp header', InvalidTokenException::TOO_LATE_ERROR, null, $headers['exp']);
+        if (isset($claims['exp'])) {
+            if (time() > $claims['exp'] - self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too late due to exp claim', InvalidTokenException::TOO_LATE_ERROR, null, $claims['exp']);
         }
 
         return new JWT($headers, $claims);

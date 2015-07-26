@@ -46,15 +46,16 @@ namespace SimpleJWT\Crypt;
  */
 class AlgorithmFactory {
     static $alg_map = array(
-        '/none/' => 'SimpleJWT\Crypt\None',
-        '/ES\d+/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/RS\d+/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/HS\d+/' => 'SimpleJWT\Crypt\HMAC',
+        '/^none$/' => 'SimpleJWT\Crypt\None',
+        '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
+        '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
+        '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',
 
-        '/dir/' => 'SimpleJWT\Crypt\DirectEncryption',
-        '/A\d+KW/' => 'SimpleJWT\Crypt\AESKeyWrap',
+        '/^dir$/' => 'SimpleJWT\Crypt\DirectEncryption',
+        '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
+        '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
 
-        '/A\d+CBC-HS\d+/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
+        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
     );
 
     private static $use_map = array(

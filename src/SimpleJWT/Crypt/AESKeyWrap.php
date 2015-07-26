@@ -75,10 +75,9 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        if ($kid == null) {
-            $key = $this->selectKey($keys);
-        } else {
-            $key = $this->selectKey($keys, array("kid" => $kid));
+        $key = $this->selectKey($keys, $kid);
+        if ($key == null) {
+            throw new CryptException('Key not found or is invalid');
         }
 
         if ((strlen($cek) % 8) != 0) throw new CryptException('Content encryption key not a multiple of 64 bits');
@@ -103,10 +102,9 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        if ($kid == null) {
-            $key = $this->selectKey($keys);
-        } else {
-            $key = $this->selectKey($keys, array("kid" => $kid));
+        $key = $this->selectKey($keys, $kid);
+        if ($key == null) {
+            throw new CryptException('Key not found or is invalid');
         }
 
         $cipher = self::$alg_params[$this->getAlg()]['cipher'];

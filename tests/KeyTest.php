@@ -21,12 +21,12 @@ class KeyTest extends \PHPUnit_Framework_TestCase {
         $pem = file_get_contents('ec_private.pem');
         $key = new ECKey($pem, 'pem');
         $this->assertFalse($key->isPublic());
-        //$this->assertEquals($pem, $key->toPEM()); // Different OIDs
+        $this->assertEquals($pem, $key->toPEM());
 
         $pem = file_get_contents('ec_public.pem');
         $key = new ECKey($pem, 'pem');
         $this->assertTrue($key->isPublic());
-        $this->assertEquals($pem, $key->toPEM());
+        //$this->assertEquals($pem, $key->toPEM()); // Different OIDs
     }
 }
 ?>

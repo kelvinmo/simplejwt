@@ -124,29 +124,62 @@ class KeySet {
      * Finds a key matching specified criteria.
      *
      * The criteria is expressed as an associative array, with the keys being
-     * the name of JWK property to match, and the values being the value to be
-     * matched.  A key matches the criteria if all of the criteria are fulfilled.
+     * the name of JWK property to match (with an optional prefix `~`), and the
+     * values being the value to be matched.
      *
-     * If there are multiple keys matching the criteria, the first one is returned.
+     * A criterion can be mandatory or optional.  A key matches the criteria if all of
+     * the mandatory criteria are fulfilled.  If there is more than one key in the
+     * key set that matches all of the mandatory criteria, the key which also matches
+     * the most optional criteria will be returned.
      *
      * @param array $criteria the criteria
      * @return Key the found key, or null
      */
     function get($criteria) {
+        $results = array();
+
+        // Round 1: All mandatory criteria
         foreach ($this->keys as $key) {
             $key_data = $key->getKeyData();
-            $found = true;
+            $key_data[Key::SIZE_PROPERTY] = $key->getSize();
+            $kid = $key->getKeyId();
+
+            // Round 1: All mandatory criteria
             foreach ($criteria as $criterion => $value) {
-                if (is_array($value) && (array_diff($key_data[$criterion], $value) !== array_diff($value, $key_data[$criterion]))) {
-                    $found = false;
-                    break;
-                } elseif ($key_data[$criterion] != $value) {
-                    $found = false;
-                    break;
+                if ($criterion[0] == '~') continue;
+
+                if (is_array($value) && (count(array_diff($value, $key_data[$criterion]) > 0))) {
+                    $results[$kid] = $key_data;
+                } elseif ($key_data[$criterion] == $value) {
+                    $results[$kid] = $key_data;
                 }
             }
-            if ($found) return $key;
         }
+
+        if (count($results) == 0) return null;
+        if (count($results) == 1) {
+            $kids = array_keys($results);
+            return $this->getById($kids[0]);
+        }
+
+        // Round 2: Optional criteria
+        $results = array_map(function($key_data) {
+            foreach ($criteria as $criterion => $value) {
+                $count = 0;
+
+                if ($criterion[0] != '~') continue;
+                $criterion = substr($criterion, 1);
+
+                if (isset($key_data[$criterion]) && ($key_data[$criterion] == $value)) {
+                    $count++;
+                }
+            }
+            return $count;
+        }, $results);
+        asort($results);
+        $kids = array_keys($results);
+        return $this->getById($kids[0]);
+
         return null;
     }
 

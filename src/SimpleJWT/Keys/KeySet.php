@@ -35,8 +35,14 @@
 
 namespace SimpleJWT\Keys;
 
+use SimpleJWT\JWE;
+use SimpleJWT\Crypt\CryptException;
+
 /**
  * A class representing a JSON web key set.
+ *
+ * This class supports plaintext JSON web key sets, as well as encrypted JSON web key sets
+ * encrypted using PBES2 and JWE compact serialization.
  */
 class KeySet {
     /** @var array the keys in this key set */
@@ -46,10 +52,21 @@ class KeySet {
      * Loads a set of keys into the key set.  The set of keys is encoded
      * in JSON Web Key (JWK) format.
      *
-     * @param string $jwk the JSON web key to load
+     * @param string $jwk the JSON web key set to load
+     * @param string $password the password, if the key set is password protected.
      * @throws KeyException if there is an error in reading a key
      */
-    function load($jwk) {
+    function load($jwk, $password = null) {
+        if ($password != null) {
+            $keys = KeySet::createFromSecret($password, 'bin');
+            try {
+                $jwe = JWE::decrypt($jwk, $keys);
+                $jwk = $jwe->getPlaintext();
+            } catch (CryptException $e) {
+                throw new KeyException('Cannot decrypt key set', 0, $e);
+            }
+        }
+
         $data = json_decode($jwk, true);
         foreach ($data['keys'] as $key_data) {
             $this->keys[] = KeyFactory::create($key_data, 'php');
@@ -59,13 +76,24 @@ class KeySet {
     /**
      * Returns a key set in JSON format.
      *
+     * @param string $password the password
      * @return string the key set
      */
-    function toJSON() {
+    function toJSON($password = null) {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);
-        return json_encode(array('keys' => $result));
+        $json = json_encode(array('keys' => $result));
+        if ($password == null) return $json;
+
+        $keys = KeySet::createFromSecret($password, 'bin');
+        $headers = array(
+            'alg' => 'PBES2-HS256+A128KW',
+            'enc' => 'A128CBC-HS256',
+            'cty' => 'jwk-set+json'
+        );
+        $jwe = new JWE($headers, $json);
+        return $jwe->encrypt($keys);
     }
 
     /**

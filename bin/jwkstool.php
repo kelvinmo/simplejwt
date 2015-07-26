@@ -49,18 +49,28 @@ use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Keys\KeySet;
 
 abstract class Command extends SymfonyCommand {
+
+    private $password = null;
+
     protected function configure() {
         $this->addArgument('jwks_file', InputArgument::REQUIRED, 'The file name of the key store');
+        $this->addOption('password', 'p', InputOption::VALUE_REQUIRED, 'The password used to encrypt the key store');
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output) {
+        if ($input->getOption('password')) {
+            $this->password = $input->getOption('password');
+        }
     }
 
     protected function loadKeySet($jwks) {
         $set = new KeySet();
-        $set->load($jwks);
+        $set->load($jwks, $this->password);
         return $set;
     }
 
     protected function saveKeySet($set) {
-        return $set->toJSON();
+        return $set->toJSON($this->password);
     }
 }
 
@@ -72,6 +82,10 @@ abstract class SelectKeyCommand extends Command {
         $this->addArgument('kid', InputArgument::OPTIONAL, 'Select the key with this ID');
         $this->addOption('use', null, InputOption::VALUE_REQUIRED, 'Select the key with this use');
         $this->addOption('op', null, InputOption::VALUE_REQUIRED, 'Select the key with this operation');
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output) {
+        parent::execute($input, $output);
     }
 
     protected function selectKey(InputInterface $input, OutputInterface $output) {
@@ -108,8 +122,9 @@ class AddCommand extends Command {
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
-        $key_file = $input->getArgument('key_file');
+        parent::execute($input, $output);
 
+        $key_file = $input->getArgument('key_file');
         if (!file_exists($key_file)) {
             $output->writeln('File not found: ' . $key_file);
             return 1;
@@ -161,6 +176,8 @@ class ListKeysCommand extends Command {
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
+        parent::execute($input, $output);
+
         $jwks_file = $input->getArgument('jwks_file');
 
         if (!file_exists($jwks_file)) {
@@ -204,8 +221,9 @@ class RemoveCommand extends SelectKeyCommand {
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
-        $jwks_file = $input->getArgument('jwks_file');
+        parent::execute($input, $output);
 
+        $jwks_file = $input->getArgument('jwks_file');
         if (!file_exists($jwks_file)) {
             $output->writeln('File not found: ' . $jwks_file);
             return 1;
@@ -233,8 +251,9 @@ class ExportCommand extends SelectKeyCommand {
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
-        $jwks_file = $input->getArgument('jwks_file');
+        parent::execute($input, $output);
 
+        $jwks_file = $input->getArgument('jwks_file');
         if (!file_exists($jwks_file)) {
             $output->writeln('File not found: ' . $jwks_file);
             return 1;

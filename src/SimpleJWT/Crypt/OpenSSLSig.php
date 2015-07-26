@@ -85,12 +85,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function sign($data, $keys, $kid = null) {
-        if ($kid == null) {
-            $key = $this->selectKey($keys);
-        } else {
-            $key = $this->selectKey($keys, array("kid" => $kid));
-        }
-
+        $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -126,12 +121,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        if ($kid == null) {
-            $key = $this->selectKey($keys);
-        } else {
-            $key = $this->selectKey($keys, array("kid" => $kid));
-        }
-
+        $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }

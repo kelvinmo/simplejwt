@@ -92,14 +92,29 @@ abstract class Algorithm {
     /**
      * Select the key from the key set that can be used by this algorithm.
      *
-     * The criteria can be specified directly, or if no criteria are supplied,
-     * the {@link getKeyCriteria()} function will be called.
+     * The criteria specified in this function is combined with the default
+     * criteria for the algorithm (through the {@link getKeyCriteria()} function)
+     * before it is bassed to the {@link SimpleJWT\Keys\KeySet::get()} function
+     * to retrieve the key.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set
-     * @param array $criteria the criteria
+     * `$criteria` can be one of the following:
+     *
+     * 1. `null`, in which case only the default criteria are used
+     * 2. a string containing the key ID; or
+     * 3. an array compatible with the {@link SimpleJWT\Keys\KeySet::get()} function
+     *
+     * @param SimpleJWT\Keys\KeySet $keys the key set from which the key will
+     * be selected
+     * @param array|string $criteria the criteria
      */
-    protected function selectKey($keys, $criteria = array()) {
-        $criteria = array_merge($this->getKeyCriteria(), $criteria);
+    protected function selectKey($keys, $criteria = null) {
+        if ($criteria == null) {
+            $criteria = $this->getKeyCriteria();
+        } elseif (is_string($criteria)) {
+            $criteria = array_merge($this->getKeyCriteria(), array("kid" => $criteria));
+        } else {
+            $criteria = array_merge($this->getKeyCriteria(), $criteria);
+        }
 
         return $keys->get($criteria);
     }

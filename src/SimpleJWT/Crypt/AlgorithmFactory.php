@@ -80,7 +80,7 @@ class AlgorithmFactory {
                 return new $cls($alg);
             }
         }
-        throw new \UnexpectedValueException('Algorithm not supported');
+        throw new \UnexpectedValueException('Algorithm not supported: ' . $alg);
     }
 
     /**

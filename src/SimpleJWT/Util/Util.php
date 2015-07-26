@@ -83,6 +83,20 @@ class Util {
     }
 
     /**
+     * Converts an interger into a 64-bit big-endian byte string.
+     *
+     * @param int $x the interger
+     * @return string the byte string
+     */
+    static function packInt64($x) {
+        if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
+            return pack('J', $x);
+        } else {
+            return "\x00\x00\x00\x00" . pack('N', $x);
+        }
+    }
+
+    /**
      * Obtains a number of random bytes.  This function uses an entropy source specified
      * in $rand_source or the OpenSSL or mcrypt extensions.  If
      * $rand_source is not available, the mt_rand() PHP function is used.

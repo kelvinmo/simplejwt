@@ -67,7 +67,7 @@ abstract class Algorithm {
      * by this class
      */
     protected function __construct($alg = null) {
-        if (($alg != null) && !in_array($alg, $this->getSupportedAlgs())) throw new \UnexpectedValueException('Algorithm not supported');
+        if (($alg != null) && !in_array($alg, $this->getSupportedAlgs())) throw new \UnexpectedValueException('Algorithm not supported: ' . $alg);
         $this->alg = $alg;
     }
 

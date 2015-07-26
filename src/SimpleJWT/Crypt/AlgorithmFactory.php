@@ -49,7 +49,12 @@ class AlgorithmFactory {
         '/none/' => 'SimpleJWT\Crypt\None',
         '/ES\d+/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/RS\d+/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/HS\d+/' => 'SimpleJWT\Crypt\HMAC'
+        '/HS\d+/' => 'SimpleJWT\Crypt\HMAC',
+
+        '/dir/' => 'SimpleJWT\Crypt\DirectEncryption',
+        '/A\d+KW/' => 'SimpleJWT\Crypt\AESKeyWrap',
+
+        '/A\d+CBC-HS\d+/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
     );
 
     private static $use_map = array(

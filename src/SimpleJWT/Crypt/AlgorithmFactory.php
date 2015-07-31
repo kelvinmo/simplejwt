@@ -46,7 +46,6 @@ namespace SimpleJWT\Crypt;
  */
 class AlgorithmFactory {
     static $alg_map = array(
-        '/^none$/' => 'SimpleJWT\Crypt\None',
         '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',

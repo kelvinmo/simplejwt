@@ -101,6 +101,43 @@ print $jwt->getHeader('alg');
 print $jwt->getClaim('sub');
 ```
 
+### Creating a JWE
+
+To create a JWE, set up the desired header array and plaintext, then
+create a `JWE` object:
+
+```php
+// Note $headers['alg'] and $headers['enc'] are required
+$headers = array('alg' => 'PBES2-HS256+A128KW', 'enc' => 'A128CBC-HS256');
+$plaintext = 'This is the plaintext I want to encrypt.';
+$jwt = new SimpleJWT\JWE($headers, $plaintext);
+```
+
+The JWT can then be encrypted:
+
+```php
+try {
+    print $jwt->encrypt($set);
+} catch (\RuntimeException $e) {
+
+}
+```
+
+### Decrypting a JWE
+
+To decrypt a JWE, use the decrypt function:
+
+```php
+try {
+    $jwt = SimpleJWT\JWT::decrypt('abc.def.ghi.klm.nop', $set, 'PBES2-HS256+A128KW');
+} catch (SimpleJWT\InvalidTokenException $e) {
+
+}
+
+print $jwt->getHeader('alg');
+print $jwt->getPlaintext();
+```
+
 ## License
 
 BSD 3 clause

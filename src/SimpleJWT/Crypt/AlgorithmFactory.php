@@ -60,16 +60,24 @@ class AlgorithmFactory {
     /**
      * Creates an algorithm given a specified `alg` or `enc` parameter.
      *
-     *
      * @param string $alg the `alg` or `enc` parameter
+     * @param string $use the expected use
      * @throws \UnexpectedValueException if the algorithm cannot be created
-     * (e.g. if it a required library is not present)
+     * (e.g. if it a required library is not present) or is not of the expected
+     * use
      * @return Algorithm the algorithm
-     * @throws \UnexpectedValueException if the algorithm is not supported
      */
-    static public function create($alg) {
+    static public function create($alg, $use = null) {
+        if (($use != null) && !isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');
+      
         foreach (self::$alg_map as $regex => $cls) {
             if (preg_match($regex, $alg)) {
+                if ($use != null) {
+                    $superclass = self::$use_map[$use];
+                  
+                    if (!is_subclass_of($cls, $superclass, true)) throw new \UnexpectedValueException('Unexpected use for algorithm: ' . $alg);
+                }
+              
                 return new $cls($alg);
             }
         }

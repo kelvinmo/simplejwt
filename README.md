@@ -39,30 +39,30 @@ can add keys in the following ways:
 
 1. By loading a JSON object formatted as a JWK Set object as per [RFC7517](http://tools.ietf.org/html/rfc7517):
 
-```php
-$set = new SimpleJWT\Keys\KeySet();
-$set->load(file_get_contents('private.json'));
-```
+  ```php
+  $set = new SimpleJWT\Keys\KeySet();
+  $set->load(file_get_contents('private.json'));
+  ```
 
 2. By adding a key manually:
 
-```php
-$set = new SimpleJWT\Keys\KeySet();
-
-// JWK format
-$key = new SimpleJWT\Keys\RSAKey(file_get_contents('jwk.json'), 'json');
-
-// PEM format - note raw key only, no X.509 certificates
-$key = new SimpleJWT\Keys\RSAKey(file_get_contents('rsa.pem'), 'pem');
-
-$set->add($key);
-```
+  ```php
+  $set = new SimpleJWT\Keys\KeySet();
+  
+  // JWK format
+  $key = new SimpleJWT\Keys\RSAKey(file_get_contents('jwk.json'), 'json');
+  
+  // PEM format - note raw key only, no X.509 certificates
+  $key = new SimpleJWT\Keys\RSAKey(file_get_contents('rsa.pem'), 'pem');
+  
+  $set->add($key);
+  ```
 
 3. For a secret used in HMAC signatures, directly:
 
-```php
-$set = SimpleJWT\Keys\KeySet::createFromSecret('secret123');
-```
+  ```php
+  $set = SimpleJWT\Keys\KeySet::createFromSecret('secret123');
+  ```
 
 ### Creating a JWT
 

@@ -86,7 +86,7 @@ try {
 }
 ```
 
-### Verfiying a JWT
+### Verifying a JWT
 
 To consume and verify a JWT, use the decode function:
 

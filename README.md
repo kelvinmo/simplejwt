@@ -88,11 +88,11 @@ try {
 
 ### Verifying a JWT
 
-To consume and verify a JWT, use the decode function:
+To consume and verify a JWT, use the decode function.  Note that you will need to supply the expected `alg` parameter that has been previously agreed out-of-band.
 
 ```php
 try {
-    $jwt = SimpleJWT\JWT::decode('abc.def.ghigjghr');
+    $jwt = SimpleJWT\JWT::decode('abc.def.ghigjghr', $set, 'HS256');
 } catch (SimpleJWT\InvalidTokenException $e) {
 
 }

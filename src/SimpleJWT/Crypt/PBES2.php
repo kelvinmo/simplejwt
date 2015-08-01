@@ -89,13 +89,13 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         return array('kty' => 'oct', '~alg' => $this->getAlg());
     }
 
+    /**
+     * Sets the number of iterations to use in PBKFD2 key generation.
+     *
+     * @param int $iterations number of iterations
+     */
     public function setIterations($iterations) {
         $this->iterations = $iterations;
-    }
-
-    // To enable testing
-    protected function generateSaltInput() {
-        return Util::random_bytes(8);
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
@@ -120,6 +120,16 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
 
         $derived_keyset = $this->getKeySetFromPassword($key->toBinary(), $headers);
         return $this->aeskw->decryptKey($encrypted_key, $derived_keyset, $headers);
+    }
+
+    /**
+     * Generates salt input.  This uses {@link SimpleJWT\Util\Util::random_bytes()}
+     * to generate random bytes.
+     *
+     * @return string the salt input
+     */
+    protected function generateSaltInput() {
+        return Util::random_bytes(8);
     }
 
     private function getKeySetFromPassword($password, $headers) {

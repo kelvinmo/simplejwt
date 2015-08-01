@@ -51,6 +51,8 @@ class AlgorithmFactory {
         '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',
 
         '/^dir$/' => 'SimpleJWT\Crypt\DirectEncryption',
+        '/^RSA1_5$/' => 'SimpleJWT\Crypt\RSAES',
+        '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\RSAES',
         '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
         '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
 

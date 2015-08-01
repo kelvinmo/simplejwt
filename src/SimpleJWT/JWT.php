@@ -93,7 +93,9 @@ class JWT {
     public static function decode($token, $keys, $expected_alg, $kid = null, $format = self::COMPACT_FORMAT) {
         switch ($format) {
             case self::COMPACT_FORMAT:
-                list($protected, $payload, $signature) = explode('.', $token, 3);
+                $parts = explode('.', $token, 3);
+                if (count($parts) != 3) InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
+                list($protected, $payload, $signature) = $parts;
                 break;
             case self::JSON_FORMAT:
                 $obj = json_decode($token, true);

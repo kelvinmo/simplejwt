@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\ASN1Util;
 use SimpleJWT\Util\Util;
@@ -85,7 +86,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function sign($data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid);
+        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => false));
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -121,7 +122,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid);
+        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true));
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }

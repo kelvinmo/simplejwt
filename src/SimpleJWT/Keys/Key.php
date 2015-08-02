@@ -43,7 +43,8 @@ use SimpleJWT\Util\Util;
 abstract class Key {
     const PEM_PUBLIC = '/-----BEGIN PUBLIC KEY-----([^-:]+)-----END PUBLIC KEY-----/';
 
-    const SIZE_PROPERTY = 'https://github.com/kelvinmo/simplejwt/#jwk:keysize';
+    const SIZE_PROPERTY = '#size';
+    const PUBLIC_PROPERTY = '#public';
 
     protected $data;
 

@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
-use SimpleJWT\Util\ASN1Util;
+use SimpleJWT\Util\ASN1;
 
 /**
  * A factory object for creating `Key` objects.
@@ -117,11 +117,11 @@ class KeyFactory {
 
                 $offset = 0;
 
-                $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                $offset += ASN1Util::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
+                $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                $offset += ASN1::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
 
-                $oid = ASN1Util::decodeOID($algorithm);
+                $oid = ASN1::decodeOID($algorithm);
                 if (isset(self::$oid_map[$oid])) {
                     return new self::$oid_map[$oid]($data, 'pem');
                 }

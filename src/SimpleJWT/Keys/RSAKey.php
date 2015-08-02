@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
-use SimpleJWT\Util\ASN1Util;
+use SimpleJWT\Util\ASN1;
 use SimpleJWT\Util\Util;
 
 /**
@@ -78,19 +78,19 @@ class RSAKey extends Key {
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
+                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
 
-                    $algorithm = ASN1Util::decodeOID($algorithm);
+                    $algorithm = ASN1::decodeOID($algorithm);
                     if ($algorithm != self::OID) throw new KeyException('Not RSA key');
 
 
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // NULL - parameters
-                    $offset += ASN1Util::readDER($der, $offset, $value, true);  // BIT STRING
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $n);  // INTEGER [n]
-                    $offset += ASN1Util::readDER($der, $offset, $e);  // INTEGER [e]
+                    $offset += ASN1::readDER($der, $offset, $value);  // NULL - parameters
+                    $offset += ASN1::readDER($der, $offset, $value, true);  // BIT STRING
+                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $n);  // INTEGER [n]
+                    $offset += ASN1::readDER($der, $offset, $e);  // INTEGER [e]
 
                     $jwk['kty'] = self::KTY;
                     $jwk['n'] = Util::base64url_encode($n);
@@ -100,20 +100,20 @@ class RSAKey extends Key {
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1Util::readDER($der, $offset, $data);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $version);  // INTEGER
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
 
                     if (ord($version) != 0) throw new KeyException('Unsupported RSA private key version');
 
-                    $offset += ASN1Util::readDER($der, $offset, $n);  // INTEGER [n]
-                    $offset += ASN1Util::readDER($der, $offset, $e);  // INTEGER [e]
-                    $offset += ASN1Util::readDER($der, $offset, $d);  // INTEGER [d]
-                    $offset += ASN1Util::readDER($der, $offset, $p);  // INTEGER [p]
-                    $offset += ASN1Util::readDER($der, $offset, $q);  // INTEGER [q]
-                    $offset += ASN1Util::readDER($der, $offset, $dp);  // INTEGER [dp]
-                    $offset += ASN1Util::readDER($der, $offset, $dq);  // INTEGER [dq]
-                    $offset += ASN1Util::readDER($der, $offset, $qi);  // INTEGER [qi]
-                    if (strlen($der) > $offset) ASN1Util::readDER($der, $offset, $oth);  // INTEGER [other]
+                    $offset += ASN1::readDER($der, $offset, $n);  // INTEGER [n]
+                    $offset += ASN1::readDER($der, $offset, $e);  // INTEGER [e]
+                    $offset += ASN1::readDER($der, $offset, $d);  // INTEGER [d]
+                    $offset += ASN1::readDER($der, $offset, $p);  // INTEGER [p]
+                    $offset += ASN1::readDER($der, $offset, $q);  // INTEGER [q]
+                    $offset += ASN1::readDER($der, $offset, $dp);  // INTEGER [dp]
+                    $offset += ASN1::readDER($der, $offset, $dq);  // INTEGER [dq]
+                    $offset += ASN1::readDER($der, $offset, $qi);  // INTEGER [qi]
+                    if (strlen($der) > $offset) ASN1::readDER($der, $offset, $oth);  // INTEGER [other]
 
                     $jwk['kty'] = self::KTY;
                     $jwk['n'] = Util::base64url_encode($n);
@@ -155,16 +155,16 @@ class RSAKey extends Key {
 
     public function toPEM() {
         if ($this->isPublic()) {
-            $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                    ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID(self::OID))
-                    . ASN1Util::encodeDER(ASN1Util::NULL_TYPE),
+            $der = ASN1::encodeDER(ASN1::SEQUENCE,
+                ASN1::encodeDER(ASN1::SEQUENCE,
+                    ASN1::encodeDER(ASN1::OID, ASN1::encodeOID(self::OID))
+                    . ASN1::encodeDER(ASN1::NULL_TYPE),
                     false
                 ) .
-                ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00).
-                    ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                        ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
-                         . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['e'])),
+                ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00).
+                    ASN1::encodeDER(ASN1::SEQUENCE,
+                        ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
+                         . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['e'])),
                         false
                     )
                 ),
@@ -172,16 +172,16 @@ class RSAKey extends Key {
 
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($der) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
-            $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, chr(0))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['e']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['d']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['p']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['q']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['dp']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['dq']))
-                . ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, Util::base64url_decode($this->data['qi'])),
+            $der = ASN1::encodeDER(ASN1::SEQUENCE,
+                ASN1::encodeDER(ASN1::INTEGER_TYPE, chr(0))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['e']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['d']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['p']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['q']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['dp']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['dq']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['qi'])),
             false);
 
             return wordwrap("-----BEGIN RSA PRIVATE KEY-----\n" . base64_encode($der) . "\n-----END RSA PRIVATE KEY-----\n", 64, "\n", true);

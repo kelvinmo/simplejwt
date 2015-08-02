@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
-use SimpleJWT\Util\ASN1Util;
+use SimpleJWT\Util\ASN1;
 use SimpleJWT\Util\Util;
 
 /**
@@ -90,20 +90,20 @@ class ECKey extends Key {
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
+                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
 
-                    $algorithm = ASN1Util::decodeOID($algorithm);
+                    $algorithm = ASN1::decodeOID($algorithm);
                     if ($algorithm != self::EC_OID) throw new KeyException('Not EC key');
 
-                    $offset += ASN1Util::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1Util::decodeOID($curve);
+                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
+                    $curve = ASN1::decodeOID($curve);
                     if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
 
                     $len = self::$curves[$curve]['len'];
 
-                    $offset += ASN1Util::readDER($der, $offset, $point);  // BIT STRING - ECPoint
+                    $offset += ASN1::readDER($der, $offset, $point);  // BIT STRING - ECPoint
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect public key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid public key');  // W
@@ -120,22 +120,22 @@ class ECKey extends Key {
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1Util::readDER($der, $offset, $data);  // SEQUENCE
-                    $offset += ASN1Util::readDER($der, $offset, $version);  // INTEGER
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
 
                     if (ord($version) != 1) throw new KeyException('Invalid private key version');
 
-                    $offset += ASN1Util::readDER($der, $offset, $d);  // OCTET STRING [d]
+                    $offset += ASN1::readDER($der, $offset, $d);  // OCTET STRING [d]
 
-                    $offset += ASN1Util::readDER($der, $offset, $data);  // SEQUENCE[0]
-                    $offset += ASN1Util::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1Util::decodeOID($curve);
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[0]
+                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
+                    $curve = ASN1::decodeOID($curve);
                     if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
 
                     $len = self::$curves[$curve]['len'];
 
-                    $offset += ASN1Util::readDER($der, $offset, $data);  // SEQUENCE[1]
-                    $offset += ASN1Util::readDER($der, $offset, $point);  // BIT STRING - ECPoint
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[1]
+                    $offset += ASN1::readDER($der, $offset, $point);  // BIT STRING - ECPoint
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
@@ -182,22 +182,22 @@ class ECKey extends Key {
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
 
         if ($this->isPublic()) {
-            $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                    ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID(self::EC_OID))
-                    . ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID($oid)),
+            $der = ASN1::encodeDER(ASN1::SEQUENCE,
+                ASN1::encodeDER(ASN1::SEQUENCE,
+                    ASN1::encodeDER(ASN1::OID, ASN1::encodeOID(self::EC_OID))
+                    . ASN1::encodeDER(ASN1::OID, ASN1::encodeOID($oid)),
                     false
                 ) .
-                ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])),
+                ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])),
             false);
 
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($der) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
-            $der = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, chr(0x01))
-                . ASN1Util::encodeDER(ASN1Util::OCTET_STRING, Util::base64url_decode($this->data['d']))
-                . ASN1Util::encodeDER(0x00, ASN1Util::encodeDER(ASN1Util::OID, ASN1Util::encodeOID($oid)), false, ASN1Util::CONTEXT_CLASS)
-                . ASN1Util::encodeDER(0x01, ASN1Util::encodeDER(ASN1Util::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])), false, ASN1Util::CONTEXT_CLASS),
+            $der = ASN1::encodeDER(ASN1::SEQUENCE,
+                ASN1::encodeDER(ASN1::INTEGER_TYPE, chr(0x01))
+                . ASN1::encodeDER(ASN1::OCTET_STRING, Util::base64url_decode($this->data['d']))
+                . ASN1::encodeDER(0x00, ASN1::encodeDER(ASN1::OID, ASN1::encodeOID($oid)), false, ASN1::CONTEXT_CLASS)
+                . ASN1::encodeDER(0x01, ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])), false, ASN1::CONTEXT_CLASS),
             false);
 
             return wordwrap("-----BEGIN EC PRIVATE KEY-----\n" . base64_encode($der) . "\n-----END EC PRIVATE KEY-----\n", 64, "\n", true);

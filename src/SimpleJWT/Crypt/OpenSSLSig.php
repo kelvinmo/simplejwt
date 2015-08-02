@@ -37,7 +37,7 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeyException;
-use SimpleJWT\Util\ASN1Util;
+use SimpleJWT\Util\ASN1;
 use SimpleJWT\Util\Util;
 
 /**
@@ -101,9 +101,9 @@ class OpenSSLSig extends SHA2 {
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
             // OpenSSL returns ECDSA signatures as an ASN.1 DER SEQUENCE
             $offset = 0;
-            $offset += ASN1Util::readDER($binary, $offset, $value);  // SEQUENCE
-            $offset += ASN1Util::readDER($binary, $offset, $r);  // INTEGER
-            $offset += ASN1Util::readDER($binary, $offset, $s);  // INTEGER
+            $offset += ASN1::readDER($binary, $offset, $value);  // SEQUENCE
+            $offset += ASN1::readDER($binary, $offset, $r);  // INTEGER
+            $offset += ASN1::readDER($binary, $offset, $s);  // INTEGER
 
             // DER integers are big-endian in two's complement form. We need to
             // convert these to unsigned integers.  But the r and s values are always
@@ -141,9 +141,9 @@ class OpenSSLSig extends SHA2 {
             if (ord($r[0]) > 0x7f) $r = "\x00" . $r;
             if (ord($s[0]) > 0x7f) $s = "\x00" . $s;
 
-            $binary = ASN1Util::encodeDER(ASN1Util::SEQUENCE,
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, $r) .
-                ASN1Util::encodeDER(ASN1Util::INTEGER_TYPE, $s),
+            $binary = ASN1::encodeDER(ASN1::SEQUENCE,
+                ASN1::encodeDER(ASN1::INTEGER_TYPE, $r) .
+                ASN1::encodeDER(ASN1::INTEGER_TYPE, $s),
             false);
         }
 

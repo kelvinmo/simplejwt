@@ -155,23 +155,28 @@ class KeySet {
      */
     function get($criteria) {
         $results = array();
-
+        
         // Round 1: All mandatory criteria
         foreach ($this->keys as $key) {
             $key_data = $key->getKeyData();
             $key_data[Key::SIZE_PROPERTY] = $key->getSize();
+            $key_data[Key::PUBLIC_PROPERTY] = $key->isPublic();
             $kid = $key->getKeyId();
 
             // Round 1: All mandatory criteria
+            $found = true;
             foreach ($criteria as $criterion => $value) {
                 if ($criterion[0] == '~') continue;
 
-                if (is_array($value) && (count(array_diff($value, $key_data[$criterion]) > 0))) {
-                    $results[$kid] = $key_data;
-                } elseif ($key_data[$criterion] == $value) {
-                    $results[$kid] = $key_data;
+                if (is_array($value) && (array_diff($value, $key_data[$criterion]) !== array_diff($key_data[$criterion], $value))) {
+                    $found = false;
+                    break;
+                } elseif ($key_data[$criterion] != $value) {
+                    $found = false;
+                    break;
                 }
             }
+            if ($found) $results[$kid] = $key_data;
         }
 
         if (count($results) == 0) return null;
@@ -181,7 +186,7 @@ class KeySet {
         }
 
         // Round 2: Optional criteria
-        $results = array_map(function($key_data) {
+        $results = array_map(function($key_data) use ($criteria) {
             foreach ($criteria as $criterion => $value) {
                 $count = 0;
 

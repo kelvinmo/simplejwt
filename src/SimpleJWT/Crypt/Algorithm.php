@@ -107,13 +107,19 @@ abstract class Algorithm {
      * be selected
      * @param array|string $criteria the criteria
      */
-    protected function selectKey($keys, $criteria = null) {
-        if ($criteria == null) {
-            $criteria = $this->getKeyCriteria();
-        } elseif (is_string($criteria)) {
-            $criteria = array_merge($this->getKeyCriteria(), array("kid" => $criteria));
-        } else {
-            $criteria = array_merge($this->getKeyCriteria(), $criteria);
+    protected function selectKey() {
+        $args = func_get_args();
+        $keys = array_shift($args);
+        
+        $criteria = $this->getKeyCriteria();
+        
+        foreach ($args as $arg) {
+            if ($arg == null) continue;
+            if (is_string($arg)) {
+                $criteria = array_merge($criteria, array("kid" => $arg));
+            } elseif (is_array($arg)) {
+                $criteria = array_merge($criteria, $arg);
+            }
         }
 
         return $keys->get($criteria);

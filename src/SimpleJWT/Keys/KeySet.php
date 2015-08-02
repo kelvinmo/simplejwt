@@ -86,6 +86,24 @@ class KeySet {
 
         $this->keys[] = $key;
     }
+    
+    /**
+     * Adds all the keys from another key set.
+     * 
+     * This function calls the {@link add()} function on all the keys in the
+     * specified key set.
+     * 
+     * @param KeySet $set the key set containing the keys to add
+     */
+    function addAll($set) {
+        foreach ($set->keys as $key) {
+            try {
+                $this->add($key);
+            } catch (KeyException $e) {
+                // ignore
+            }
+        }
+    }
 
     /**
      * Returns all the keys in the key set as `Key` objects

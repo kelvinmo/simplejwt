@@ -122,7 +122,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true));
+        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true, '~use' => 'sig'));
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }

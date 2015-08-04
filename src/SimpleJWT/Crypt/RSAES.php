@@ -73,7 +73,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true));
+        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true, '~use' => 'enc'));
         if (($key == null) || !$key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }

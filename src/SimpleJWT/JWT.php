@@ -53,8 +53,8 @@ use SimpleJWT\Util\Util;
  * functions.
  */
 class JWT {
-    const COMPACT_FORMAT = 0;
-    const JSON_FORMAT = 1;
+    const COMPACT_FORMAT = 'compact';
+    const JSON_FORMAT = 'json';
 
     static public $TIME_ALLOWANCE = 300;
 
@@ -86,7 +86,7 @@ class JWT {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use to verify the signature. If null, this
      * is automatically retrieved
-     * @param int $format the JWT serialisation format
+     * @param string $format the JWT serialisation format
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
@@ -218,7 +218,7 @@ class JWT {
      * @param bool $include_iat if true, override the `iat` header with the current
      * time
      * @param string $alg if not null, override the `alg` header
-     * @param int $format the JWT serialisation format
+     * @param string $format the JWT serialisation format
      * @return string the signed and serialised JWT
      * @throws SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT

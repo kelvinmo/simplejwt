@@ -42,8 +42,8 @@ use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Util\Util;
 
 class JWE {
-    const COMPACT_FORMAT = 0;
-    const JSON_FORMAT = 1;
+    const COMPACT_FORMAT = 'compact';
+    const JSON_FORMAT = 'json';
 
     protected $headers = array('typ' => 'JWE');
 
@@ -68,7 +68,7 @@ class JWE {
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
-     * @param int $format the JWE serialisation format
+     * @param string $format the JWE serialisation format
      * @return JWE the decrypted JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
@@ -223,7 +223,7 @@ class JWE {
      * content encryption key
      * @param string $kid the ID of the key to use to encrypt. If null, this
      * is automatically retrieved
-     * @param int $format the JWE serialisation format
+     * @param string $format the JWE serialisation format
      * @return string the encrypted JWE
      * @throws SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT

@@ -36,6 +36,7 @@
 namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
+use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
@@ -123,6 +124,16 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     /**
+     * Returns the required key size for the AES key wrap key
+     *
+     * @return int the key size, in bits
+     */
+    protected function getAESKWKeySize() {
+        $criteria = $this->aeskw->getKeyCriteria();
+        return $criteria[Key::SIZE_PROPERTY];
+    }
+
+    /**
      * Generates salt input.  This uses {@link SimpleJWT\Util\Util::random_bytes()}
      * to generate random bytes.
      *
@@ -135,7 +146,7 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     private function getKeySetFromPassword($password, $headers) {
         $salt = $headers['alg'] . "\x00" . Util::base64url_decode($headers['p2s']);
 
-        $hash = hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], 0, true);
+        $hash = hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);
         $keys = new KeySet();
         $keys->add(new SymmetricKey($hash, 'bin'));
         return $keys;

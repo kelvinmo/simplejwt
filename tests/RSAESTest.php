@@ -89,9 +89,9 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
         $headers = array();
 
         $alg = new RSAES('RSA-OAEP-256');
-        $encrypted_key = $stub->encryptKey($cek, $public_set, $headers);
+        $encrypted_key = $alg->encryptKey($cek, $public_set, $headers);
 
-        $new_cek = $stub->decryptKey($encrypted_key, $private_set, $headers);
+        $new_cek = $alg->decryptKey($encrypted_key, $private_set, $headers);
         $this->assertEquals(base64_encode($cek), base64_encode($new_cek));
     }
 }

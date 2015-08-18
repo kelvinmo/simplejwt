@@ -46,9 +46,9 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     const RFC3394_IV = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
 
     static protected $alg_params = array(
-        'A128KW' => array('cipher' => 'AES-128-ECB', 'key' => 32),
-        'A192KW' => array('cipher' => 'AES-192-ECB', 'key' => 48),
-        'A256KW' => array('cipher' => 'AES-256-ECB', 'key' => 64),
+        'A128KW' => array('cipher' => 'AES-128-ECB', 'key' => 16),
+        'A192KW' => array('cipher' => 'AES-192-ECB', 'key' => 24),
+        'A256KW' => array('cipher' => 'AES-256-ECB', 'key' => 32),
     );
 
     public function __construct($alg) {

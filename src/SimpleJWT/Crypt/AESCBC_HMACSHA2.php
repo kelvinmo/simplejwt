@@ -111,13 +111,13 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
         list($mac_key, $enc_key) = str_split($cek, (int) (strlen($cek) / 2));
         $al = Util::packInt64(strlen($additional) * 8);
 
-        $m = hash_hmac($params['hash'], $additional . $iv . $ciphertext . $al, $mac_key, true);
+        $e = Util::base64url_decode($ciphertext);
+        $m = hash_hmac($params['hash'], $additional . $iv . $e . $al, $mac_key, true);
         $t = substr($m, 0, $params['tag']);
 
         if (!Util::secure_compare(Util::base64url_decode($tag), $t)) throw new CryptException('Authentication tag does not match');
-
-        $ciphertext = Util::base64url_decode($ciphertext);
-        $plaintext = openssl_encrypt($ciphertext, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
+        
+        $plaintext = openssl_decrypt($e, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
 
         return $plaintext;
     }

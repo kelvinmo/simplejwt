@@ -36,7 +36,12 @@
 namespace SimpleJWT\Crypt;
 
 /**
- * Interface for key encryption algorithms.
+ * Interface for key encryption algorithms.  These are used for the following
+ * JWE key management modes:
+ *
+ * - key encryption
+ * - key wrapping
+ * - key agreement with key wrapping (which will also implement {@link KeyDerivationAlgorithm})
  */
 interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
     /**

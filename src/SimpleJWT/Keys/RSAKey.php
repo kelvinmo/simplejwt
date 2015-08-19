@@ -55,19 +55,20 @@ class RSAKey extends Key {
      *
      * - `php` - JSON web key formatted as a PHP associative array
      * - `json` - JSON web key
+     * - `jwe` - Encrypted JSON web key
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
      *
      * @param string|array $data the key data
      * @param string $format the format
+     * @param string $password the password, if the key is password protected
+     * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format) {
+    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
-                parent::__construct($data);
-                break;
             case 'json':
-                $jwk = json_decode($data, true);
-                parent::__construct($jwk);
+            case 'jwe':
+                parent::__construct($data, $format, $password, $alg);
                 break;
             case 'pem':
                 $offset = 0;

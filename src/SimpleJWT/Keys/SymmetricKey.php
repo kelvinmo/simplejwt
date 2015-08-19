@@ -50,21 +50,22 @@ class SymmetricKey extends Key {
      *
      * - `php` - JSON web key formatted as a PHP associative array
      * - `json` - JSON web key
+     * - `jwe` - Encrypted JSON web key
      * - `base64url` - the symmetric key encoded in Base64url format
      * - `base64` - the symmetric key encoded in Base64 format
      * - `bin` - the symmetric key encoded in binary format
      *
      * @param string|array $data the key data
      * @param string $format the format
+     * @param string $password the password, if the key is password protected
+     * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format) {
+    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
-                parent::__construct($data);
-                break;
             case 'json':
-                $jwk = json_decode($data, true);
-                parent::__construct($jwk);
+            case 'jwe':
+                parent::__construct($data, $format, $password, $alg);
                 break;
             case 'base64url':
                 $jwk = array(

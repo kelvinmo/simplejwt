@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Keys;
 
+use SimpleJWT\JWE;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 
 /**
@@ -49,14 +51,61 @@ abstract class Key {
     protected $data;
 
     /**
-     * Creates a key
+     * Creates a key.  By default the following formats are supported:
      *
-     * @param array the underlying key parameters, in JSON web key format
+     * - `php` - JSON web key formatted as a PHP associative array
+     * - `json` - JSON web key
+     * - `jwe` - Encrypted JSON web key
+     *
+     * Subclasses may support additional formats.
+     *
+     * @param array $data the underlying key parameters, in JSON web key format
+     * @param string $format the format
+     * @param string $password the password, if the key is password protected
+     * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data = array()) {
-        $this->data = $data;
+    public function __construct($data = array(), $format = 'php', $password = null, $alg = 'PBES2-HS256+A128KW') {
+        switch ($format) {
+            case 'php':
+                $this->data = $data;
+                break;
+            case 'json':
+                $jwk = json_decode($data, true);
+
+                if (isset($jwk['ciphertext'])) {
+                    $this->data = self::decrypt($data, $password, $alg);
+                } else {
+                    $this->data = $jwk;
+                }
+                break;
+            case 'jwe':
+                $this->data = self::decrypt($data, $password, $alg);
+        }
+
         if (!isset($data['kid'])) {
             $this->data['kid'] = substr($this->getSignature(), 0, 7);
+        }
+    }
+
+    /**
+     * Decrypts an encrypted JSON web key
+     *
+     * @param array $data the underlying key parameters, in JSON web key format
+     * @param string $password the password, if the key is password protected
+     * @param string $alg the algorithm, if the key is password protected
+     * @return array the decrypted data
+     */
+    private static function decrypt($data, $password, $alg) {
+        if ($password == null) {
+            throw new KeyException('No password for encrypted key');
+        } else {
+            $keys = KeySet::createFromSecret($password, 'bin');
+            try {
+                $jwe = JWE::decrypt($data, $keys, $alg, (isset($data['ciphertext'])) ? JWE::JSON_FORMAT : JWE::COMPACT_FORMAT);
+                return json_decode($jwe->getPlaintext());
+            } catch (CryptException $e) {
+                throw new KeyException('Cannot decrypt key', 0, $e);
+            }
         }
     }
 
@@ -164,12 +213,29 @@ abstract class Key {
     }
 
     /**
-     * Returns the key in JSON format
+     * Returns a key as a JSON web key.
      *
-     * @return string the key in JSON format
+     * If `$password` is null or if the key is a public key, an unencrypted JSON
+     * structure is returned.
+     *
+     * If `$password` is not null and the key is a private key, a JWE is created
+     * using PBES2 key encryption.
+     *
+     * @param string $password the password
+     * @return string the key set
      */
-    public function toJSON() {
-        return json_encode($this->data);
+    public function toJWK($password = null) {
+        $json = json_encode($this->data);
+        if (($password == null) || $this->isPublic()) return $json;
+
+        $keys = KeySet::createFromSecret($password, 'bin');
+        $headers = array(
+            'alg' => 'PBES2-HS256+A128KW',
+            'enc' => 'A128CBC-HS256',
+            'cty' => 'jwk+json'
+        );
+        $jwe = new JWE($headers, $json);
+        return $jwe->encrypt($keys);
     }
 
     /**

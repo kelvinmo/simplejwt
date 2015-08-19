@@ -50,17 +50,18 @@ class KeySet {
 
     /**
      * Loads a set of keys into the key set.  The set of keys is encoded
-     * in JSON Web Key (JWK) format.
+     * in JSON Web Key Set (JWKS) format.
      *
      * @param string $jwk the JSON web key set to load
-     * @param string $password the password, if the key set is password protected.
+     * @param string $password the password, if the key set is password protected
+     * @param string $alg the algorithm, if the key set is password protected
      * @throws KeyException if there is an error in reading a key
      */
-    function load($jwk, $password = null) {
+    function load($jwk, $password = null, $alg = 'PBES2-HS256+A128KW') {
         if ($password != null) {
             $keys = KeySet::createFromSecret($password, 'bin');
             try {
-                $jwe = JWE::decrypt($jwk, $keys);
+                $jwe = JWE::decrypt($jwk, $keys, $alg);
                 $jwk = $jwe->getPlaintext();
             } catch (CryptException $e) {
                 throw new KeyException('Cannot decrypt key set', 0, $e);
@@ -74,12 +75,16 @@ class KeySet {
     }
 
     /**
-     * Returns a key set in JSON format.
+     * Returns a key set as a JSON web key set.
+     *
+     * If `$password` is null, an unencrypted JSON structure is returned.
+     *
+     * If `$password` is not null, a JWE is created using PBES2 key encryption.
      *
      * @param string $password the password
      * @return string the key set
      */
-    function toJSON($password = null) {
+    function toJWKS($password = null) {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);
@@ -114,13 +119,13 @@ class KeySet {
 
         $this->keys[] = $key;
     }
-    
+
     /**
      * Adds all the keys from another key set.
-     * 
+     *
      * This function calls the {@link add()} function on all the keys in the
      * specified key set.
-     * 
+     *
      * @param KeySet $set the key set containing the keys to add
      */
     function addAll($set) {
@@ -183,7 +188,7 @@ class KeySet {
      */
     function get($criteria) {
         $results = array();
-        
+
         // Round 1: All mandatory criteria
         foreach ($this->keys as $key) {
             $key_data = $key->getKeyData();

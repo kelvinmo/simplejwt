@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Keys;
 
+use SimpleJWT\JWE;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\ASN1;
 
 /**
@@ -74,19 +76,24 @@ class KeyFactory {
      * - `php` - JSON web key formatted as a PHP associative array
      * - `json` - JSON web key
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
+     * - `jwe` - Encrypted JSON web key
      *
      * @param string $data the key data
      * @param string $format the format
+     * @param string $password the password, if the key is password protected
+     * @param string $alg the algorithm, if the key is password protected
      * @return Key the key object
      * @throws KeyException if an error occurs in reading the data
      */
-    static public function create($data, $format = null) {
+    static public function create($data, $format = null, $password = null, $alg = 'PBES2-HS256+A128KW') {
         // 1. Detect format
         if (($format == null) || ($format == 'auto')) {
             if (is_array($data)) {
                 $format = 'php';
             } elseif (json_decode($data, true) != null) {
                 $format = 'json';
+            } elseif (substr_count($data, '.') == 5) {
+                $format = 'jwe';
             } elseif (preg_match('/-----([^-:]+)-----/', $data)) {
                 $format = 'pem';
             }
@@ -96,11 +103,32 @@ class KeyFactory {
 
         // 2. Decode JSON
         if ($format == 'json') {
-            $data = json_decode($data, true);
-            $format = 'php';
+            $json = json_decode($data, true);
+            if (isset($json['ciphertext'])) {
+                $format = 'jwe';
+            } else {
+                $data = $json;
+                $format = 'php';
+            }
         }
 
-        // 3. PHP/JSON
+        // 3. JWE
+        if ($format == 'jwe') {
+            if ($password == null) {
+                throw new KeyException('No password for encrypted key');
+            } else {
+                $keys = KeySet::createFromSecret($password, 'bin');
+                try {
+                    $jwe = JWE::decrypt($data, $keys, $alg, (isset($data['ciphertext'])) ? JWE::JSON_FORMAT : JWE::COMPACT_FORMAT);
+                    $data = json_decode($jwe->getPlaintext());
+                    $format = 'php';
+                } catch (CryptException $e) {
+                    throw new KeyException('Cannot decrypt key', 0, $e);
+                }
+            }
+        }
+
+        // 4. PHP/JSON
         if ($format == 'php') {
             if (($data != null) && isset($data['kty'])) {
                 if (isset(self::$jwk_kty_map[$data['kty']])) {
@@ -134,6 +162,7 @@ class KeyFactory {
             }
         }
 
+        // 5. Symmetric key
         if (($format == 'base64url') || ($format == 'base64') || ($format == 'bin')) {
             return new SymmetricKey($data, $format);
         }

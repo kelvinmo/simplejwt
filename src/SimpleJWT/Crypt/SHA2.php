@@ -54,7 +54,7 @@ abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
 
     public function shortHash($data) {
         $hash = hash('sha' . $this->size, $data, true);
-        $short = substr($hash, $this->size / 16);
+        $short = substr($hash, 0, $this->size / 16);
         return Util::base64url_encode($short);
     }
 }

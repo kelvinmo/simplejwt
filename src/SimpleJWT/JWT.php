@@ -226,7 +226,7 @@ class JWT {
      */
     public function encode($keys, $kid = null, $include_iat = true, $alg = null, $format = self::COMPACT_FORMAT) {
         if ($alg != null) $this->headers['alg'] = $alg;
-        if ($include_iat) $this->headers['iat'] = time();
+        if ($include_iat && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
             $signer = AlgorithmFactory::create($this->headers['alg']);

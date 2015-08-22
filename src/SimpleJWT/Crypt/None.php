@@ -63,6 +63,10 @@ abstract class None extends Algorithm implements SignatureAlgorithm {
         if ($kid != null) return false;
         return ($signature === '');
     }
+
+    public function getSigningKey($keys, $kid = null) {
+        return null;
+    }
 }
 
 ?>

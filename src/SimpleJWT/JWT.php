@@ -234,6 +234,8 @@ class JWT {
         } catch (\UnexpectedValueException $e) {
             throw new CryptException($e->getMessage(), 0, $e);
         }
+        $key = $signer->getSigningKey($keys, $kid);
+        if ($key != null) $protected['kid'] = $key->getKeyId();
         $protected = Util::base64url_encode(json_encode($this->headers));
         $payload = Util::base64url_encode(json_encode($this->claims));
         $signing_input = $protected . '.' . $payload;

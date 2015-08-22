@@ -71,6 +71,17 @@ interface SignatureAlgorithm {
     public function verify($signature, $data, $keys, $kid = null);
 
     /**
+     * Obtains the key that will be used to sign the payload.
+     *
+     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * to be used to sign the payload
+     * @param string $kid the ID of the key to be used. If null the key will
+     * be chosen automatically.
+     * @return SimpleJWT\Keys\Key the signing key
+     */
+    public function getSigningKey($keys, $kid = null);
+
+    /**
      * Calculates an OpenID Connect short hash of a payload.
      *
      * The short hash is the left-most half of the hash, with the hash algorithm

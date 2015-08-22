@@ -79,6 +79,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
         }
+        $headers['kid'] = $key->getKeyId();
 
         if ((strlen($cek) % 8) != 0) throw new CryptException('Content encryption key not a multiple of 64 bits');
 

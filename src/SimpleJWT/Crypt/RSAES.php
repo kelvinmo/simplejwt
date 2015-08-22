@@ -77,6 +77,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
         if (($key == null) || !$key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }
+        $headers['kid'] = $key->getKeyId();
 
         $params = self::$alg_params[$this->getAlg()];
 

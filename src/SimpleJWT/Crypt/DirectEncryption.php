@@ -60,6 +60,7 @@ class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
         }
+        $headers['kid'] = $key->getKeyId();
 
         return $key->toBinary();
     }

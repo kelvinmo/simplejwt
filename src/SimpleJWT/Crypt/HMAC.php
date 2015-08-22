@@ -68,7 +68,7 @@ class HMAC extends SHA2 {
     }
 
     public function sign($data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid);        
+        $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !is_a($key, 'SimpleJWT\Keys\SymmetricKey')) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -78,6 +78,10 @@ class HMAC extends SHA2 {
     public function verify($signature, $data, $keys, $kid = null) {
         $compare = $this->sign($data, $keys, $kid);
         return Util::secure_compare($signature, $compare);
+    }
+
+    public function getSigningKey($keys, $kid = null) {
+        return $this->selectKey($keys, $kid);
     }
 }
 

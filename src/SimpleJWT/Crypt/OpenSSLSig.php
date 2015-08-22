@@ -86,7 +86,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function sign($data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => false));
+        $key = $this->getSigningKey($keys, $kid);
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -163,6 +163,10 @@ class OpenSSLSig extends SHA2 {
                 return false;
                 break;
         }
+    }
+
+    public function getSigningKey($keys, $kid = null) {
+        return $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => false));
     }
 }
 

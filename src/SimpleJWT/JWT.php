@@ -148,6 +148,7 @@ class JWT {
         $signing_input = $protected . '.' . $payload;
 
         try {
+            if (isset($headers['kid'])) $kid = $headers['kid'];
             $result = $signer->verify($signature, $signing_input, $keys, $kid);
         } catch (KeyException $e) {
             throw new InvalidTokenException($e->getMessage(), InvalidTokenException::SIGNATURE_VERIFICATION_ERROR, $e);

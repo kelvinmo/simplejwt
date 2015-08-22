@@ -92,7 +92,7 @@ class JWE {
                     foreach ($obj['recipients'] as $recipient) {
                         if (isset($recipient_obj['header']['kid'])) {
                             $target_kid = $recipient_obj['header']['kid'];
-                            if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
+                            if ($keys->getById($target_kid) != null) {
                                 $unprotected = (isset($unprotected)) ? array_merge($unprotected, $recipient_obj['header']) : $recipient_obj['header'];
                                 $encrypted_key = $recipient_obj['encrypted_key'];
                                 break;
@@ -143,9 +143,10 @@ class JWE {
                 $keys->add(new SymmetricKey(array(
                     'kty' => SymmetricKey::KTY,
                     'alg' => $this->headers['alg'],
-                    'k' => Util::base64url_encode($agreed_key)
+                    'k' => Util::base64url_encode($agreed_key),
+                    'kid' => '#key-agreement-with-wrapping'
                 ), 'php'));
-                $kid = null;
+                $kid = '#key-agreement-with-wrapping';
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;
@@ -158,7 +159,7 @@ class JWE {
 
         if (!isset($cek) && ($key_enc instanceof KeyEncryptionAlgorithm)) {
             try {
-                $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
+                if (!isset($kid)) $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
                 $cek = $key_enc->decryptKey($encrypted_key, $keys, $headers, $kid);
             } catch (KeyException $e) {
                 throw new InvalidTokenException($e->getMessage(), InvalidTokenException::DECRYPTION_ERROR, $e);

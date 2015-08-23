@@ -216,8 +216,9 @@ class JWT {
      * JWT
      * @param string $kid the ID of the key to use to sign. If null, this
      * is automatically retrieved
-     * @param bool $include_iat if true, override the `iat` header with the current
-     * time
+     * @param bool|array $auto_complete an array of headers or claims that
+     * should be automatically completed, or false if no auto-completion is
+     * to be performed
      * @param string $alg if not null, override the `alg` header
      * @param string $format the JWT serialisation format
      * @return string the signed and serialised JWT
@@ -225,9 +226,10 @@ class JWT {
      * to sign the JWT
      * @throws SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
-    public function encode($keys, $kid = null, $include_iat = true, $alg = null, $format = self::COMPACT_FORMAT) {
+    public function encode($keys, $kid = null, $auto_complete = array('iat', 'kid'), $alg = null, $format = self::COMPACT_FORMAT) {
+        if ($auto_complete === false) $auto_complete = array();
         if ($alg != null) $this->headers['alg'] = $alg;
-        if ($include_iat && !isset($this->claims['iat'])) $this->claims['iat'] = time();
+        if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
             $signer = AlgorithmFactory::create($this->headers['alg']);
@@ -235,7 +237,7 @@ class JWT {
             throw new CryptException($e->getMessage(), 0, $e);
         }
         $key = $signer->getSigningKey($keys, $kid);
-        if ($key != null) $protected['kid'] = $key->getKeyId();
+        if (($key != null) && in_array('kid', $auto_complete)) $this->headers['kid'] = $key->getKeyId();
         $protected = Util::base64url_encode(json_encode($this->headers));
         $payload = Util::base64url_encode(json_encode($this->claims));
         $signing_input = $protected . '.' . $payload;

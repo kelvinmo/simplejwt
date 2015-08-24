@@ -187,6 +187,28 @@ class KeySet {
      * @return Key the found key, or null
      */
     function get($criteria) {
+        $keys = $this->find($criteria);
+        if ($keys == null) return null;
+        return $keys[0];
+    }
+
+
+    /**
+     * Finds a key matching specified criteria.
+     *
+     * The criteria is expressed as an associative array, with the keys being
+     * the name of JWK property to match (with an optional prefix `~`), and the
+     * values being the value to be matched.
+     *
+     * A criterion can be mandatory or optional.  A key matches the criteria if all of
+     * the mandatory criteria are fulfilled.  If there is more than one key in the
+     * key set that matches all of the mandatory criteria, the key which also matches
+     * the most optional criteria will be returned.
+     *
+     * @param array $criteria the criteria
+     * @return Key the found key, or null
+     */
+    protected function find($criteria) {
         $results = array();
 
         // Round 1: All mandatory criteria
@@ -215,7 +237,7 @@ class KeySet {
         if (count($results) == 0) return null;
         if (count($results) == 1) {
             $kids = array_keys($results);
-            return $this->getById($kids[0]);
+            return array($this->getById($kids[0]));
         }
 
         // Round 2: Optional criteria
@@ -234,9 +256,9 @@ class KeySet {
         }, $results);
         asort($results);
         $kids = array_keys($results);
-        return $this->getById($kids[0]);
-
-        return null;
+        return array_map(function($kid) {
+            return $this->getById($kid);
+        }, $kids);
     }
 
     /**

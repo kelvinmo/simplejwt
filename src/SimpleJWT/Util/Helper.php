@@ -45,53 +45,53 @@ use SimpleJWT\InvalidTokenException;
  * JWTs and JWEs are accepted.
  */
 class Helper {
-    
+
     const COMPACT_FORMAT = 'compact';
     const JSON_FORMAT = 'json';
-    
-    
+
+
     private $data;
     private $type;
     private $format;
-    
+
     /**
      * Creates an instance of Helper with specified encoded data.
      * This calls the {@link detect()} function to detect the format of
      * the encoded data.
-     * 
+     *
      * @param string $data an encoded JWT or JWE
      * @throw InvalidTokenException if the encoded data is invalid
      */
     function __construct($data) {
         $results = self::detect($data);
-        
+
         if ($results == null) {
             throw new InvalidTokenException('Cannot parse format', InvalidTokenException::TOKEN_PARSE_ERROR);
         }
-        
+
         $this->data = $data;
         $this->type = $results['type'];
         $this->format = $results['format'];
     }
-    
+
     /**
      * Returns the type of the encoded data.
-     * 
+     *
      * @return string either `JWT` or `JWE`
      */
     function getType() {
         return $this->type;
     }
-    
+
     /**
      * Returns the serialisation format used to encode the data.
-     * 
+     *
      * @return string either `compact` or `json`
      */
     function getFormat() {
         return $this->format;
     }
-    
+
     /**
      * Decrypts or verifies the signature of the token and returns
      * the SimpleJWT object representing the token.
@@ -108,21 +108,21 @@ class Helper {
     function getObject($keys, $expected_alg, $kid = null) {
         switch ($this->type) {
             case 'JWT':
-                return JWT::decode($this->data, $keys, $expected_alg, $kid, $this->format);
+                return JWT::decode($this->data, $keys, $expected_alg, $kid, array(), $this->format);
             case 'JWE':
                 return JWE::decrypt($this->data, $keys, $expected_alg, $kid, $this->format);
         }
     }
-    
+
     /**
      * Decrypts and verifies a nested JWT.
-     * 
+     *
      * If the supplied token is a JWT, this function calls {@link getObject()}
      * to decode the JWT.
-     * 
+     *
      * If the supplied token is a JWE, the JWE is firstly decrypted, then the underlying
      * plaintext is treated as a JWT, and further decoded.
-     * 
+     *
      * @param SimpleJWT\Keys\KeySet $keys the key set containing the decryption
      * and verification keys
      * @param string $expected_jwe_alg the expected value of the `alg` parameter for the
@@ -148,10 +148,10 @@ class Helper {
                 return JWT::decode($jwe->getPlaintext(), $keys, $expected_jwt_alg, $jwt_kid);
         }
     }
-    
+
     /**
      * Attempts to detect the format of JWT or JWE encoded data.
-     * 
+     *
      * @param string $data the encoded data
      * @return mixed an array with keys `type` and `format`
      * (see {@link getType()} and {@link getFormat()}), or `null`
@@ -159,9 +159,9 @@ class Helper {
      */
     static function detect($data) {
         $results = array();
-        
+
         $obj = json_decode($data, true);
-        
+
         if ($obj == null) {
             $dot_count = substr_count($data, '.');
             if ($dot_count == 3) {
@@ -180,7 +180,7 @@ class Helper {
                 $results['format'] = self::JSON_FORMAT;
             }
         }
-        
+
         return (isset($results['type'])) ? $results : null;
     }
 }

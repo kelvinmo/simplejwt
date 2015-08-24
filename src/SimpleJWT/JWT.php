@@ -86,11 +86,17 @@ class JWT {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use to verify the signature. If null, this
      * is automatically retrieved
+     * @param bool|array $skip_validation an array of headers or claims that
+     * should be ignored as part of the validation process (e.g. if expired tokens
+     * are to be accepted), or false if all validation
+     * is to be performed.
      * @param string $format the JWT serialisation format
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decode($token, $keys, $expected_alg, $kid = null, $format = self::COMPACT_FORMAT) {
+    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = array(), $format = self::COMPACT_FORMAT) {
+        if ($skip_validation === false) $skip_validation = array();
+
         switch ($format) {
             case self::COMPACT_FORMAT:
                 $parts = explode('.', $token, 3);
@@ -160,11 +166,11 @@ class JWT {
 
         // Check time, etc
         $time = time();
-        if (isset($claims['nbf'])) {
+        if (isset($claims['nbf']) && !in_array('nbf', $skip_validation)) {
             if ($time < $claims['nbf'] - self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too early due to nbf claim', InvalidTokenException::TOO_EARLY_ERROR, null, $claims['nbf']);
         }
 
-        if (isset($claims['exp'])) {
+        if (isset($claims['exp']) && !in_array('exp', $skip_validation)) {
             if ($time > $claims['exp'] + self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too late due to exp claim', InvalidTokenException::TOO_LATE_ERROR, null, $claims['exp']);
         }
 

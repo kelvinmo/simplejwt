@@ -77,15 +77,15 @@ class AlgorithmFactory {
      */
     static public function create($alg, $use = null) {
         if (($use != null) && !isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');
-      
+
         foreach (self::$alg_map as $regex => $cls) {
             if (preg_match($regex, $alg)) {
                 if ($use != null) {
                     $superclass = self::$use_map[$use];
-                  
+
                     if (!is_subclass_of($cls, $superclass, true)) throw new \UnexpectedValueException('Unexpected use for algorithm: ' . $alg);
                 }
-              
+
                 return new $cls($alg);
             }
         }
@@ -115,6 +115,28 @@ class AlgorithmFactory {
         }
 
         return $results;
+    }
+
+    /**
+     * Adds the `none` algorithm to the repository.
+     *
+     * By default, the `none` algorithm is not included in the repository
+     * for security reasons.  However, there may be instances where the
+     * `none` algorithm is required (e.g. in non-security sensitive JWTs).
+     *
+     * @see removeNoneAlg()
+     */
+    static public function addNoneAlg() {
+        self::$alg_map['/^none$/'] = 'SimpleJWT\Crypt\None';
+    }
+
+    /**
+     * Removes the `none` algorithm to the repository.
+     *
+     * @see addNoneAlg()
+     */
+    static public function removeNoneAlg() {
+        unset(self::$alg_map['/^none$/']);
     }
 }
 

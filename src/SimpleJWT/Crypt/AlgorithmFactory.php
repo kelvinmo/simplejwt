@@ -136,7 +136,7 @@ class AlgorithmFactory {
      * @see addNoneAlg()
      */
     static public function removeNoneAlg() {
-        unset(self::$alg_map['/^none$/']);
+        if (isset(self::$alg_map['/^none$/'])) unset(self::$alg_map['/^none$/']);
     }
 }
 

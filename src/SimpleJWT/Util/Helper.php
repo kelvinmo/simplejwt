@@ -164,10 +164,10 @@ class Helper {
 
         if ($obj == null) {
             $dot_count = substr_count($data, '.');
-            if ($dot_count == 3) {
+            if ($dot_count == 2) {
                 $results['type'] = 'JWT';
                 $results['format'] = self::COMPACT_FORMAT;
-            } elseif ($dot_count == 5) {
+            } elseif ($dot_count == 4) {
                 $results['type'] = 'JWE';
                 $results['format'] = self::COMPACT_FORMAT;
             }

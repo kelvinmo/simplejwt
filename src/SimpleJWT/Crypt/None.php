@@ -38,7 +38,7 @@ namespace SimpleJWT\Crypt;
 /**
  * Implements the `none` signature algorithm.
  */
-abstract class None extends Algorithm implements SignatureAlgorithm {
+class None extends Algorithm implements SignatureAlgorithm {
     protected function __construct($alg) {
         parent::__construct($alg);
     }

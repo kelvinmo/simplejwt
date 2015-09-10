@@ -11,12 +11,12 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     protected function hex2base64url($hex) {
-        return Util::base64url_encode(hex2bin($hex));
+        return Util::base64url_encode(pack('H*', $hex));
     }
 
     function testA128KWWith128Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new AESKeyWrap('A128KW');
         $set = $this->getKeySet($kek);
@@ -29,8 +29,8 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testA192KWWith128Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F1011121314151617');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F1011121314151617');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new AESKeyWrap('A192KW');
         $set = $this->getKeySet($kek);
@@ -43,8 +43,8 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testA256KWWith128Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new AESKeyWrap('A256KW');
         $set = $this->getKeySet($kek);
@@ -57,8 +57,8 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testA192KWWith192Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F1011121314151617');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF0001020304050607');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F1011121314151617');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF0001020304050607');
 
         $alg = new AESKeyWrap('A192KW');
         $set = $this->getKeySet($kek);
@@ -71,8 +71,8 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testA256KWWith192Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF0001020304050607');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF0001020304050607');
 
         $alg = new AESKeyWrap('A256KW');
         $set = $this->getKeySet($kek);
@@ -85,8 +85,8 @@ class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testA256KWWith246Key() {
-        $kek = hex2bin('000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
-        $key = hex2bin('00112233445566778899AABBCCDDEEFF000102030405060708090A0B0C0D0E0F');
+        $kek = pack('H*', '000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F');
+        $key = pack('H*', '00112233445566778899AABBCCDDEEFF000102030405060708090A0B0C0D0E0F');
 
         $alg = new AESKeyWrap('A256KW');
         $set = $this->getKeySet($kek);

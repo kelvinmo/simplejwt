@@ -25,7 +25,7 @@ You can install via [Composer](http://getcomposer.org/).
 ```json
 {
     "require": {
-        "kelvinmo/simplejwt": "dev-master"
+        "kelvinmo/simplejwt": "0.1.*"
     }
 }
 ```
@@ -48,13 +48,13 @@ can add keys in the following ways:
 
   ```php
   $set = new SimpleJWT\Keys\KeySet();
-  
+
   // JWK format
   $key = new SimpleJWT\Keys\RSAKey(file_get_contents('jwk.json'), 'json');
-  
+
   // PEM format - note raw key only, no X.509 certificates
   $key = new SimpleJWT\Keys\RSAKey(file_get_contents('rsa.pem'), 'pem');
-  
+
   $set->add($key);
   ```
 

@@ -97,14 +97,18 @@ class Util {
     }
 
     /**
-     * Obtains a number of random bytes.  This function uses an entropy source specified
-     * in $rand_source or the OpenSSL or mcrypt extensions.  If
-     * $rand_source is not available, the mt_rand() PHP function is used.
+     * Obtains a number of random bytes.  For PHP 7 and later, this function
+     * calls the native `random_bytes()` function.  For older PHP versions, this
+     * function uses an entropy source specified in $rand_source or the OpenSSL
+     * or mcrypt extensions.  If $rand_source is not available, the mt_rand()
+     * PHP function is used.
      *
      * @param int $num_bytes the number of bytes to generate
      * @return string a string containing random bytes
      */
     static function random_bytes($num_bytes, $rand_source = null) {
+        if (function_exists('random_bytes')) return random_bytes($num_bytes);
+
         $is_windows = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 
         if ($is_windows) {

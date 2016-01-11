@@ -13,7 +13,7 @@
         "ext-Phar": "*",
         "phpunit/phpunit": "4.*",
         "phing/phing": "2.*",
-        "symfony/console": "2.*"
+        "symfony/console": "2.7.*"
     },
     "license": "BSD-3-Clause",
     "authors": [

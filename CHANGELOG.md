@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.1.3
+
+- Fixed bug in jwkstool in referencing renamed method in KeySet
+
 ## Version 0.1.2
 
 - Fixed bug caused by dependency issues with `symfony/composer`.  The version

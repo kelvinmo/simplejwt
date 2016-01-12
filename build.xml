@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project default="phar" basedir=".">
+    <property name="phar.file" value="./bin/jwkstool.phar" />
+
     <target name="phar">
-        <pharpackage destfile="./bin/jwkstool.phar" basedir="./" stub="build/jwkstool_pharstub.php" compression="bzip2">
+        <pharpackage destfile="${phar.file}" basedir="./" stub="build/jwkstool_pharstub.php" compression="bzip2">
             <fileset dir="./bin">
                 <include name="jwkstool.php" />
             </fileset>
@@ -15,5 +17,6 @@
                 <exclude name="symfony/console/Tests/**/**" />
             </fileset>
         </pharpackage>
+        <chmod file="${phar.file}" mode="0755" />
     </target>
 </project>

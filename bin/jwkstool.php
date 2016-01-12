@@ -70,7 +70,7 @@ abstract class Command extends SymfonyCommand {
     }
 
     protected function saveKeySet($set) {
-        return $set->toJSON($this->password);
+        return $set->toJWKS($this->password);
     }
 }
 

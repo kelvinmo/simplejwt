@@ -8,6 +8,7 @@ php:
 before_script:
     - composer config -g github-oauth.github.com $GITHUB_COMPOSER_TOKEN
     - composer install
+    - vendor/bin/phing phar
 notification:
     email: false
 env:

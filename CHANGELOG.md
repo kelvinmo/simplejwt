@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.1.4
+
+- Fixed syntax error when throwing exception as a result of an invalid
+  COMPACT_FORMAT token (#1)
+
 ## Version 0.1.3
 
 - Fixed bug in jwkstool in referencing renamed method in KeySet

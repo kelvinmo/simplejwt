@@ -80,7 +80,7 @@ class JWT {
      * Decodes a serialised JWT.
      *
      * @param string $token the serialised JWT
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
@@ -218,7 +218,7 @@ class JWT {
     /**
      * Signs and serialises the JWT.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key to sign the
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to sign the
      * JWT
      * @param string $kid the ID of the key to use to sign. If null, this
      * is automatically retrieved
@@ -228,9 +228,9 @@ class JWT {
      * @param string $alg if not null, override the `alg` header
      * @param string $format the JWT serialisation format
      * @return string the signed and serialised JWT
-     * @throws SimpleJWT\Keys\KeyException if there is an error obtaining the key
+     * @throws \SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT
-     * @throws SimpleJWT\Crypt\CryptException if there is a cryptographic error
+     * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
     public function encode($keys, $kid = null, $auto_complete = array('iat', 'kid'), $alg = null, $format = self::COMPACT_FORMAT) {
         if ($auto_complete === false) $auto_complete = array();

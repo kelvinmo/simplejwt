@@ -64,7 +64,7 @@ class JWE {
      * Decrypts a JWE.
      *
      * @param string $token the serialised JWE
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
@@ -220,15 +220,15 @@ class JWE {
     /**
      * Encrypts the JWE.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key to encrypt the
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to encrypt the
      * content encryption key
      * @param string $kid the ID of the key to use to encrypt. If null, this
      * is automatically retrieved
      * @param string $format the JWE serialisation format
      * @return string the encrypted JWE
-     * @throws SimpleJWT\Keys\KeyException if there is an error obtaining the key
+     * @throws \SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT
-     * @throws SimpleJWT\Crypt\CryptException if there is a cryptographic error
+     * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
     public function encrypt($keys, $kid = null, $format = self::COMPACT_FORMAT) {
         if (!isset($this->headers['alg'])) throw new \InvalidArgumentException('alg parameter missing');

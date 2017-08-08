@@ -7,7 +7,7 @@ php:
     - 7.0
     - hhvm
 before_script:
-    - composer config -g github-oauth.github.com $GITHUB_COMPOSER_TOKEN
+    - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_TOKEN; fi'
     - composer install
 #    - vendor/bin/phing phar
 notification:

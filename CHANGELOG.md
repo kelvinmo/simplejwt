@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.1.5
+
+- Fixed namespace error in documentation blocks (#3)
+
 ## Version 0.1.4
 
 - Fixed syntax error when throwing exception as a result of an invalid

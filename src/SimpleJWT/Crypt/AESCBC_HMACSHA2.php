@@ -55,7 +55,7 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
     }
 
     public function getSupportedAlgs() {
-        $ciphers = openssl_get_cipher_methods();
+        $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $hashes = hash_algos();
         $results = array();
 

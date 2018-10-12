@@ -56,7 +56,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function getSupportedAlgs() {
-        $ciphers = openssl_get_cipher_methods();
+        $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $results = array();
 
         foreach (self::$alg_params as $alg => $param) {

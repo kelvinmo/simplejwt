@@ -70,7 +70,7 @@ class OpenSSLSig extends SHA2 {
         $results = array();
         $hashes = array();
 
-        $hash_algos = openssl_get_md_methods();
+        $hash_algos = array_map('strtoupper', openssl_get_md_methods());
         if (in_array('SHA256', $hash_algos)) $hashes[] = 256;
         if (in_array('SHA384', $hash_algos)) $hashes[] = 384;
         if (in_array('SHA512', $hash_algos)) $hashes[] = 512;

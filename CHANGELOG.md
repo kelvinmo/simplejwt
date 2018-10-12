@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.1.6
+
+- Support newer versions of OpenSSL used in PHP 7, which uses lowercase
+  cipher and message digest names (#7)
+
 ## Version 0.1.5
 
 - Fixed namespace error in documentation blocks (#3)

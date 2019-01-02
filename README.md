@@ -101,6 +101,25 @@ print $jwt->getHeader('alg');
 print $jwt->getClaim('sub');
 ```
 
+### Deserialising a JWT
+
+You can also deserialise a JWT without verifying it using the deserialise function.
+**Note that you should not trust the contents of the data contained in a JWT without verifying them.**
+
+```php
+try {
+    list($headers, $claims, $signing_input, $signature) =
+        SimpleJWT\JWT::deserialise('abc.def.ghigjghr', $set, 'HS256');
+} catch (SimpleJWT\InvalidTokenException $e) {
+
+}
+
+print $header['alg'];
+print $header['sub'];
+print $signing_input;  // abc.def
+print $signature;      // ghigjghr
+```
+
 ### Creating a JWE
 
 To create a JWE, set up the desired header array and plaintext, then

@@ -94,6 +94,16 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $jwt2 = JWT::decode($token, $set2, 'ES256');
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
+    
+    function testDeserialise() {
+        $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
+        list($headers, $claims, $signing_input, $signature) = JWT::deserialise($token);
+        
+        $this->assertEquals('HS256', $headers['alg']);
+        $this->assertTrue($claims['http://example.com/is_root']);
+        $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $signing_input);
+        $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $signature);
+    }
 
     function testVerifyHMAC() {
         $set = $this->getPublicKeySet();

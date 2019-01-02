@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.0
+
+- Refactored code to add deserialise function
+
 ## Version 0.1.5
 
 - Fixed namespace error in documentation blocks (#3)

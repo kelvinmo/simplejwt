@@ -1,6 +1,12 @@
 # Changelog
 
-## Version 0.2.0
+## Version 0.2.2
+
+- Fixed incorrect decoding of PEM-encoded EC private keys (#8)
+- Improved decoding of PEM-encoded RSA keys
+- Enhanced tests
+
+## Version 0.2.0/1
 
 - Refactored code to add deserialise function
 

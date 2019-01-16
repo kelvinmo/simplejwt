@@ -94,8 +94,8 @@ class RSAKey extends Key {
                     $offset += ASN1::readDER($der, $offset, $e);  // INTEGER [e]
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['n'] = Util::base64url_encode($n);
-                    $jwk['e'] = Util::base64url_encode($e);
+                    $jwk['n'] = Util::base64url_encode(Util::pack($n));
+                    $jwk['e'] = Util::base64url_encode(Util::pack($e));
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
                     $der = base64_decode($matches[1]);
 
@@ -117,14 +117,14 @@ class RSAKey extends Key {
                     if (strlen($der) > $offset) ASN1::readDER($der, $offset, $oth);  // INTEGER [other]
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['n'] = Util::base64url_encode($n);
+                    $jwk['n'] = Util::base64url_encode(Util::pack($n));
                     $jwk['e'] = Util::base64url_encode($e);
-                    $jwk['d'] = Util::base64url_encode($d);
-                    $jwk['p'] = Util::base64url_encode($p);
-                    $jwk['q'] = Util::base64url_encode($q);
-                    $jwk['dp'] = Util::base64url_encode($dp);
-                    $jwk['dq'] = Util::base64url_encode($dq);
-                    $jwk['qi'] = Util::base64url_encode($qi);
+                    $jwk['d'] = Util::base64url_encode(Util::pack($d));
+                    $jwk['p'] = Util::base64url_encode(Util::pack($p));
+                    $jwk['q'] = Util::base64url_encode(Util::pack($q));
+                    $jwk['dp'] = Util::base64url_encode(Util::pack($dp));
+                    $jwk['dq'] = Util::base64url_encode(Util::pack($dq));
+                    $jwk['qi'] = Util::base64url_encode(Util::pack($qi));
                 }
 
                 parent::__construct($jwk);

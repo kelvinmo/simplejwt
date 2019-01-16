@@ -141,8 +141,8 @@ class ECKey extends Key {
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
 
-                    $x = substr($point, 1, ($len - 1) / 2);
-                    $y = substr($point, 1 + ($len - 1) / 2);
+                    $x = substr($point, 1, $len / 2);
+                    $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
                     $jwk['crv'] = self::$curves[$curve]['crv'];

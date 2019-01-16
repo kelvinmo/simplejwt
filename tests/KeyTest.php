@@ -25,13 +25,18 @@ class KeyTest extends \PHPUnit_Framework_TestCase {
     public function testEC() {
         $pem = file_get_contents('ec_private.pem');
         $key = new ECKey($pem, 'pem');
+        $key_data = $key->getKeyData();
         $this->assertFalse($key->isPublic());
-        $this->assertEquals($pem, $key->toPEM());
-
+        $this->assertEquals("IUN-eG7WkRmqa5xa_agso36vn0ZLJ7EokYyPK64M1ww", $key_data['d']);
+        $this->assertEquals("V_Go0coP2q7BktWwkkHBVgVMCt5gpIyegCccpfoGPy4", $key_data['x']);
+        $this->assertEquals("aEPjI2pjfCwPeoh2KykOpVPLSUJ9tGHH5ER-DGYjt_g", $key_data['y']);
+        
         $pem = file_get_contents('ec_public.pem');
         $key = new ECKey($pem, 'pem');
+        $key_data = $key->getKeyData();
         $this->assertTrue($key->isPublic());
-        //$this->assertEquals($pem, $key->toPEM()); // Different OIDs
+        $this->assertEquals("V_Go0coP2q7BktWwkkHBVgVMCt5gpIyegCccpfoGPy4", $key_data['x']);
+        $this->assertEquals("aEPjI2pjfCwPeoh2KykOpVPLSUJ9tGHH5ER-DGYjt_g", $key_data['y']);
     }
 }
 ?>

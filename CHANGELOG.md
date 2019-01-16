@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.0
+
+- Refactored code to add deserialise function
+
 ## Version 0.1.6
 
 - Support newer versions of OpenSSL used in PHP 7, which uses lowercase

@@ -96,62 +96,12 @@ class JWT {
      */
     public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = array(), $format = self::COMPACT_FORMAT) {
         if ($skip_validation === false) $skip_validation = array();
-
-        switch ($format) {
-            case self::COMPACT_FORMAT:
-                $parts = explode('.', $token, 3);
-                if (count($parts) != 3) throw new InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
-                list($protected, $payload, $signature) = $parts;
-                break;
-            case self::JSON_FORMAT:
-                $obj = json_decode($token, true);
-                if ($obj == null) throw new InvalidTokenException('Cannot decode JSON', InvalidTokenException::TOKEN_PARSE_ERROR);
-                $payload = $obj['payload'];
-
-                if (isset($obj['signatures'])) {
-                    foreach ($obj['signatures'] as $signature_obj) {
-                        if (isset($signature_obj['header']['kid'])) {
-                            $target_kid = $signature_obj['header']['kid'];
-                            if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
-                                $unprotected = $signature_obj['header'];
-                                $protected = $signature_obj['protected'];
-                                $signature = $signature_obj['signature'];
-                                break;
-                            }
-                        }
-                        throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
-                    }
-                } else {
-                    $unprotected = $obj['header'];
-                    $protected = $obj['protected'];
-                    $signature = $obj['signature'];
-                }
-                break;
-            default:
-                throw new \InvalidArgumentException('Incorrect format');
-        }
-
-        $headers = json_decode(Util::base64url_decode($protected), true);
-        if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
-
-        // Process crit
-        if (isset($headers['crit'])) {
-            foreach ($headers['crit'] as $critical) {
-                if (!in_array($critical, array('nbf', 'exp', 'alg', 'kid'))) {
-                    throw new InvalidTokenException('Critical header not supported: ' . $critical, InvalidTokenException::UNSUPPORTED_ERROR);
-                }
-            }
-        }
-
-        if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
-
-        $claims = json_decode(Util::base64url_decode($payload), true);
-        if ($claims == null) throw new InvalidTokenException('Cannot decode claims', InvalidTokenException::TOKEN_PARSE_ERROR);
+        
+        list($headers, $claims, $signing_input, $signature) = self::deserialise($token, $format, true);
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
         $signer = AlgorithmFactory::create($expected_alg);
-        $signing_input = $protected . '.' . $payload;
 
         try {
             if (isset($headers['kid'])) $kid = $headers['kid'];
@@ -261,6 +211,79 @@ class JWT {
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
+    }
+    
+    /**
+     * Deserialises a JWT without checking its validity.
+     *
+     * Generally, you should use the {@link decode()} function to decode and
+     * verify a JWT.  However, in certain circumstances you do not wish to
+     * validate JWT, such as obtaining untrusted &quot;hints&quot; from the
+     * claims may be a JWT.  This function provides such a deserialisation
+     * mechanism
+     *
+     * @param string $token the serialised JWT
+     * @param string $format the JWT serialisation format
+     * @return array an array containing the deserialised header,
+     * deserialised claims, the signing input (i.e. the first two
+     * parts of the serialised JWT) and signature
+     * @throws InvalidTokenException if the token is invalid for any reason
+     */
+    public static function deserialise($token, $format = self::COMPACT_FORMAT, $process_crit = false) {
+        switch ($format) {
+            case self::COMPACT_FORMAT:
+                $parts = explode('.', $token, 3);
+                if (count($parts) != 3) throw new InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
+                list($protected, $payload, $signature) = $parts;
+                break;
+            case self::JSON_FORMAT:
+                $obj = json_decode($token, true);
+                if ($obj == null) throw new InvalidTokenException('Cannot decode JSON', InvalidTokenException::TOKEN_PARSE_ERROR);
+                $payload = $obj['payload'];
+
+                if (isset($obj['signatures'])) {
+                    foreach ($obj['signatures'] as $signature_obj) {
+                        if (isset($signature_obj['header']['kid'])) {
+                            $target_kid = $signature_obj['header']['kid'];
+                            if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
+                                $unprotected = $signature_obj['header'];
+                                $protected = $signature_obj['protected'];
+                                $signature = $signature_obj['signature'];
+                                break;
+                            }
+                        }
+                        throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
+                    }
+                } else {
+                    $unprotected = $obj['header'];
+                    $protected = $obj['protected'];
+                    $signature = $obj['signature'];
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException('Incorrect format');
+        }
+
+        $headers = json_decode(Util::base64url_decode($protected), true);
+        if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+        // Process crit
+        if ($process_crit && isset($headers['crit'])) {
+            foreach ($headers['crit'] as $critical) {
+                if (!in_array($critical, array('nbf', 'exp', 'alg', 'kid'))) {
+                    throw new InvalidTokenException('Critical header not supported: ' . $critical, InvalidTokenException::UNSUPPORTED_ERROR);
+                }
+            }
+        }
+        
+        if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
+
+        $claims = json_decode(Util::base64url_decode($payload), true);
+        if ($claims == null) throw new InvalidTokenException('Cannot decode claims', InvalidTokenException::TOKEN_PARSE_ERROR);
+        
+        $signing_input = $protected . '.' . $payload;
+        
+        return array($headers, $claims, $signing_input, $signature);
     }
 }
 ?>

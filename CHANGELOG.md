@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.3
+
+- Fixed support for RSA-OAEP-256
+
 ## Version 0.2.2
 
 - Fixed incorrect decoding of PEM-encoded EC private keys (#8)

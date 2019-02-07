@@ -94,8 +94,8 @@ class RSAKey extends Key {
                     $offset += ASN1::readDER($der, $offset, $e);  // INTEGER [e]
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['n'] = Util::base64url_encode(Util::pack($n));
-                    $jwk['e'] = Util::base64url_encode(Util::pack($e));
+                    $jwk['n'] = Util::base64url_encode(ASN1::intToUint($n));
+                    $jwk['e'] = Util::base64url_encode(ASN1::intToUint($e));
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
                     $der = base64_decode($matches[1]);
 
@@ -117,14 +117,14 @@ class RSAKey extends Key {
                     if (strlen($der) > $offset) ASN1::readDER($der, $offset, $oth);  // INTEGER [other]
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['n'] = Util::base64url_encode(Util::pack($n));
+                    $jwk['n'] = Util::base64url_encode(ASN1::intToUint($n));
                     $jwk['e'] = Util::base64url_encode($e);
-                    $jwk['d'] = Util::base64url_encode(Util::pack($d));
-                    $jwk['p'] = Util::base64url_encode(Util::pack($p));
-                    $jwk['q'] = Util::base64url_encode(Util::pack($q));
-                    $jwk['dp'] = Util::base64url_encode(Util::pack($dp));
-                    $jwk['dq'] = Util::base64url_encode(Util::pack($dq));
-                    $jwk['qi'] = Util::base64url_encode(Util::pack($qi));
+                    $jwk['d'] = Util::base64url_encode(ASN1::intToUint($d));
+                    $jwk['p'] = Util::base64url_encode(ASN1::intToUint($p));
+                    $jwk['q'] = Util::base64url_encode(ASN1::intToUint($q));
+                    $jwk['dp'] = Util::base64url_encode(ASN1::intToUint($dp));
+                    $jwk['dq'] = Util::base64url_encode(ASN1::intToUint($dq));
+                    $jwk['qi'] = Util::base64url_encode(ASN1::intToUint($qi));
                 }
 
                 parent::__construct($jwk);
@@ -164,8 +164,8 @@ class RSAKey extends Key {
                 ) .
                 ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00).
                     ASN1::encodeDER(ASN1::SEQUENCE,
-                        ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
-                         . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['e'])),
+                        ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['n'])))
+                         . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['e']))),
                         false
                     )
                 ),
@@ -175,14 +175,14 @@ class RSAKey extends Key {
         } else {
             $der = ASN1::encodeDER(ASN1::SEQUENCE,
                 ASN1::encodeDER(ASN1::INTEGER_TYPE, chr(0))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['n']))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['n'])))
                 . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['e']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['d']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['p']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['q']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['dp']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['dq']))
-                . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['qi'])),
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['d'])))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['p'])))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['q'])))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['dp'])))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['dq'])))
+                . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['qi']))),
             false);
 
             return wordwrap("-----BEGIN RSA PRIVATE KEY-----\n" . base64_encode($der) . "\n-----END RSA PRIVATE KEY-----\n", 64, "\n", true);

@@ -63,24 +63,6 @@ class Util {
     static public function base64url_decode($data) {
         return base64_decode(strtr($data, '-_', '+/'));
     }
-    
-    /**
-     * Pack binary data that the length is a multiple of 2.
-     *
-     * If the length of the data string is not a multiple of 2:
-     * - if the first byte is a null character (\0), strip it out
-     * - otherwise, pad the data string with a null character
-     *
-     * @param string $data the data to pack
-     * @return string the packed data
-     */
-    static public function pack($data) {
-        if (strlen($data) % 2 == 1) {
-            if ($data[0] == "\0") return ltrim($data, "\0");
-            return "\0" . $data;
-        }
-        return $data;
-    }
 
     /**
      * Compares two strings using the same time whether they're equal or not.

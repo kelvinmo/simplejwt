@@ -213,6 +213,44 @@ class ASN1 {
 
         return $oid;
     }
+
+    /**
+     * Converts a data string representing a signed integer into
+     * an unsigned integer.
+     *
+     * DER-encoded integers are signed integers in two's complement form.
+     *
+     * If the length of the data string is not a multiple of 2:
+     * - if the first byte is a null character (\0), added by the
+     *   two's complement encoding, strip it out
+     * - otherwise, pad the data string with a null character
+     *
+     * @param string $data the data string representing a signed integer
+     * @return string the unsigned integer, or null if the integer is
+     * a negative number
+     */
+    static public function intToUint($data) {
+        if (strlen($data) % 2 == 1) {
+            if ($data[0] == "\0") return ltrim($data, "\0");
+            return "\0" . $data;
+        } elseif (ord($data) > 127) {
+            return null;
+        }
+        return $data;
+    }
+    
+    /**
+     * Converts a data string representing an unsigned integer into
+     * a signed integer in two's complement form.
+     *
+     * @param string $data the data string representing an unsigned integer
+     * @return string the signed integer
+     */
+    static public function uintToInt($data) {
+        var_dump(ord($data));
+        if (ord($data) > 127) return "\0" . $data;
+        return $data;
+    }
 }
 
 ?>

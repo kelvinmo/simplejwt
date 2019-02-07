@@ -247,7 +247,6 @@ class ASN1 {
      * @return string the signed integer
      */
     static public function uintToInt($data) {
-        var_dump(ord($data));
         if (ord($data) > 127) return "\0" . $data;
         return $data;
     }

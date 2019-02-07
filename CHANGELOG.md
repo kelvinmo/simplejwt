@@ -3,6 +3,7 @@
 ## Version 0.2.3
 
 - Fixed support for RSA-OAEP-256
+- Fixed incorrect encoding of RSA keys into PEM (#10)
 
 ## Version 0.2.2
 

@@ -46,10 +46,12 @@ namespace SimpleJWT\Crypt;
  */
 class AlgorithmFactory {
     static $alg_map = array(
+        // Signature algorithms
         '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',
 
+        // Key management algorithms (derivation or encryption)
         '/^dir$/' => 'SimpleJWT\Crypt\DirectEncryption',
         '/^RSA1_5$/' => 'SimpleJWT\Crypt\RSAES',
         '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\RSAES',
@@ -57,6 +59,7 @@ class AlgorithmFactory {
         '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
         '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
 
+        // Content encryption algorithms
         '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
     );
 

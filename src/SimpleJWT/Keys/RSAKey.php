@@ -95,7 +95,7 @@ class RSAKey extends Key {
 
                     $jwk['kty'] = self::KTY;
                     $jwk['n'] = Util::base64url_encode(ASN1::intToUint($n));
-                    $jwk['e'] = Util::base64url_encode(ASN1::intToUint($e));
+                    $jwk['e'] = Util::base64url_encode($e);
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
                     $der = base64_decode($matches[1]);
 
@@ -165,7 +165,7 @@ class RSAKey extends Key {
                 ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00).
                     ASN1::encodeDER(ASN1::SEQUENCE,
                         ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['n'])))
-                         . ASN1::encodeDER(ASN1::INTEGER_TYPE, ASN1::uintToInt(Util::base64url_decode($this->data['e']))),
+                         . ASN1::encodeDER(ASN1::INTEGER_TYPE, Util::base64url_decode($this->data['e'])),
                         false
                     )
                 ),

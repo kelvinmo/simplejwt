@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.2.3
+## Version 0.2.3/4
 
 - Fixed support for RSA-OAEP-256
 - Fixed incorrect encoding of RSA keys into PEM (#10)

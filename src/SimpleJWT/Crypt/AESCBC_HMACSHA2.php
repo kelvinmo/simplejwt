@@ -44,11 +44,11 @@ use SimpleJWT\Util\Util;
  */
 class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
 
-    static protected $alg_params = array(
-        'A128CBC-HS256' => array('cipher' => 'AES-128-CBC', 'hash' => 'sha256', 'key' => 32, 'tag' => 16),
-        'A192CBC-HS384' => array('cipher' => 'AES-192-CBC', 'hash' => 'sha384', 'key' => 48, 'tag' => 24),
-        'A256CBC-HS512' => array('cipher' => 'AES-256-CBC', 'hash' => 'sha512', 'key' => 64, 'tag' => 32),
-    );
+    static protected $alg_params = [
+        'A128CBC-HS256' => ['cipher' => 'AES-128-CBC', 'hash' => 'sha256', 'key' => 32, 'tag' => 16],
+        'A192CBC-HS384' => ['cipher' => 'AES-192-CBC', 'hash' => 'sha384', 'key' => 48, 'tag' => 24],
+        'A256CBC-HS512' => ['cipher' => 'AES-256-CBC', 'hash' => 'sha512', 'key' => 64, 'tag' => 32],
+    ];
 
     public function __construct($alg) {
         parent::__construct($alg);
@@ -57,7 +57,7 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
     public function getSupportedAlgs() {
         $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $hashes = hash_algos();
-        $results = array();
+        $results = [];
 
         foreach (self::$alg_params as $alg => $param) {
             if (in_array($param['cipher'], $ciphers) && in_array($param['hash'], $hashes)) {
@@ -69,7 +69,7 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return array('kty' => 'oct');
+        return ['kty' => 'oct'];
     }
 
     // cek binary iv base64url
@@ -92,11 +92,11 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
         $m = hash_hmac($params['hash'], $additional . $iv . $e . $al, $mac_key, true);
         $t = substr($m, 0, $params['tag']);
 
-        return array(
+        return [
             'ciphertext' => Util::base64url_encode($e),
             'tag' => Util::base64url_encode($t),
             'iv' => Util::base64url_encode($iv),
-        );
+        ];
     }
 
     // check cek and iv formats

@@ -45,7 +45,7 @@ namespace SimpleJWT\Crypt;
  *
  */
 class AlgorithmFactory {
-    static $alg_map = array(
+    static $alg_map = [
         // Signature algorithms
         '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
@@ -61,13 +61,13 @@ class AlgorithmFactory {
 
         // Content encryption algorithms
         '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
-    );
+    ];
 
-    private static $use_map = array(
+    private static $use_map = [
         Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\SignatureAlgorithm',
         Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\EncryptionAlgorithm',
         Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm'
-    );
+    ];
 
     /**
      * Creates an algorithm given a specified `alg` or `enc` parameter.
@@ -105,7 +105,7 @@ class AlgorithmFactory {
      * @return array an array of algorithms.
      */
     static public function getSupportedAlgs($use) {
-        $results = array();
+        $results = [];
 
         if (!isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');
         $superclass = self::$use_map[$use];

@@ -96,7 +96,7 @@ abstract class SelectKeyCommand extends Command {
             $key = $this->set->getById($input->getArgument('kid'), true);
 
         } else {
-            $criteria = array();
+            $criteria = [];
             if ($input->getOption('use')) $criteria['use'] = $input->getOption('use');
             if ($input->getOption('op')) $criteria['key_ops'] = explode(',', $input->getOption('op'));
             $key = $this->set->get($criteria);
@@ -189,7 +189,7 @@ class ListKeysCommand extends Command {
 
         $table = new Table($output);
         $table->setStyle('borderless');
-        $table->setHeaders(array('ID', 'Type', 'Size', 'Use', 'Ops'));
+        $table->setHeaders(['ID', 'Type', 'Size', 'Use', 'Ops']);
 
         foreach ($set->getKeys() as $key) {
             $id = $key->getKeyId();
@@ -204,10 +204,10 @@ class ListKeysCommand extends Command {
             if ($use == null) $use = '';
 
             $ops = $key->getOperations();
-            if ($ops == null) $ops = array();
+            if ($ops == null) $ops = [];
             $ops = implode(',', $ops);
 
-            $table->addRow(array($id, $kty, $size, $use, $ops));
+            $table->addRow([$id, $kty, $size, $use, $ops]);
         }
 
         $table->render();

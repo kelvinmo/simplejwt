@@ -54,19 +54,19 @@ use SimpleJWT\Util\ASN1;
  *
  */
 class KeyFactory {
-    static $jwk_kty_map = array(
+    static $jwk_kty_map = [
         RSAKey::KTY => 'SimpleJWT\Keys\RSAKey',
         ECKey::KTY => 'SimpleJWT\Keys\ECKey',
         SymmetricKey::KTY => 'SimpleJWT\Keys\SymmetricKey'
-    );
-    static $pem_map = array(
+    ];
+    static $pem_map = [
         RSAKey::PEM_PRIVATE => 'SimpleJWT\Keys\RSAKey',
         ECKey::PEM_PRIVATE => 'SimpleJWT\Keys\ECKey'
-    );
-    static $oid_map = array(
+    ];
+    static $oid_map = [
         RSAKey::OID => 'SimpleJWT\Keys\RSAKey',
         ECKey::EC_OID => 'SimpleJWT\Keys\ECKey'
-    );
+    ];
 
     /**
      * Detects the format of key data and returns a key object.

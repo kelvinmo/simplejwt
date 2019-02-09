@@ -12,7 +12,7 @@ class JWETest extends \PHPUnit_Framework_TestCase {
     protected function getPrivateKeySet() {
         $set = new KeySet();
 
-        $set->add(new RSAKey(array(
+        $set->add(new RSAKey([
             "kty" => "RSA",
             "kid" => "rsa1_5",
             "n" => "sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw",
@@ -23,12 +23,12 @@ class JWETest extends \PHPUnit_Framework_TestCase {
             "dp" => "w0kZbV63cVRvVX6yk3C8cMxo2qCM4Y8nsq1lmMSYhG4EcL6FWbX5h9yuvngs4iLEFk6eALoUS4vIWEwcL4txw9LsWH_zKI-hwoReoP77cOdSL4AVcraHawlkpyd2TWjE5evgbhWtOxnZee3cXJBkAi64Ik6jZxbvk-RR3pEhnCs",
             "dq" => "o_8V14SezckO6CNLKs_btPdFiO9_kC1DsuUTd2LAfIIVeMZ7jn1Gus_Ff7B7IVx3p5KuBGOVF8L-qifLb6nQnLysgHDh132NDioZkhH7mI7hPG-PYE_odApKdnqECHWw0J-F0JWnUd6D2B_1TvF9mXA2Qx-iGYn8OVV1Bsmp6qU",
             "qi" => "eNho5yRBEBxhGBtQRww9QirZsB66TrfFReG_CcteI1aCneT0ELGhYlRlCtUkTRclIfuEPmNsNDPbLoLqqCVznFbvdB7x-Tl-m0l_eFTj2KiqwGqE9PZB9nNTwMVvH3VRRSLWACvPnSiwP8N5Usy-WRXS-V7TbpxIhvepTfE0NNo"
-        ), 'php'));
+        ], 'php'));
 
-        $set->add(new SymmetricKey(array(
+        $set->add(new SymmetricKey([
             "kty" => "oct",
             "k" => "GawgguFyGrWKav7AX4VKUg"
-        ), 'php'));
+        ], 'php'));
 
         return $set;
     }
@@ -52,7 +52,7 @@ class JWETest extends \PHPUnit_Framework_TestCase {
         $plaintext = 'Live long and prosper.';
 
         $public_set = $this->getPublicKeySet();
-        $jwe = new JWE(array("alg" => "RSA1_5","enc" => "A128CBC-HS256"), $plaintext);
+        $jwe = new JWE(["alg" => "RSA1_5","enc" => "A128CBC-HS256"], $plaintext);
         $token = $jwe->encrypt($public_set);
 
         $private_set = $this->getPrivateKeySet();

@@ -11,7 +11,7 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
         $cek = base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLHwj5wszw==');
 
         $private_set = new KeySet();
-        $private_set->add(new RSAKey(array(
+        $private_set->add(new RSAKey([
             "kty" => "RSA",
             "kid" => "rsa1_5",
             "n" => "sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw",
@@ -22,12 +22,12 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
             "dp" => "w0kZbV63cVRvVX6yk3C8cMxo2qCM4Y8nsq1lmMSYhG4EcL6FWbX5h9yuvngs4iLEFk6eALoUS4vIWEwcL4txw9LsWH_zKI-hwoReoP77cOdSL4AVcraHawlkpyd2TWjE5evgbhWtOxnZee3cXJBkAi64Ik6jZxbvk-RR3pEhnCs",
             "dq" => "o_8V14SezckO6CNLKs_btPdFiO9_kC1DsuUTd2LAfIIVeMZ7jn1Gus_Ff7B7IVx3p5KuBGOVF8L-qifLb6nQnLysgHDh132NDioZkhH7mI7hPG-PYE_odApKdnqECHWw0J-F0JWnUd6D2B_1TvF9mXA2Qx-iGYn8OVV1Bsmp6qU",
             "qi" => "eNho5yRBEBxhGBtQRww9QirZsB66TrfFReG_CcteI1aCneT0ELGhYlRlCtUkTRclIfuEPmNsNDPbLoLqqCVznFbvdB7x-Tl-m0l_eFTj2KiqwGqE9PZB9nNTwMVvH3VRRSLWACvPnSiwP8N5Usy-WRXS-V7TbpxIhvepTfE0NNo"
-        ), 'php'));
+        ], 'php'));
 
         $public_set = new KeySet();
         $public_set->add($private_set->getById('rsa1_5')->getPublicKey());
 
-        $headers = array();
+        $headers = [];
 
         $alg = new RSAES('RSA1_5');
         $encrypted_key = $alg->encryptKey($cek, $public_set, $headers);
@@ -40,7 +40,7 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
         $cek = base64_decode('saH0gFSP4XM/tAP/a5rU9ooHbltwLiJpL4LLLnrqQPw=');
 
         $private_set = new KeySet();
-        $private_set->add(new RSAKey(array(
+        $private_set->add(new RSAKey([
             "kty" => "RSA",
             "kid" => "rsa-oaep",
             "n" => "oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUWcJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3Spsk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2asbOenSZeyaxziK72UwxrrKoExv6kc5twXTq4h-QChLOln0_mtUZwfsRaMStPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2djYgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw",
@@ -51,12 +51,12 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
             "dp" => "ZK-YwE7diUh0qR1tR7w8WHtolDx3MZ_OTowiFvgfeQ3SiresXjm9gZ5KLhMXvo-uz-KUJWDxS5pFQ_M0evdo1dKiRTjVw_x4NyqyXPM5nULPkcpU827rnpZzAJKpdhWAgqrXGKAECQH0Xt4taznjnd_zVpAmZZq60WPMBMfKcuE",
             "dq" => "Dq0gfgJ1DdFGXiLvQEZnuKEN0UUmsJBxkjydc3j4ZYdBiMRAy86x0vHCjywcMlYYg4yoC4YZa9hNVcsjqA3FeiL19rk8g6Qn29Tt0cj8qqyFpz9vNDBUfCAiJVeESOjJDZPYHdHY8v1b-o-Z2X5tvLx-TCekf7oxyeKDUqKWjis",
             "qi" => "VIMpMYbPf47dT1w_zDUXfPimsSegnMOA1zTaX7aGk_8urY6R8-ZW1FxU7AlWAyLWybqq6t16VFd7hQd0y6flUK4SlOydB61gwanOsXGOAOv82cHq0E3eL4HrtZkUuKvnPrMnsUUFlfUdybVzxyjz9JF_XyaY14ardLSjf4L_FNY"
-        ), 'php'));
+        ], 'php'));
 
         $public_set = new KeySet();
         $public_set->add($private_set->getById('rsa-oaep')->getPublicKey());
 
-        $headers = array();
+        $headers = [];
 
         $alg = new RSAES('RSA-OAEP');
         $encrypted_key = $alg->encryptKey($cek, $public_set, $headers);
@@ -70,7 +70,7 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
         $cek = base64_decode('VIWbNCxJ6io=');
 
         $private_set = new KeySet();
-        $private_set->add(new RSAKey(array(
+        $private_set->add(new RSAKey([
             "kty" => "RSA",
             "kid" => "rsa-oaep-256",
             "n" => "pylWkxVbGBO7hId_tFNDVW4FaAQ95ZEIcqOlGMwR4j4tt06vRUUGjE49JYonGPus3MPq-kV2lblX6I-_EQrtBJqZLZxDAjLQLzUpxno0GZNeqbVp-FsbzTfea4mc1iaX6EMTD_BSnQnJfYE8sV8pN1H_VvlD-9q7Y5ccx_T21b_xWUQWsfWQe95ahKRPmALvKbQ72hlg-Uj4r7h2bBq4DTLuyI7WbQtlrr5EptCzxeCrBRqqG5EvvMF7jnUd3sxTZbbbbasAIMMFfbQBOlEhOleYo6q2eYWw9NiGJ6VKDz8ChfvLSv3-tlyxU69mglZW1DI4t1UDIxUAdT9OQh48Vw",
@@ -81,12 +81,12 @@ class RSAESTest extends \PHPUnit_Framework_TestCase {
             "dp" => "EO3LVEQhwPnhI2JNEJn-6zXHKos04Aisb6a5AhCnVD8pOvTlKZyMEutGTnAJKAXHJW4Y5YI0VboPUE029cysrBt81cWP9xD5w_kmRpSdiP3R5-pf7RCBggu5sNKozUsJP-z9uW2r1uKMOm-MGG3IbN3Imv0-QD4Pz4qeC8snrws",
             "dq" => "l_wlSEtaQV6qY8A-bvqNr-mhyLAE2e5ugFSP79byzkTuXLEX535wKFeY9X0TdWbOjqRQOxPg8bXtXKaUJTfEqpayo5V4Kky1tY0JNuCw-mOxGSlU05ztF21x7zLG9CyE4uGfnU3ZmcIVGwMrl70iqnP9jFvNFaLcpARtWsyZcCE",
             "qi" => "S7gGTh7_fp78PEV4_O21nKSu8Jk6gxLf3LGz3s9FiqZlDT0IZvFDy_DTgl6TgRgRcKChZR7vzX3veGuOs1ZVXZ-gfIW19cvddDgvESm142tBZrbMkVeSNplwhkghLEhJWDUf3JzxTyGNvn-_fL2TogmkaB_iPOtEurZ9ZvRdHJ0"
-        ), 'php'));
+        ], 'php'));
 
         $public_set = new KeySet();
         $public_set->add($private_set->getById('rsa-oaep-256')->getPublicKey());
 
-        $headers = array();
+        $headers = [];
 
         $alg = new RSAES('RSA-OAEP-256');
         $encrypted_key = $alg->encryptKey($cek, $public_set, $headers);

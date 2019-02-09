@@ -42,11 +42,11 @@ use SimpleJWT\Keys\Key;
  * Interface for content authenticated encryption algorithms.
  */
 class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
-    static protected $alg_params = array(
-        'RSA1_5' => array('padding' => OPENSSL_PKCS1_PADDING),
-        'RSA-OAEP' => array('padding' => OPENSSL_PKCS1_OAEP_PADDING),
-        'RSA-OAEP-256' => array('padding' => OPENSSL_NO_PADDING, 'oaep' => 'sha256')
-    );
+    static protected $alg_params = [
+        'RSA1_5' => ['padding' => OPENSSL_PKCS1_PADDING],
+        'RSA-OAEP' => ['padding' => OPENSSL_PKCS1_OAEP_PADDING],
+        'RSA-OAEP-256' => ['padding' => OPENSSL_NO_PADDING, 'oaep' => 'sha256']
+    ];
 
 
     public function __construct($alg) {
@@ -58,7 +58,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return array('kty' => 'RSA');
+        return ['kty' => 'RSA'];
     }
 
     /**
@@ -73,7 +73,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true, '~use' => 'enc'));
+        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true, '~use' => 'enc']);
         if (($key == null) || !$key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }
@@ -89,7 +89,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
 
         $ciphertext = '';
         if (!openssl_public_encrypt($cek, $ciphertext, $key->toPEM(), $params['padding'])) {
-            $messages = array();
+            $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
             throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages));
         }
@@ -98,7 +98,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => false));
+        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => false]);
         if (($key == null) || $key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }
@@ -107,7 +107,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
 
         $cek = '';
         if (!openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), $params['padding'])) {
-            $messages = array();
+            $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
             throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages));
         }

@@ -72,7 +72,7 @@ class RSAKey extends Key {
                 break;
             case 'pem':
                 $offset = 0;
-                $jwk = array();
+                $jwk = [];
 
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                     $der = base64_decode($matches[1]);
@@ -146,12 +146,12 @@ class RSAKey extends Key {
     }
 
     public function getPublicKey() {
-        return new RSAKey(array(
+        return new RSAKey([
             'kid' => $this->data['kid'],
             'kty' => $this->data['kty'],
             'n' => $this->data['n'],
             'e' => $this->data['e']
-        ), 'php');
+        ], 'php');
     }
 
     public function toPEM() {
@@ -190,7 +190,7 @@ class RSAKey extends Key {
     }
 
     protected function getSignatureKeys() {
-        return array('kty', 'n', 'e');
+        return ['kty', 'n', 'e'];
     }
 }
 

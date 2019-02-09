@@ -88,8 +88,8 @@ create a `JWT` object:
 
 ```php
 // Note $headers['alg'] is required
-$headers = array('alg' => 'HS256', 'typ' => 'JWT');
-$claims = array('iss' => 'me', 'exp' => 1234567);
+$headers = ['alg' => 'HS256', 'typ' => 'JWT'];
+$claims = ['iss' => 'me', 'exp' => 1234567];
 $jwt = new SimpleJWT\JWT($headers, $claims);
 ```
 
@@ -151,7 +151,7 @@ create a `JWE` object:
 
 ```php
 // Note $headers['alg'] and $headers['enc'] are required
-$headers = array('alg' => 'PBES2-HS256+A128KW', 'enc' => 'A128CBC-HS256');
+$headers = ['alg' => 'PBES2-HS256+A128KW', 'enc' => 'A128CBC-HS256'];
 $plaintext = 'This is the plaintext I want to encrypt.';
 $jwt = new SimpleJWT\JWE($headers, $plaintext);
 ```

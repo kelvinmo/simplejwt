@@ -54,11 +54,11 @@ class HMAC extends SHA2 {
     }
 
     public function getKeyCriteria() {
-        return array('kty' => 'oct');
+        return ['kty' => 'oct'];
     }
 
     public function getSupportedAlgs() {
-        $results = array();
+        $results = [];
         $hash_algos = hash_algos();
         if (in_array('sha256', $hash_algos)) $results[] = 'HS256';
         if (in_array('sha384', $hash_algos)) $results[] = 'HS384';

@@ -53,12 +53,12 @@ class ECKey extends Key {
     const P384_OID = '1.3.132.0.34';
     const P521_OID = '1.3.132.0.35';
 
-    static $curves = array(
-        self::P256_OID => array('crv' => 'P-256', 'len' => 64),
-        self::P256_OID2 => array('crv' => 'P-256', 'len' => 64),
-        self::P384_OID => array('crv' => 'P-384', 'len' => 96),
-        self::P521_OID => array('crv' => 'P-521', 'len' => 132),
-    );
+    static $curves = [
+        self::P256_OID => ['crv' => 'P-256', 'len' => 64],
+        self::P256_OID2 => ['crv' => 'P-256', 'len' => 64],
+        self::P384_OID => ['crv' => 'P-384', 'len' => 96],
+        self::P521_OID => ['crv' => 'P-521', 'len' => 132],
+    ];
 
     /**
      * Creates an EC key.
@@ -84,7 +84,7 @@ class ECKey extends Key {
                 break;
             case 'pem':
                 $offset = 0;
-                $jwk = array();
+                $jwk = [];
 
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                     $der = base64_decode($matches[1]);
@@ -169,13 +169,13 @@ class ECKey extends Key {
     }
 
     public function getPublicKey() {
-        return new ECKey(array(
+        return new ECKey([
             'kid' => $this->data['kid'],
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
             'x' => $this->data['x'],
             'y' => $this->data['y']
-        ), 'php');
+        ], 'php');
     }
 
     public function toPEM() {
@@ -206,7 +206,7 @@ class ECKey extends Key {
     }
 
     protected function getSignatureKeys() {
-        return array('kty', 'crv', 'x', 'y');
+        return ['kty', 'crv', 'x', 'y'];
     }
 
     private function getOID($crv) {

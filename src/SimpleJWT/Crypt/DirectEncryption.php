@@ -48,11 +48,14 @@ class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
     }
 
     public function getSupportedAlgs() {
-        return array('dir');
+        return ['dir'];
     }
 
     public function getKeyCriteria() {
-        return array('kty' => 'oct', '~alg' => $this->getAlg());
+        return [
+            'kty' => 'oct',
+            '~alg' => $this->getAlg()
+        ];
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {

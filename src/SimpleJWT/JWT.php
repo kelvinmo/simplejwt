@@ -58,12 +58,12 @@ class JWT {
 
     static public $TIME_ALLOWANCE = 300;
 
-    protected $headers = array(
+    protected $headers = [
         'typ' => 'JWT',
         'alg' => 'RS256'
-    );
+    ];
 
-    protected $claims = array();
+    protected $claims = [];
 
     /**
      * Creates a new JWT.
@@ -94,8 +94,8 @@ class JWT {
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = array(), $format = self::COMPACT_FORMAT) {
-        if ($skip_validation === false) $skip_validation = array();
+    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = [], $format = self::COMPACT_FORMAT) {
+        if ($skip_validation === false) $skip_validation = [];
         
         list($headers, $claims, $signing_input, $signature) = self::deserialise($token, $format, true);
 
@@ -182,8 +182,8 @@ class JWT {
      * to sign the JWT
      * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
-    public function encode($keys, $kid = null, $auto_complete = array('iat', 'kid'), $alg = null, $format = self::COMPACT_FORMAT) {
-        if ($auto_complete === false) $auto_complete = array();
+    public function encode($keys, $kid = null, $auto_complete = ['iat', 'kid'], $alg = null, $format = self::COMPACT_FORMAT) {
+        if ($auto_complete === false) $auto_complete = [];
         if ($alg != null) $this->headers['alg'] = $alg;
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
@@ -203,11 +203,11 @@ class JWT {
             case self::COMPACT_FORMAT:
                 return $signing_input . '.' . $signature;
             case self::JSON_FORMAT:
-                return json_encode(array(
+                return json_encode([
                     'protected' => $protected,
                     'payload' => $payload,
                     'signature' => $signature
-                ));
+                ]);
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
@@ -270,7 +270,7 @@ class JWT {
         // Process crit
         if ($process_crit && isset($headers['crit'])) {
             foreach ($headers['crit'] as $critical) {
-                if (!in_array($critical, array('nbf', 'exp', 'alg', 'kid'))) {
+                if (!in_array($critical, ['nbf', 'exp', 'alg', 'kid'])) {
                     throw new InvalidTokenException('Critical header not supported: ' . $critical, InvalidTokenException::UNSUPPORTED_ERROR);
                 }
             }
@@ -283,7 +283,7 @@ class JWT {
         
         $signing_input = $protected . '.' . $payload;
         
-        return array($headers, $claims, $signing_input, $signature);
+        return [$headers, $claims, $signing_input, $signature];
     }
 }
 ?>

@@ -68,24 +68,24 @@ class SymmetricKey extends Key {
                 parent::__construct($data, $format, $password, $alg);
                 break;
             case 'base64url':
-                $jwk = array(
+                $jwk = [
                     'kty' => self::KTY,
                     'k' => $data
-                );
+                ];
                 parent::__construct($jwk);
                 break;
             case 'base64':
-                $jwk = array(
+                $jwk = [
                     'kty' => self::KTY,
                     'k' => Util::base64url_encode(base64_decode($data))
-                );
+                ];
                 parent::__construct($jwk);
                 break;
             case 'bin':
-                $jwk = array(
+                $jwk = [
                     'kty' => self::KTY,
                     'k' => Util::base64url_encode($data)
-                );
+                ];
                 parent::__construct($jwk);
                 break;
             default:
@@ -121,7 +121,7 @@ class SymmetricKey extends Key {
     }
 
     protected function getSignatureKeys() {
-        return array('kty', 'k');
+        return ['kty', 'k'];
     }
 }
 

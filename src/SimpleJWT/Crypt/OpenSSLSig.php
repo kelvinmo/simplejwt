@@ -60,15 +60,15 @@ class OpenSSLSig extends SHA2 {
     public function getKeyCriteria() {
         switch ($this->family) {
             case 'RS':
-                return array('kty' => 'RSA');
+                return ['kty' => 'RSA'];
             case 'ES':
-                return array('kty' => 'EC');
+                return ['kty' => 'EC'];
         }
     }
 
     public function getSupportedAlgs() {
-        $results = array();
-        $hashes = array();
+        $results = [];
+        $hashes = [];
 
         $hash_algos = array_map('strtoupper', openssl_get_md_methods());
         if (in_array('SHA256', $hash_algos)) $hashes[] = 256;
@@ -93,7 +93,7 @@ class OpenSSLSig extends SHA2 {
 
         $binary = '';
         if (!openssl_sign($data, $binary, $key->toPEM(), 'SHA' . $this->size)) {
-            $messages = array();
+            $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
             throw new CryptException('Cannot calculate signature: ' . implode("\n", $messages));
         }
@@ -122,7 +122,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => true, '~use' => 'sig'));
+        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if ($key == null) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -157,7 +157,7 @@ class OpenSSLSig extends SHA2 {
                 return false;
                 break;
             default:
-                $messages = array();
+                $messages = [];
                 while ($message = openssl_error_string()) $messages[] = $message;
                 throw new CryptException('Cannot verify signature: ' . implode("\n", $messages));
                 return false;
@@ -166,7 +166,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function getSigningKey($keys, $kid = null) {
-        return $this->selectKey($keys, $kid, array(Key::PUBLIC_PROPERTY => false));
+        return $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => false]);
     }
 }
 

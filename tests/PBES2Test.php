@@ -17,12 +17,12 @@ class PBES2Test extends \PHPUnit_Framework_TestCase {
         $keys = $this->getKeySet($password);
 
         $stub = $this->getMockBuilder('SimpleJWT\Crypt\PBES2')
-            ->setMethods(array('generateSaltInput'))->setConstructorArgs(array('PBES2-HS256+A128KW'))->getMock();
+            ->setMethods(['generateSaltInput'])->setConstructorArgs(['PBES2-HS256+A128KW'])->getMock();
 
         $stub->method('generateSaltInput')->willReturn(Util::base64url_decode('2WCTcJZ1Rvd_CJuJripQ1w'));
         $stub->setIterations(4096);
 
-        $headers = array('alg' => 'PBES2-HS256+A128KW');
+        $headers = ['alg' => 'PBES2-HS256+A128KW'];
 
         $encrypted_key = $stub->encryptKey($cek, $keys, $headers);
 
@@ -37,11 +37,11 @@ class PBES2Test extends \PHPUnit_Framework_TestCase {
         $password = 'Thus from my lips, by yours, my sin is purged.';
         $keys = $this->getKeySet($password);
 
-        $headers = array(
+        $headers = [
             'alg' => 'PBES2-HS256+A128KW',
             'p2c' => 4096,
             'p2s' => '2WCTcJZ1Rvd_CJuJripQ1w'
-        );
+        ];
 
         $alg = new PBES2('PBES2-HS256+A128KW');
         $cek = $alg->decryptKey($encrypted_key, $keys, $headers);

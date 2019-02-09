@@ -10,23 +10,23 @@ function time() {
 class JWTTest extends \PHPUnit_Framework_TestCase {
 
     protected function getJWTClaims() {
-        return array(
+        return [
             "iss" => "joe",
             "exp" => 1300819380,
             "http://example.com/is_root" => true
-        );
+        ];
     }
 
     protected function getPrivateKeySet() {
         $set = new Keys\KeySet();
 
-        $set->add(new Keys\SymmetricKey(array(
+        $set->add(new Keys\SymmetricKey([
             "kty" => "oct",
             "k" => "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
             "kid" => "hmac"
-        ), 'php'));
+        ], 'php'));
 
-        $set->add(new Keys\RSAKey(array(
+        $set->add(new Keys\RSAKey([
             "kty" => "RSA",
             "n" => "ofgWCuLjybRlzo0tZWJjNiuSfb4p4fAkd_wWJcyQoTbji9k0l8W26mPddxHmfHQp-Vaw-4qPCJrcS2mJPMEzP1Pt0Bm4d4QlL-yRT-SFd2lZS-pCgNMsD1W_YpRPEwOWvG6b32690r2jZ47soMZo9wGzjb_7OMg0LOL-bSf63kpaSHSXndS5z5rexMdbBYUsLA9e-KXBdQOS-UTo7WTBEMa2R2CapHg665xsmtdVMTBQY4uDZlxvb3qCo5ZwKh9kG4LT6_I5IhlJH7aGhyxXFvUK-DWNmoudF8NAco9_h9iaGNj8q2ethFkMLs91kzk2PAcDTW9gb54h4FRWyuXpoQ",
             "e" => "AQAB",
@@ -37,16 +37,16 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
             "dq" => "h_96-mK1R_7glhsum81dZxjTnYynPbZpHziZjeeHcXYsXaaMwkOlODsWa7I9xXDoRwbKgB719rrmI2oKr6N3Do9U0ajaHF-NKJnwgjMd2w9cjz3_-kyNlxAr2v4IKhGNpmM5iIgOS1VZnOZ68m6_pbLBSp3nssTdlqvd0tIiTHU",
             "qi" => "IYd7DHOhrWvxkwPQsRM2tOgrjbcrfvtQJipd-DlcxyVuuM9sQLdgjVk2oy26F0EmpScGLq2MowX7fhd_QJQ3ydy5cY7YIBi87w93IKLEdfnbJtoOPLUW0ITrJReOgo1cq9SbsxYawBgfp_gh6A5603k2-ZQwVK0JKSHuLFkuQ3U",
             "kid" => "RSA"
-        ), 'php'));
+        ], 'php'));
 
-        $set->add(new Keys\ECKey(array(
+        $set->add(new Keys\ECKey([
             "kty" => "EC",
             "crv" => "P-256",
             "x" => "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
             "y" => "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
             "d" => "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI",
             "kid" => "EC"
-        ), 'php'));
+        ], 'php'));
 
         return $set;
     }
@@ -69,7 +69,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     function testGenerateHMAC() {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
-        $jwt = new JWT(array('typ' => 'JWT', 'alg' => 'HS256'), $claims);
+        $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
         $token = $jwt->encode($set, null, false);
         $this->assertEquals('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.0stp4GfJhgUSjqUtkZ1Hfmt1bvPKiHSzojeTw3sr7R8', $token);
     }
@@ -77,7 +77,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     function testGenerateRSA() {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
-        $jwt = new JWT(array('alg' => 'RS256'), $claims);
+        $jwt = new JWT(['alg' => 'RS256'], $claims);
         $token = $jwt->encode($set, null, false);
         $this->assertEquals('eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.WLAkxL55suP-DBGVRHnJk-gT3-U_lVwUeINTxPx42MnneO4Q8Hv1A4331-BLHzSB3bRvoGtHv-IdMykYqGPi8PkdXGuBqJIkL9_HNb2YHtS_ALL2xYSUdHntxPcMr_2HHmVsePhYESlLpfW4wR2CKHXn13gQCjbZTXFwGyvuj_BH5ozpK0JdlttGQ7EL3Uetjv2143F-lI5w_Ttw4Ob4M8jsu7-K63MvqZvWexq3oBzmH4soLTSu84I63ZoyS7mxYvMxvCgV5Is8TGsY81pmyXMeMGb1GodaLrULnc5alz96fDekZYFT8mfuRVZP6Kmsu6MqsszPILY4YuWq6bSkXg', $token);
     }
@@ -85,7 +85,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     function testGenerateEC() {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
-        $jwt = new JWT(array('alg' => 'ES256'), $claims);
+        $jwt = new JWT(['alg' => 'ES256'], $claims);
         $token = $jwt->encode($set, null, false);
 
         // Note that ECDSA generates a different signature every time, as a random
@@ -144,7 +144,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $claims['exp'] = 1;
-        $jwt = new JWT(array('typ' => 'JWT', 'alg' => 'HS256'), $claims);
+        $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
         $token = $jwt->encode($set, null, false);
 
         $this->setExpectedException('SimpleJWT\InvalidTokenException');

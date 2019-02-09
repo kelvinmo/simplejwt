@@ -64,7 +64,7 @@ abstract class Key {
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data = array(), $format = 'php', $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data = [], $format = 'php', $password = null, $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
                 $this->data = $data;
@@ -229,11 +229,11 @@ abstract class Key {
         if (($password == null) || $this->isPublic()) return $json;
 
         $keys = KeySet::createFromSecret($password, 'bin');
-        $headers = array(
+        $headers = [
             'alg' => 'PBES2-HS256+A128KW',
             'enc' => 'A128CBC-HS256',
             'cty' => 'jwk+json'
-        );
+        ];
         $jwe = new JWE($headers, $json);
         return $jwe->encrypt($keys);
     }
@@ -273,7 +273,7 @@ abstract class Key {
      */
     public function getSignature() {
         $keys = $this->getSignatureKeys();
-        $signing = array();
+        $signing = [];
         foreach ($keys as $key) $signing[$key] = $this->data[$key];
         ksort($signing);
         return Util::base64url_encode(hash('sha256', json_encode($signing), true));

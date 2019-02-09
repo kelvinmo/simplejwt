@@ -48,7 +48,7 @@ class None extends Algorithm implements SignatureAlgorithm {
     }
 
     public function getSupportedAlgs() {
-        return array('none');
+        return ['none'];
     }
 
     public function sign($data, $keys, $kid = null) {

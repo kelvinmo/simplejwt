@@ -116,7 +116,7 @@ abstract class Algorithm {
         foreach ($args as $arg) {
             if ($arg == null) continue;
             if (is_string($arg)) {
-                $criteria = array_merge($criteria, array("kid" => $arg));
+                $criteria = array_merge($criteria, ['kid' => $arg]);
             } elseif (is_array($arg)) {
                 $criteria = array_merge($criteria, $arg);
             }

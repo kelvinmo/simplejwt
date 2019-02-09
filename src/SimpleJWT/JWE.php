@@ -45,7 +45,7 @@ class JWE {
     const COMPACT_FORMAT = 'compact';
     const JSON_FORMAT = 'json';
 
-    protected $headers = array('typ' => 'JWE');
+    protected $headers = ['typ' => 'JWE'];
 
     protected $plaintext = null;
 
@@ -140,12 +140,12 @@ class JWE {
 
             if ($key_enc instanceof KeyEncryptionAlgorithm) {
                 // Key agreement with wrapping
-                $keys->add(new SymmetricKey(array(
+                $keys->add(new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
                     'alg' => $this->headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
                     'kid' => '#key-agreement-with-wrapping'
-                ), 'php'));
+                ], 'php'));
                 $kid = '#key-agreement-with-wrapping';
             } else {
                 // Direct key agreement or direct encryption
@@ -244,11 +244,11 @@ class JWE {
 
             if ($key_enc instanceof KeyEncryptionAlgorithm) {
                 // Key agreement with wrapping
-                $keys->add(new SymmetricKey(array(
+                $keys->add(new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
                     'alg' => $this->headers['alg'],
                     'k' => Util::base64url_encode($agreed_key)
-                ), 'php'));
+                ], 'php'));
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;
@@ -286,12 +286,12 @@ class JWE {
             case self::COMPACT_FORMAT:
                 return $protected . '.' . $encrypted_key . '.' . $iv . '.' . $ciphertext . '.' . $tag;
             case self::JSON_FORMAT:
-                $obj = array(
+                $obj = [
                     'protected' => $protected,
                     'ciphertext' => $ciphertext,
                     'tag' => $tag,
                     'encrypted_key' => $encrypted_key
-                );
+                ];
                 if ($iv) $obj['iv'] = $iv;
 
                 return json_encode($obj);

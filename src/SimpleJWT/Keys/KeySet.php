@@ -46,7 +46,7 @@ use SimpleJWT\Crypt\CryptException;
  */
 class KeySet {
     /** @var array the keys in this key set */
-    protected $keys = array();
+    protected $keys = [];
 
     /**
      * Loads a set of keys into the key set.  The set of keys is encoded
@@ -88,15 +88,15 @@ class KeySet {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);
-        $json = json_encode(array('keys' => $result));
+        $json = json_encode(['keys' => $result]);
         if ($password == null) return $json;
 
         $keys = KeySet::createFromSecret($password, 'bin');
-        $headers = array(
+        $headers = [
             'alg' => 'PBES2-HS256+A128KW',
             'enc' => 'A128CBC-HS256',
             'cty' => 'jwk-set+json'
-        );
+        ];
         $jwe = new JWE($headers, $json);
         return $jwe->encrypt($keys);
     }
@@ -158,7 +158,7 @@ class KeySet {
      * @return Key the found key, or null
      */
     function getById($kid, $fuzzy = false) {
-        $fuzzy_keys = array();
+        $fuzzy_keys = [];
 
         foreach ($this->keys as $key) {
             if ($key->getKeyId() == $kid) {
@@ -209,7 +209,7 @@ class KeySet {
      * @return Key the found key, or null
      */
     protected function find($criteria) {
-        $results = array();
+        $results = [];
 
         // Round 1: All mandatory criteria
         foreach ($this->keys as $key) {
@@ -237,7 +237,7 @@ class KeySet {
         if (count($results) == 0) return null;
         if (count($results) == 1) {
             $kids = array_keys($results);
-            return array($this->getById($kids[0]));
+            return [$this->getById($kids[0])];
         }
 
         // Round 2: Optional criteria

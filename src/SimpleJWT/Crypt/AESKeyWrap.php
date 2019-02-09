@@ -45,11 +45,11 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
 
     const RFC3394_IV = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
 
-    static protected $alg_params = array(
-        'A128KW' => array('cipher' => 'AES-128-ECB', 'key' => 16),
-        'A192KW' => array('cipher' => 'AES-192-ECB', 'key' => 24),
-        'A256KW' => array('cipher' => 'AES-256-ECB', 'key' => 32),
-    );
+    static protected $alg_params = [
+        'A128KW' => ['cipher' => 'AES-128-ECB', 'key' => 16],
+        'A192KW' => ['cipher' => 'AES-192-ECB', 'key' => 24],
+        'A256KW' => ['cipher' => 'AES-256-ECB', 'key' => 32],
+    ];
 
     public function __construct($alg) {
         parent::__construct($alg);
@@ -57,7 +57,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
 
     public function getSupportedAlgs() {
         $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
-        $results = array();
+        $results = [];
 
         foreach (self::$alg_params as $alg => $param) {
             if (in_array($param['cipher'], $ciphers)) {
@@ -71,7 +71,11 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     public function getKeyCriteria() {
         $alg = $this->getAlg();
         $size = self::$alg_params[$alg]['key'] * 8;
-        return array('kty' => 'oct', Key::SIZE_PROPERTY => $size, '~alg' => $this->getAlg());
+        return [
+            'kty' => 'oct',
+            Key::SIZE_PROPERTY => $size,
+            '~alg' => $this->getAlg()
+        ];
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {

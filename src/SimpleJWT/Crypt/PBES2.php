@@ -47,11 +47,11 @@ use SimpleJWT\Keys\SymmetricKey;
  */
 class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
 
-    static protected $alg_params = array(
-        'PBES2-HS256+A128KW' => array('hash' => 'sha256'),
-        'PBES2-HS384+A192KW' => array('hash' => 'sha384'),
-        'PBES2-HS512+A256KW' => array('hash' => 'sha512')
-    );
+    static protected $alg_params = [
+        'PBES2-HS256+A128KW' => ['hash' => 'sha256'],
+        'PBES2-HS384+A192KW' => ['hash' => 'sha384'],
+        'PBES2-HS512+A256KW' => ['hash' => 'sha512']
+    ];
 
     protected $hash_alg;
     protected $aeskw;
@@ -69,7 +69,7 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function getSupportedAlgs() {
-        $results = array();
+        $results = [];
 
         $aeskw = new AESKeyWrap(null);
         $aeskw_algs = $aeskw->getSupportedAlgs();
@@ -87,7 +87,10 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
 
     public function getKeyCriteria() {
         $alg = $this->getAlg();
-        return array('kty' => 'oct', '~alg' => $this->getAlg());
+        return [
+            'kty' => 'oct',
+            '~alg' => $this->getAlg()
+        ];
     }
 
     /**

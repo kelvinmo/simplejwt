@@ -108,7 +108,7 @@ class Helper {
     function getObject($keys, $expected_alg, $kid = null) {
         switch ($this->type) {
             case 'JWT':
-                return JWT::decode($this->data, $keys, $expected_alg, $kid, array(), $this->format);
+                return JWT::decode($this->data, $keys, $expected_alg, $kid, [], $this->format);
             case 'JWE':
                 return JWE::decrypt($this->data, $keys, $expected_alg, $kid, $this->format);
         }
@@ -158,7 +158,7 @@ class Helper {
      * if the format cannot be detected
      */
     static function detect($data) {
-        $results = array();
+        $results = [];
 
         $obj = json_decode($data, true);
 

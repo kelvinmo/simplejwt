@@ -7,13 +7,22 @@ SimpleJWT is a simple JSON web token library written in PHP.
 
 ## Features
 
-- JSON web token [RFC7519](http://tools.ietf.org/html/rfc7519)
-  and JSON web signatures [RFC7515](http://tools.ietf.org/html/rfc7515)
+- JSON web token [RFC7519](http://tools.ietf.org/html/rfc7519),
+  JSON web signatures [RFC7515](http://tools.ietf.org/html/rfc7515)
+  and JSON web encryption [RFC7516](http://tools.ietf.org/html/rfc7516)
 - JSON web keys [RFC7517](http://tools.ietf.org/html/rfc7517)
 - Signature algorithms
     * HMAC family (HS256, HS384, HS512)
     * RSA family (RS256, RS384, RS512)
     * ECDSA family (ES256, ES384, ES512)
+- Key management algorithms
+    * Key agreement or direct encryption
+    * RSAES-PKCS1-v1_5 (RSA1_5)
+    * RSAES with OAEP (RSA-OAEP, RSA-OAEP-256)
+    * AES key wrap (A128KW, A192KW, A256KW)
+    * PBES2 (PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW)
+- Content encryption algorithms
+    * AES_CBC_HMAC_SHA2 family (A128CBC-HS256, A192CBC-HS384, A256CBC-HS512)
 
 ## Requirements
 
@@ -65,6 +74,11 @@ can add keys in the following ways:
 
   ```php
   $set = SimpleJWT\Keys\KeySet::createFromSecret('secret123');
+
+  // The above is a shortcut for the following:
+  $set = new SimpleJWT\Keys\KeySet();
+  $key = new SimpleJWT\Keys\SymmetricKey('secret123', 'bin');
+  $set->add($key);
   ```
 
 ### Creating a JWT
@@ -89,9 +103,16 @@ try {
 }
 ```
 
+By default, SimpleJWT will automatically include a `kid` (Key ID) header and
+a `iat` (Issued At) claim in all JWTs.  If the key used to sign the JWT does
+not have a `kid` assigned (e.g. if it is imported from a PEM file), a `kid`
+is generated.  You can disable this behaviour by specifying `$auto_complete`
+to false when calling `SimpleJWT\JWT::encode()`.
+
 ### Verifying a JWT
 
-To consume and verify a JWT, use the decode function.  Note that you will need to supply the expected `alg` parameter that has been previously agreed out-of-band.
+To consume and verify a JWT, use the decode function.  Note that you will need
+to supply the expected `alg` parameter that has been previously agreed out-of-band.
 
 ```php
 try {
@@ -135,7 +156,7 @@ $plaintext = 'This is the plaintext I want to encrypt.';
 $jwt = new SimpleJWT\JWE($headers, $plaintext);
 ```
 
-The JWT can then be encrypted:
+The JWE can then be encrypted:
 
 ```php
 try {
@@ -160,6 +181,6 @@ print $jwt->getHeader('alg');
 print $jwt->getPlaintext();
 ```
 
-## License
+## Licence
 
 BSD 3 clause

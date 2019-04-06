@@ -49,13 +49,13 @@ class ECKey extends Key {
 
     const EC_OID = '1.2.840.10045.2.1';
     const P256_OID = '1.2.840.10045.3.1.7';
-    const P256_OID2 = '1.3.132.0.10';
+    const SECP256K1_OID = '1.3.132.0.10';
     const P384_OID = '1.3.132.0.34';
     const P521_OID = '1.3.132.0.35';
 
     static $curves = [
         self::P256_OID => ['crv' => 'P-256', 'len' => 64],
-        self::P256_OID2 => ['crv' => 'P-256', 'len' => 64],
+        self::SECP256K1_OID => ['crv' => 'SECP256K1', 'len' => 64],
         self::P384_OID => ['crv' => 'P-384', 'len' => 96],
         self::P521_OID => ['crv' => 'P-521', 'len' => 132],
     ];

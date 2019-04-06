@@ -95,12 +95,12 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $jwt = new JWT(['alg' => 'ES256'], $claims);
-        $token = $jwt->encode($set, null, false);
+        $token = $jwt->encode($set, 'EC', false);
 
         // Note that ECDSA generates a different signature every time, as a random
         // number is used as part of the algorithm.
         $set2 = $this->getPublicKeySet();
-        $jwt2 = JWT::decode($token, $set2, 'ES256');
+        $jwt2 = JWT::decode($token, $set2, 'ES256', 'EC');
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
 

@@ -189,8 +189,9 @@ class RSAKey extends Key {
         }
     }
 
-    protected function getSignatureKeys() {
-        return ['kty', 'n', 'e'];
+    protected function getThumbnailMembers() {
+        // https://tools.ietf.org/html/rfc7638#section-3.2
+        return ['e', 'kty', 'n'];
     }
 }
 

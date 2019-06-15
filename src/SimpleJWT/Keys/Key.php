@@ -83,7 +83,7 @@ abstract class Key {
         }
 
         if (!isset($data['kid'])) {
-            $this->data['kid'] = substr($this->getSignature(), 0, 7);
+            $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
         }
     }
 
@@ -247,23 +247,30 @@ abstract class Key {
     abstract public function toPEM();
 
     /**
-     * Obtains the keys from the underlying JSON web key object to be used
-     * to calculate the key's signature.
-     *
-     * Generally, the following should be returned:
+     * Obtains the members from the underlying JSON web key object to be used
+     * to calculate the key's thumbnail.
+     * 
+     * The members are specified in RFC 7638.  Generally, this includes:
      *
      * - `kty`
-     * - `alg` (if exists)
      * - if it is a symmetric key, the key itself
      * - if it is an asymmetric key, all the parameters for the public key
      *
      * @return array the array of keys
+     * @see https://tools.ietf.org/html/rfc7638
      */
-    abstract protected function getSignatureKeys();
+    abstract protected function getThumbnailMembers();
+
+    /** 
+     * Alias for {@link getThumbnail()} for compatibility.
+     */
+    public function getSignature() {
+        return $this->getThumbnail();
+    }
 
     /**
      * Obtains a signature for the key.  The signature is derived from the
-     * keys to the JSON web key object as returned by the {@link getSignatureKeys()}
+     * keys to the JSON web key object as returned by the {@link getThumbnailMembers()}
      * function.
      *
      * For asymmetric keys, the public and private keys should have the same
@@ -271,10 +278,10 @@ abstract class Key {
      *
      * @return string the signature
      */
-    public function getSignature() {
-        $keys = $this->getSignatureKeys();
+    public function getThumbnail() {
+        $members = $this->getThumbnailMembers();
         $signing = [];
-        foreach ($keys as $key) $signing[$key] = $this->data[$key];
+        foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
         ksort($signing);
         return Util::base64url_encode(hash('sha256', json_encode($signing), true));
     }

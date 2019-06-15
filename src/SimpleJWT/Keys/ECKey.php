@@ -205,8 +205,9 @@ class ECKey extends Key {
         }
     }
 
-    protected function getSignatureKeys() {
-        return ['kty', 'crv', 'x', 'y'];
+    protected function getThumbnailMembers() {
+        // https://tools.ietf.org/html/rfc7638#section-3.2
+        return ['crv', 'kty', 'x', 'y'];
     }
 
     private function getOID($crv) {

@@ -111,9 +111,9 @@ class KeySet {
      * @throws KeyException if there is an identical key
      */
     function add($key) {
-        $signature = $key->getSignature();
+        $thumbnail = $key->getThumbnail();
         foreach ($this->keys as $existing_key) {
-            if ($existing_key->getSignature() == $signature) throw new KeyException('Key already exists');
+            if ($existing_key->getThumbnail() == $thumbnail) throw new KeyException('Key already exists');
             if ($existing_key->getKeyID() == $key->getKeyID()) throw new KeyException('Key already exists');
         }
 
@@ -268,7 +268,7 @@ class KeySet {
      */
     function remove($key) {
         for ($i = 0; $i < count($this->keys); $i++) {
-            if ($this->keys[$i]->getSignature() == $key->getSignature()) {
+            if ($this->keys[$i]->getThumbnail() == $key->getThumbnail()) {
                 unset($this->keys[$i]);
                 return;
             }

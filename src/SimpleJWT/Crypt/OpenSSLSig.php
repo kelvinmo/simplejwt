@@ -80,6 +80,8 @@ class OpenSSLSig extends SHA2 {
         }
         if (defined('OPENSSL_KEYTYPE_EC')) {
             foreach ($hashes as $size) $results[] = 'ES' . $size;
+
+            $results[] = 'ES256K';
         }
 
         return $results;

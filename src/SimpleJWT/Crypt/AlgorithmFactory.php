@@ -48,6 +48,7 @@ class AlgorithmFactory {
     static $alg_map = [
         // Signature algorithms
         '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
+        '/^ES256K$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
         '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',
 

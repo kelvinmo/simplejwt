@@ -50,7 +50,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
 
         $set->add(new Keys\ECKey([
             "kty" => "EC",
-            "crv" => "SECP256K1",
+            "crv" => "P-256K",
             "x" => "QGVPYUfFqCwBeaapsTbrtQZFU5h0EXBO8iEzH3pUz-c",
             "y" => "3BZVYSHcdZMkWtnnenhAiCXdWJyVGEMKMECIdzVD11U",
             "d" => "jA_zoAn0BhF0M7x8A3zZtWuFXI9U-A1jAGXjTKHsMkY",
@@ -107,13 +107,13 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     function testGenerateECSECP256k1() {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
-        $jwt = new JWT(['alg' => 'ES256'], $claims);
-        $token = $jwt->encode($set, 'secp256k1', false);
+        $jwt = new JWT(['alg' => 'ES256K'], $claims);
+        $token = $jwt->encode($set, 'EC', false);
 
         // Note that ECDSA generates a different signature every time, as a random
         // number is used as part of the algorithm.
         $set2 = $this->getPublicKeySet();
-        $jwt2 = JWT::decode($token, $set2, 'ES256', 'secp256k1');
+        $jwt2 = JWT::decode($token, $set2, 'ES256K', 'EC');
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
 

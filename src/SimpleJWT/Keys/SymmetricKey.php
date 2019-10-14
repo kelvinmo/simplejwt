@@ -120,8 +120,9 @@ class SymmetricKey extends Key {
         return Util::base64url_decode($this->data['k']);
     }
 
-    protected function getSignatureKeys() {
-        return ['kty', 'k'];
+    protected function getThumbnailMembers() {
+        // https://tools.ietf.org/html/rfc7638#section-3.2
+        return ['k', 'kty'];
     }
 }
 

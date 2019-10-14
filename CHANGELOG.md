@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.2.5
+
+- Fixed incorrect handling of kid when using symmetric encryption (#13)
+- Enhanced documentation
+- Refactored coding style
+
 ## Version 0.2.3/4
 
 - Fixed support for RSA-OAEP-256

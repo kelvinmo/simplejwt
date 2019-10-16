@@ -42,8 +42,8 @@ use SimpleJWT\Util\Util;
 
 /**
  * SHA2 signature algorithms that use the OpenSSL library.  These include
- * RSA-SHA and EC-SHA algorithms: `RS256`, `RS384`, `RS512`, `ES256`, `ES384`
- * and `ES512`.
+ * RSA-SHA and EC-SHA algorithms: `RS256`, `RS384`, `RS512`, `ES256`, `ES384`,
+ * `ES512` and `ES256K`.
  */
 class OpenSSLSig extends SHA2 {
     private $family;
@@ -80,6 +80,9 @@ class OpenSSLSig extends SHA2 {
         }
         if (defined('OPENSSL_KEYTYPE_EC')) {
             foreach ($hashes as $size) $results[] = 'ES' . $size;
+
+            if (function_exists('openssl_get_curve_names') && in_array('secp256k1', openssl_get_curve_names()) && in_array('SHA256', $hash_algos))
+                $results[] = 'ES256K';
         }
 
         return $results;

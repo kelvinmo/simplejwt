@@ -48,6 +48,15 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
             "kid" => "EC"
         ], 'php'));
 
+        $set->add(new Keys\ECKey([
+            "kty" => "EC",
+            "crv" => "secp256k1",
+            "x" => "QGVPYUfFqCwBeaapsTbrtQZFU5h0EXBO8iEzH3pUz-c",
+            "y" => "3BZVYSHcdZMkWtnnenhAiCXdWJyVGEMKMECIdzVD11U",
+            "d" => "jA_zoAn0BhF0M7x8A3zZtWuFXI9U-A1jAGXjTKHsMkY",
+            "kid" => "secp256k1"
+        ], 'php'));
+
         return $set;
     }
 
@@ -86,19 +95,38 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $jwt = new JWT(['alg' => 'ES256'], $claims);
-        $token = $jwt->encode($set, null, false);
+        $token = $jwt->encode($set, 'EC', false);
 
         // Note that ECDSA generates a different signature every time, as a random
         // number is used as part of the algorithm.
         $set2 = $this->getPublicKeySet();
-        $jwt2 = JWT::decode($token, $set2, 'ES256');
+        $jwt2 = JWT::decode($token, $set2, 'ES256', 'EC');
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
-    
+
+    function testGenerateEC_secp256k1() {
+        $algs = Crypt\AlgorithmFactory::getSupportedAlgs('sig');
+        if (!in_array('ES256K', $algs)) {
+            $this->markTestSkipped('ES256K algorithm not available');
+            return;
+        }
+
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $jwt = new JWT(['alg' => 'ES256K'], $claims);
+        $token = $jwt->encode($set, 'secp256k1', false);
+
+        // Note that ECDSA generates a different signature every time, as a random
+        // number is used as part of the algorithm.
+        $set2 = $this->getPublicKeySet();
+        $jwt2 = JWT::decode($token, $set2, 'ES256K', 'secp256k1');
+        $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
+    }
+
     function testDeserialise() {
         $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
         list($headers, $claims, $signing_input, $signature) = JWT::deserialise($token);
-        
+
         $this->assertEquals('HS256', $headers['alg']);
         $this->assertTrue($claims['http://example.com/is_root']);
         $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $signing_input);
@@ -122,7 +150,7 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
     function testVerifyEC() {
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
-        $jwt = JWT::decode($token, $set, 'ES256');
+        $jwt = JWT::decode($token, $set, 'ES256', 'EC');
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 

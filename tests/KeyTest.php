@@ -30,13 +30,31 @@ class KeyTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals("IUN-eG7WkRmqa5xa_agso36vn0ZLJ7EokYyPK64M1ww", $key_data['d']);
         $this->assertEquals("V_Go0coP2q7BktWwkkHBVgVMCt5gpIyegCccpfoGPy4", $key_data['x']);
         $this->assertEquals("aEPjI2pjfCwPeoh2KykOpVPLSUJ9tGHH5ER-DGYjt_g", $key_data['y']);
-        
+
         $pem = file_get_contents('ec_public.pem');
         $key = new ECKey($pem, 'pem');
         $key_data = $key->getKeyData();
         $this->assertTrue($key->isPublic());
         $this->assertEquals("V_Go0coP2q7BktWwkkHBVgVMCt5gpIyegCccpfoGPy4", $key_data['x']);
         $this->assertEquals("aEPjI2pjfCwPeoh2KykOpVPLSUJ9tGHH5ER-DGYjt_g", $key_data['y']);
+    }
+
+    public function testEC_secp256k1() {
+        $pem = file_get_contents('ec_secp256k1_private.pem');
+        $key = new ECKey($pem, 'pem');
+        $key_data = $key->getKeyData();
+        $this->assertFalse($key->isPublic());
+        $this->assertEquals("jA_zoAn0BhF0M7x8A3zZtWuFXI9U-A1jAGXjTKHsMkY", $key_data['d']);
+        $this->assertEquals("QGVPYUfFqCwBeaapsTbrtQZFU5h0EXBO8iEzH3pUz-c", $key_data['x']);
+        $this->assertEquals("3BZVYSHcdZMkWtnnenhAiCXdWJyVGEMKMECIdzVD11U", $key_data['y']);
+
+        $pem = file_get_contents('ec_secp256k1_public.pem');
+        $key = new ECKey($pem, 'pem');
+        $key_data = $key->getKeyData();
+        $this->assertTrue($key->isPublic());
+        $this->assertEquals("QGVPYUfFqCwBeaapsTbrtQZFU5h0EXBO8iEzH3pUz-c", $key_data['x']);
+        $this->assertEquals("3BZVYSHcdZMkWtnnenhAiCXdWJyVGEMKMECIdzVD11U", $key_data['y']);
+
     }
 }
 ?>

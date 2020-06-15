@@ -172,7 +172,7 @@ To decrypt a JWE, use the decrypt function:
 
 ```php
 try {
-    $jwt = SimpleJWT\JWT::decrypt('abc.def.ghi.klm.nop', $set, 'PBES2-HS256+A128KW');
+    $jwt = SimpleJWT\JWE::decrypt('abc.def.ghi.klm.nop', $set, 'PBES2-HS256+A128KW');
 } catch (SimpleJWT\InvalidTokenException $e) {
 
 }

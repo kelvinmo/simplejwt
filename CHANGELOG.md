@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.3.0
+
+- Refactored key signature methodology to align with
+  [RFC 7638](https://tools.ietf.org/html/rfc7638)
+- Fixed typo in documentation
+
 ## Version 0.2.5
 
 - Fixed incorrect handling of kid when using symmetric encryption (#13)

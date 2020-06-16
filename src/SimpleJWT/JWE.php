@@ -131,6 +131,7 @@ class JWE {
 
         if ($key_enc instanceof KeyDerivationAlgorithm) {
             try {
+                $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
                 $agreed_key = $key_enc->deriveKey($keys, $headers, $kid);
             } catch (KeyException $e) {
                 throw new InvalidTokenException($e->getMessage(), InvalidTokenException::DECRYPTION_ERROR, $e);

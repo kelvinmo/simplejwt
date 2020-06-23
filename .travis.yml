@@ -6,13 +6,25 @@ php:
     - 5.6
     - 7.0
     - 7.4
-before_script:
+
+jobs:
+    fast_finish: true
+    allow_failures:
+        - php: 5.4
+        - php: 5.5
+
+before_install:
     - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_TOKEN; fi'
-    - composer install
-#    - vendor/bin/phing phar
+    - travis_retry composer self-update
+    - phpenv config-rm xdebug.ini
+    
+install:
+    - travis_retry composer install
+
 notifications:
     email:
         on_success: false
+
 env:
     global:
         secure: GGhdl99VRvG+25OXzvofz5dLn1Wm/eVPCF0S9+ZhlGXiacOm5BVcdy7wcbA0fLuQO6CAl6YwN2D9sEvtSG/lu/7Nr4KpLzygxR31ZBKtFKixfcpTMh3EYiAgcpm7SjmFv/1ojSO7HEs2iSSCxbzLimiGXpQykScCv6TYpE5SKuPMzplDSYGDQCTw9Xr1wcifhP4bF1NcQTy0GawuPt002/SoWxoGaiV8MBtI3Kf5g9/WYfcgaPa8V7cKZc2bcSkjONugH2JTkoFh/Ro95o/L5p5k1QRLWjG58YXYZJKN/sFJbV+rcJZR1/rnHWfVOl+AX45bPt/GwzUQnOzDMtbkSL2pBJJIVPv/l1QCFFgGhzotD0xdnxRa77DyyXkA1RCwD8AErEFutENbAIy9VcLi1poFDi83wibjT99W+kMlGAps7zmjtHLMEB3AkqQ+7NAJ1PmQyFFeDueS4tiEpuaS0Nn9fACdQgfG5ymvup9Ipt+eYWiJVEQ0jPeWqNk7kI9zXKzwjH/S+n3GM+UkcVNTiSbmKPDj9eIC6ds/ttRs76iwhTVJRkGA4murLOABaLdzXaVIIT/mWs15jPoH7qbLL4/a4nfk+GtLJoYVHEgxD4ydm1mj65oMoujucyNw718YBDtyXpKCYPv1NEqPc+ubc1YMrfSjnjDF97sudaDJFoU=

@@ -39,7 +39,12 @@ use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
 
 /**
- * Interface for content authenticated encryption algorithms.
+ * Implementation of the RSA Encryption Scheme algorithms, including `RSA1_5` and
+ * the RSAES with Optimal Asymmetric Encryption Padding (OAEP).
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.2
+ * @see https://tools.ietf.org/html/rfc7518#section-4.3
+ * @see https://tools.ietf.org/html/rfc3447
  */
 class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     static protected $alg_params = [

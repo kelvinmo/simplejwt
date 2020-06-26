@@ -39,7 +39,10 @@ use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
 
 /**
- * Interface for content authenticated encryption algorithms.
+ * Implementation of the AES Key Wrap algorithms.
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.4
+ * @see https://tools.ietf.org/html/rfc3394
  */
 class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
 

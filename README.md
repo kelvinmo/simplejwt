@@ -37,7 +37,7 @@ You can install via [Composer](http://getcomposer.org/).
 ```json
 {
     "require": {
-        "kelvinmo/simplejwt": "0.1.*"
+        "kelvinmo/simplejwt": "0.3.*"
     }
 }
 ```

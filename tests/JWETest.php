@@ -48,7 +48,16 @@ class JWETest extends \PHPUnit_Framework_TestCase {
         return $set;
     }
 
-    public function testEncrypt() {
+    protected function getDirectKeySet() {
+        $set = new KeySet();
+        $set->add(new SymmetricKey([
+            "kty" => "oct",
+            "k" => "lhMUu-TevIFn6mFgPzRgUyZVlIuHeu4uAzn6dexz7vY"
+        ], 'php'));
+        return $set;
+    }
+
+    public function testEncryptRSA() {
         $plaintext = 'Live long and prosper.';
 
         $public_set = $this->getPublicKeySet();
@@ -60,12 +69,21 @@ class JWETest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
-    public function testDecrypt() {
+    public function testDecryptAESKW() {
         $plaintext = 'Live long and prosper.';
 
         $token = 'eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ.AxY8DCtDaGlsbGljb3RoZQ.KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.U0m_YmjN04DJvceFICbCVQ';
         $private_set = $this->getPrivateKeySet();
         $test_jwe = JWE::decrypt($token, $private_set, 'A128KW');
+        $this->assertEquals($plaintext, $test_jwe->getPlaintext());
+    }
+
+    public function testDecryptDirect() {
+        $plaintext = 'Live long and prosper.';
+
+        $token = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiWUkzRW9JSyJ9..h7LOWyYIlzq4BJV5V1vxhg.aZEMslyY-kybAWlb8hM6aWCocQ3TMghMhNwk4Meyjb4.IDEVZS1i76IHNSd5sAt7tA';
+        $private_set = $this->getDirectKeySet();
+        $test_jwe = JWE::decrypt($token, $private_set, 'dir');
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 }

@@ -104,16 +104,19 @@ class Util {
      * PHP function is used.
      *
      * @param int $num_bytes the number of bytes to generate
+     * @param string $rand_source file path to entropy source
      * @return string a string containing random bytes
      */
-    static function random_bytes($num_bytes, $rand_source = null) {
+    static function random_bytes($num_bytes, $rand_source = '/dev/urandom') {
+        // 1. Try random_bytes first
         if (function_exists('random_bytes')) return random_bytes($num_bytes);
 
+        // 2. Try mcrypt or openssl
         $is_windows = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 
         if ($is_windows) {
             // Windows
-            if (function_exists('mcrypt_create_iv') && version_compare(PHP_VERSION, '5.3.0', '>='))
+            if (function_exists('mcrypt_create_iv') && version_compare(PHP_VERSION, '5.3.7', '>='))
                 return mcrypt_create_iv($num_bytes);
 
             if (function_exists('openssl_random_pseudo_bytes') && version_compare(PHP_VERSION, '5.3.4', '>='))
@@ -123,14 +126,16 @@ class Util {
         if (!$is_windows && function_exists('openssl_random_pseudo_bytes'))
             return openssl_random_pseudo_bytes($num_bytes);
 
+        // 3. Try $rand_source or mt_rand
         $bytes = '';
-        if ($f === null) {
-            if ($rand_source === null) {
-                $f = FALSE;
-            } else {
-                $f = @fopen($rand_source, "r");
-            }
+        
+        // $rand_source is insecure on Windows (e.g. C:\dev\urandom would be read)
+        if (($rand_source === null) || $is_windows || !is_readable($rand_source)) {
+            $f = FALSE;
+        } else {
+            $f = @fopen($rand_source, "r");
         }
+        
         if ($f === FALSE) {
             $bytes = '';
             for ($i = 0; $i < $num_bytes; $i += 4) {

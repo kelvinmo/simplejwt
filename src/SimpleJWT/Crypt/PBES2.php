@@ -45,7 +45,7 @@ use SimpleJWT\Keys\SymmetricKey;
  *
  * @see https://tools.ietf.org/html/rfc7518#section-4.8
  */
-class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
+class PBES2 extends AESWrappedKeyAlgorithm {
 
     static protected $alg_params = [
         'PBES2-HS256+A128KW' => ['hash' => 'sha256'],
@@ -54,7 +54,6 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     ];
 
     protected $hash_alg;
-    protected $aeskw;
 
     protected $iterations = 4096;
 
@@ -62,17 +61,14 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         parent::__construct($alg);
 
         if ($alg != null) {
-            list ($dummy, $aeskw_alg) = explode('+', $alg, 2);
             $this->hash_alg = self::$alg_params[$alg]['hash'];
-            $this->aeskw = new AESKeyWrap($aeskw_alg);
         }
     }
 
     public function getSupportedAlgs() {
         $results = [];
 
-        $aeskw = new AESKeyWrap(null);
-        $aeskw_algs = $aeskw->getSupportedAlgs();
+        $aeskw_algs = $this->getAESKWAlgs();
         $hash_algs = hash_algos();
 
         foreach (self::$alg_params as $alg => $params) {
@@ -112,8 +108,8 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
             throw new CryptException('Key not found or is invalid');
         }
 
-        $derived_keyset = $this->getKeySetFromPassword($key->toBinary(), $headers);
-        return $this->aeskw->encryptKey($cek, $derived_keyset, $headers);
+        $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
+        return $this->wrapKey($cek, $derived_key, $headers);
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
@@ -122,18 +118,8 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
             throw new CryptException('Key not found or is invalid');
         }
 
-        $derived_keyset = $this->getKeySetFromPassword($key->toBinary(), $headers);
-        return $this->aeskw->decryptKey($encrypted_key, $derived_keyset, $headers);
-    }
-
-    /**
-     * Returns the required key size for the AES key wrap key
-     *
-     * @return int the key size, in bits
-     */
-    protected function getAESKWKeySize() {
-        $criteria = $this->aeskw->getKeyCriteria();
-        return $criteria[Key::SIZE_PROPERTY];
+        $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
+        return $this->unwrapKey($encrypted_key, $derived_key, $headers);
     }
 
     /**
@@ -146,13 +132,10 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         return Util::random_bytes(8);
     }
 
-    private function getKeySetFromPassword($password, $headers) {
+    private function generateKeyFromPassword($password, $headers) {
         $salt = $headers['alg'] . "\x00" . Util::base64url_decode($headers['p2s']);
 
-        $hash = hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);
-        $keys = new KeySet();
-        $keys->add(new SymmetricKey($hash, 'bin'));
-        return $keys;
+        return hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);
     }
 }
 

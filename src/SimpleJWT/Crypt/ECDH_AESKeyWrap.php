@@ -37,38 +37,42 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Keys\KeySet;
 
-class ECDH_AESKeyWrap extends AESKeyWrap {
+class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm {
+    /** @var ECDH the underlying ECDH algorithm */
+    private $ecdh;
+
     public function __construct($alg) {
-        // TODO: Modify alg to strip out ECDH-ES+ prefix
         parent::__construct($alg);
+
+        if ($alg == null) {
+            $this->ecdh = new ECDH(null);
+        } else {
+            list($ecdh_alg, $dummy) = explode('+', $alg, 2);
+
+            $size = $this->getAESKWKeySize();
+            $this->ecdh = new ECDH($ecdh_alg, $size);
+        }
     }
 
     public function getSupportedAlgs() {
-        $ecdh = new ECDH(null);
+        if (len($this->ecdh->getSupportedAlgs()) == 0) return [];
 
-        if (len($ecdh->getSupportedAlgs) == 0) return [];
-
-        $aeskw_algs = parent::getSupportedAlgs();
-
-
-        $results = [];
-
-        foreach (self::$aeskw_algs as $alg) {
-            if (in_array($param['cipher'], $ciphers)) {
-                $results[] = $alg;
-            }
-        }
-
-        return $results;
+        $aeskw_algs = $this->getAESKWAlgs();
+        return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
-    protected function deriveEphemeralKeys($keys, &$headers, $kid = null) {
-        // return a KeySet
+    public function getKeyCriteria() {
+        return $this->ecdh->getKeyCriteria();
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $ephemeral_keys = $this->deriveEphemeralKeys($keys, $headers, $kid);
-        return parent::encryptKey($cek, $ephemeral_keys, $headers, $kid);
+        $shared_key = $this->ecdh->deriveKey($keys, $headers, $kid);
+        return $this->wrapKey($cek, $shared_key, $headers);
+    }
+
+    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+        $shared_key = $this->ecdh->deriveKey($keys, $headers, $kid);
+        return $this->unwrapKey($encrypted_key, $shared_key, $headers);
     }
 }
 

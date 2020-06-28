@@ -55,6 +55,8 @@ class AESGCM extends Algorithm implements EncryptionAlgorithm {
     }
 
     public function getSupportedAlgs() {
+        if (!version_compare(PHP_VERSION, '7.1', '>=')) return [];
+
         $ciphers = array_map('strtolower', openssl_get_cipher_methods());
         $results = [];
 

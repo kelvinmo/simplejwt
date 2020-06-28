@@ -54,10 +54,22 @@ class ECKey extends Key {
     const P521_OID = '1.3.132.0.35';
 
     static $curves = [
-        self::P256_OID => ['crv' => 'P-256', 'len' => 64],
-        self::SECP256K1_OID => ['crv' => 'secp256k1', 'len' => 64],
-        self::P384_OID => ['crv' => 'P-384', 'len' => 96],
-        self::P521_OID => ['crv' => 'P-521', 'len' => 132],
+        'P-256' => [
+            'oid' => P256_OID,
+            'len' => 64
+        ],
+        'P-384' => [
+            'oid' => P384_OID,
+            'len' => 96
+        ],
+        'P-521' => [
+            'oid' => P521_OID,
+            'len' => 132
+        ],
+        'secp256k1' => [
+            'oid' => SECP256K1_OID,
+            'len' => 64
+        ],
     ];
 
     /**
@@ -98,9 +110,10 @@ class ECKey extends Key {
                     $algorithm = ASN1::decodeOID($algorithm);
                     if ($algorithm != self::EC_OID) throw new KeyException('Not EC key');
 
-                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1::decodeOID($curve);
-                    if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
+                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
+                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve = $this->getCurveNameFromOID($curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
@@ -113,7 +126,7 @@ class ECKey extends Key {
                     $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = self::$curves[$curve]['crv'];
+                    $jwk['crv'] = $curve;
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
@@ -129,9 +142,10 @@ class ECKey extends Key {
                     $offset += ASN1::readDER($der, $offset, $d);  // OCTET STRING [d]
 
                     $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[0]
-                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1::decodeOID($curve);
-                    if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
+                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
+                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve = $this->getCurveNameFromOID($curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
@@ -145,7 +159,7 @@ class ECKey extends Key {
                     $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = self::$curves[$curve]['crv'];
+                    $jwk['crv'] = $curve;
                     $jwk['d'] = Util::base64url_encode($d);
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
@@ -179,7 +193,7 @@ class ECKey extends Key {
     }
 
     public function toPEM() {
-        $oid = $this->getOID($this->data['crv']);
+        $oid = self::$curves[$this->data['crv']]['oid'];
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
 
         if ($this->isPublic()) {
@@ -205,14 +219,23 @@ class ECKey extends Key {
         }
     }
 
+    /**
+     * Gets the elliptic curve for the key.  The elliptic curve is specified in
+     * the `crv` parameter.
+     * 
+     * @return string the elliptic curve
+     */
+    public function getCurve() {
+        return $this->data['crv'];
+    }
     protected function getThumbnailMembers() {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['crv', 'kty', 'x', 'y'];
     }
 
-    private function getOID($crv) {
-        foreach (self::$curves as $oid => $params) {
-            if ($params['crv'] == $crv) return $oid;
+    private function getCurveNameFromOID($curve_oid) {
+        foreach (self::$curves as $crv => $params) {
+            if ($params['oid'] == $curve_oid) return $crv;
         }
         return null;
     }

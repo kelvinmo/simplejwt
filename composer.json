@@ -6,7 +6,8 @@
     "require": {
         "php": ">=5.4.0",
         "ext-openssl": "*",
-        "ext-hash": "*"
+        "ext-hash": "*",
+        "ext-gmp": "*"
     },
     "require-dev": {
         "ext-bz2": "*",

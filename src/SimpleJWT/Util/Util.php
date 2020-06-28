@@ -89,10 +89,14 @@ class Util {
      * @return string the byte string
      */
     static function packInt64($x) {
-        if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
+        if (version_compare(PHP_VERSION, '5.6.3', '>=') && version_compare(PHP_VERSION, '7', '<')) {
             return pack('J', $x);
         } else {
-            return "\x00\x00\x00\x00" . pack('N', $x);
+            if (PHP_INT_SIZE == 8) {
+                return pack('J', $x);
+            } else {
+                return "\x00\x00\x00\x00" . pack('N', $x);
+            }
         }
     }
 

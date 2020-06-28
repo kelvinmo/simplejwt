@@ -105,7 +105,7 @@ class AESGCM extends Algorithm implements EncryptionAlgorithm {
         $tag = Util::base64url_decode($tag);
         if (strlen($tag) != 16) throw new CryptException('Incorrect authentication tag length');
         
-        $plaintext = openssl_decrypt($e, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv, $tag, $additional);
+        $plaintext = openssl_decrypt($ciphertext, $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional);
         if ($plaintext === false) throw new CryptException('Authentication tag does not match');
 
         return $plaintext;

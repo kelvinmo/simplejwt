@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Upcoming
 
- - Fixed: Arguments for SimpleJWT\JWT::deserialise()
+- Fixed: Syntax error in SimpleJWT\JWE::decrypt()
+- Fixed: Arguments for SimpleJWT\JWT::deserialise()
  - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
-   SimpleJWT\Keys\Key::getSignature() instead
+   SimpleJWT\Keys\Key::getThumbnail() instead
 
 ## Version 0.3.1
 

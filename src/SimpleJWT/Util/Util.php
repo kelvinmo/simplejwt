@@ -89,14 +89,15 @@ class Util {
      * @return string the byte string
      */
     static function packInt64($x) {
-        if (version_compare(PHP_VERSION, '5.6.3', '>=') && version_compare(PHP_VERSION, '7', '<')) {
-            return pack('J', $x);
-        } else {
-            if (PHP_INT_SIZE == 8) {
+        if (PHP_INT_SIZE == 8) {
+            if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
                 return pack('J', $x);
             } else {
-                return "\x00\x00\x00\x00" . pack('N', $x);
+                return pack('NN', ($x & 0xFFFFFFFF00000000) >> 32, $x & ($x & 0x00000000FFFFFFFF)); 
             }
+        } else {
+            // 32-bit system
+            return "\x00\x00\x00\x00" . pack('N', $x);
         }
     }
 

@@ -143,7 +143,7 @@ class JWE {
                 // Key agreement with wrapping
                 $keys->add(new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
-                    'alg' => $this->headers['alg'],
+                    'alg' => $headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
                     'kid' => '#key-agreement-with-wrapping'
                 ], 'php'));

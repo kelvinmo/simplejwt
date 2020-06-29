@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Upcoming
 
+ - Fixed: Arguments for SimpleJWT\JWT::deserialise()
  - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
    SimpleJWT\Keys\Key::getSignature() instead
 

@@ -53,7 +53,9 @@ use SimpleJWT\Util\Util;
  * functions.
  */
 class JWT {
+    /** @var string COMPACT_FORMAT Compact JWT serialisation format */
     const COMPACT_FORMAT = 'compact';
+    /** @var string JSON_FORMAT JSON JWT serialisation format */
     const JSON_FORMAT = 'json';
 
     static public $TIME_ALLOWANCE = 300;
@@ -97,7 +99,16 @@ class JWT {
     public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = [], $format = self::COMPACT_FORMAT) {
         if ($skip_validation === false) $skip_validation = [];
         
-        list($headers, $claims, $signing_input, $signature) = self::deserialise($token, $format, true);
+        list($headers, $claims, $signing_input, $signature) = self::deserialise($token, $format);
+
+        // Process crit
+        if (isset($headers['crit'])) {
+            foreach ($headers['crit'] as $critical) {
+                if (!in_array($critical, ['nbf', 'exp', 'alg', 'kid'])) {
+                    throw new InvalidTokenException('Critical header not supported: ' . $critical, InvalidTokenException::UNSUPPORTED_ERROR);
+                }
+            }
+        }
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
@@ -229,7 +240,7 @@ class JWT {
      * parts of the serialised JWT) and signature
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function deserialise($token, $format = self::COMPACT_FORMAT, $process_crit = false) {
+    public static function deserialise($token, $format = self::COMPACT_FORMAT) {
         switch ($format) {
             case self::COMPACT_FORMAT:
                 $parts = explode('.', $token, 3);
@@ -266,15 +277,6 @@ class JWT {
 
         $headers = json_decode(Util::base64url_decode($protected), true);
         if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
-
-        // Process crit
-        if ($process_crit && isset($headers['crit'])) {
-            foreach ($headers['crit'] as $critical) {
-                if (!in_array($critical, ['nbf', 'exp', 'alg', 'kid'])) {
-                    throw new InvalidTokenException('Critical header not supported: ' . $critical, InvalidTokenException::UNSUPPORTED_ERROR);
-                }
-            }
-        }
         
         if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
 
@@ -284,6 +286,13 @@ class JWT {
         $signing_input = $protected . '.' . $payload;
         
         return [$headers, $claims, $signing_input, $signature];
+    }
+
+    /**
+     * Alias for {@link JWT::deserialise()}.
+     */
+    public static function deserialize($token, $format = self::COMPACT_FORMAT) {
+        return self::deserialise($token, $format);
     }
 }
 ?>

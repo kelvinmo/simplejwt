@@ -135,7 +135,7 @@ You can also deserialise a JWT without verifying it using the deserialise functi
 ```php
 try {
     list($headers, $claims, $signing_input, $signature) =
-        SimpleJWT\JWT::deserialise('abc.def.ghigjghr', $set, 'HS256');
+        SimpleJWT\JWT::deserialise('abc.def.ghigjghr', $set);
 } catch (SimpleJWT\InvalidTokenException $e) {
 
 }

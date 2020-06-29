@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Upcoming
+
+ - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
+   SimpleJWT\Keys\Key::getSignature() instead
+
 ## Version 0.3.1
 
 - Fixed undefined variable error when using JWE with a symmetric key (#19)

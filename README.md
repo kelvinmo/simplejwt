@@ -26,7 +26,9 @@ SimpleJWT is a simple JSON web token library written in PHP.
 
 ## Requirements
 
-- PHP 5.4.0 or later
+- PHP:
+    * PHP 7.1.0 or later; or
+    * PHP 5.4.0 or later
 - `hash` extension
 - `openssl` extension
 
@@ -133,7 +135,7 @@ You can also deserialise a JWT without verifying it using the deserialise functi
 ```php
 try {
     list($headers, $claims, $signing_input, $signature) =
-        SimpleJWT\JWT::deserialise('abc.def.ghigjghr', $set, 'HS256');
+        SimpleJWT\JWT::deserialise('abc.def.ghigjghr');
 } catch (SimpleJWT\InvalidTokenException $e) {
 
 }

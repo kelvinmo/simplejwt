@@ -146,7 +146,7 @@ class JWE {
                     'alg' => $headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
                 ], 'php');
-                $kid = $this->getThumbnail();
+                $kid = $agreed_symmetric_key->getThumbnail();
                 $agreed_symmetric_key->setKeyId($kid);
                 $keys->add($agreed_symmetric_key);
             } else {
@@ -251,7 +251,7 @@ class JWE {
                     'alg' => $headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
                 ], 'php');
-                $kid = $this->getThumbnail();
+                $kid = $agreed_symmetric_key->getThumbnail();
                 $agreed_symmetric_key->setKeyId($kid);
                 $keys->add($agreed_symmetric_key);
             } else {

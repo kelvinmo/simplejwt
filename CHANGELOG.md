@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Upcoming
+## Version 0.4.0
 
 - Changed: jwkstool build process
 - Fixed: Syntax error in SimpleJWT\JWE::decrypt()

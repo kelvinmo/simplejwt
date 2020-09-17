@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.1
+
+- Fixed: Composer dependencies on `symfony/console` for PHP 7 compatibility
+  (#22)
+
 ## Version 0.4.0
 
 - Changed: jwkstool build process

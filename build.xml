@@ -13,8 +13,7 @@
             <fileset dir="vendor">
                 <include name="autoload.php" />
                 <include name="composer/*" />
-                <include name="symfony/console/**/**" />
-                <exclude name="symfony/console/Tests/**/**" />
+                <include name="symfony/**/**" />
             </fileset>
         </pharpackage>
         <chmod file="${phar.file}" mode="0755" />

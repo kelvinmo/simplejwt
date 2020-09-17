@@ -2,8 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## Upcoming
+## Version 0.4.1
 
+- Fixed: Composer dependencies on `symfony/console` for PHP 7 compatibility
+  (#22)
+
+## Version 0.4.0
+
+- Changed: jwkstool build process
 - Fixed: Syntax error in SimpleJWT\JWE::decrypt()
 - Fixed: Arguments for SimpleJWT\JWT::deserialise()
  - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 

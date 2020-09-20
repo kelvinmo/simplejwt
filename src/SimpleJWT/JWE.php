@@ -141,13 +141,14 @@ class JWE {
 
             if ($key_enc instanceof KeyEncryptionAlgorithm) {
                 // Key agreement with wrapping
-                $keys->add(new SymmetricKey([
+                $agreed_symmetric_key = new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
-                    'alg' => $this->headers['alg'],
+                    'alg' => $headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
-                    'kid' => '#key-agreement-with-wrapping'
-                ], 'php'));
-                $kid = '#key-agreement-with-wrapping';
+                ], 'php');
+                $kid = $agreed_symmetric_key->getThumbnail();
+                $agreed_symmetric_key->setKeyId($kid);
+                $keys->add($agreed_symmetric_key);
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;
@@ -245,11 +246,14 @@ class JWE {
 
             if ($key_enc instanceof KeyEncryptionAlgorithm) {
                 // Key agreement with wrapping
-                $keys->add(new SymmetricKey([
+                $agreed_symmetric_key = new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
-                    'alg' => $this->headers['alg'],
-                    'k' => Util::base64url_encode($agreed_key)
-                ], 'php'));
+                    'alg' => $headers['alg'],
+                    'k' => Util::base64url_encode($agreed_key),
+                ], 'php');
+                $kid = $agreed_symmetric_key->getThumbnail();
+                $agreed_symmetric_key->setKeyId($kid);
+                $keys->add($agreed_symmetric_key);
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;

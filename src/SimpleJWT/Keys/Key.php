@@ -263,20 +263,22 @@ abstract class Key {
 
     /** 
      * Alias for {@link getThumbnail()} for compatibility.
+     *
+     * @deprecated Use getThumbnail() instead
      */
     public function getSignature() {
         return $this->getThumbnail();
     }
 
     /**
-     * Obtains a signature for the key.  The signature is derived from the
+     * Obtains a thumbnail for the key.  The thumbnail is derived from the
      * keys to the JSON web key object as returned by the {@link getThumbnailMembers()}
      * function.
      *
      * For asymmetric keys, the public and private keys should have the same
-     * signature.
+     * thumbnail.
      *
-     * @return string the signature
+     * @return string the thumbnail
      */
     public function getThumbnail() {
         $members = $this->getThumbnailMembers();

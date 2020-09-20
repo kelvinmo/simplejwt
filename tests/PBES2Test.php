@@ -3,8 +3,9 @@
 namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
+use PHPUnit\Framework\TestCase;
 
-class PBES2Test extends \PHPUnit_Framework_TestCase {
+class PBES2Test extends TestCase {
 
     protected function getKeySet($password) {
         return \SimpleJWT\Keys\KeySet::createFromSecret($password, 'bin');

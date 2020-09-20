@@ -1,5 +1,29 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+## Version 0.4.1
+
+- Fixed: Composer dependencies on `symfony/console` for PHP 7 compatibility
+  (#22)
+
+## Version 0.4.0
+
+- Changed: jwkstool build process
+- Fixed: Syntax error in SimpleJWT\JWE::decrypt()
+- Fixed: Arguments for SimpleJWT\JWT::deserialise()
+ - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
+   SimpleJWT\Keys\Key::getThumbnail() instead
+
+## Version 0.3.1
+
+- Fixed undefined variable error when using JWE with a symmetric key (#19)
+- Fixed Util::packInt64() when running 32-bit PHP 7
+- Fixed missing time variable in InvalidTokenException
+- More specific PHP version specification requirements in composer.json
+- Refactored Util::random_bytes() to specify file-based entropy source
+  for Unix-like systems
+
 ## Version 0.3.0
 
 - Refactored key signature methodology to align with

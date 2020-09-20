@@ -23,6 +23,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
     * PBES2 (PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW)
 - Content encryption algorithms
     * AES_CBC_HMAC_SHA2 family (A128CBC-HS256, A192CBC-HS384, A256CBC-HS512)
+    * AES GCM family (A128GCM, A192GCM, A256GCM) - requires PHP 7.1 or later
 
 ## Requirements
 
@@ -36,12 +37,8 @@ SimpleJWT is a simple JSON web token library written in PHP.
 
 You can install via [Composer](http://getcomposer.org/).
 
-```json
-{
-    "require": {
-        "kelvinmo/simplejwt": "0.3.*"
-    }
-}
+```sh
+composer require kelvinmo/simplejwt
 ```
 
 ## Usage

@@ -36,6 +36,7 @@
 namespace SimpleJWT\Keys;
 
 use SimpleJWT\Util\ASN1;
+use SimpleJWT\Util\BigNum;
 use SimpleJWT\Util\Util;
 
 /**
@@ -53,22 +54,39 @@ class ECKey extends Key {
     const P384_OID = '1.3.132.0.34';
     const P521_OID = '1.3.132.0.35';
 
+    // Curve parameters are from http://www.secg.org/sec2-v2.pdf
     static $curves = [
         'P-256' => [
-            'oid' => P256_OID,
-            'len' => 64
+            'oid' => self::P256_OID,
+            'openssl' => 'prime256v1', // = secp256r1
+            'len' => 64,
+            'a' => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC',
+            'b' => '5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B',
+            'p' => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF',
         ],
         'P-384' => [
-            'oid' => P384_OID,
-            'len' => 96
+            'oid' => self::P384_OID,
+            'openssl' => 'secp384r1',
+            'len' => 96,
+            'a' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC',
+            'b' => 'B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF',
+            'p' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF',
         ],
         'P-521' => [
-            'oid' => P521_OID,
-            'len' => 132
+            'oid' => self::P521_OID,
+            'openssl' => 'secp521r1',
+            'len' => 132,
+            'a' => '01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC',
+            'b' => '0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00',
+            'p' => '01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
         ],
         'secp256k1' => [
-            'oid' => SECP256K1_OID,
-            'len' => 64
+            'oid' => self::SECP256K1_OID,
+            'openssl' => 'secp256k1',
+            'len' => 64,
+            'a' => '0000000000000000000000000000000000000000000000000000000000000000',
+            'b' => '0000000000000000000000000000000000000000000000000000000000000007',
+            'p' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F',
         ],
     ];
 
@@ -228,6 +246,32 @@ class ECKey extends Key {
     public function getCurve() {
         return $this->data['crv'];
     }
+
+    /**
+     * Checks whether another EC key is on the same curve as this key.
+     * 
+     * @param ECKey $public_key the public key to check
+     * @return true if the EC key is on the same curve
+     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
+     */
+    public function isOnSameCurve($public_key) {
+        if (!($public_key instanceof ECKey)) return false;
+        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
+
+        $x = new BigNum(Util::base64url_decode($public_key->data['x']), 256);
+        $y = new BigNum(Util::base64url_decode($public_key->data['y']), 256);
+
+        $crv = $this->data['crv'];
+        $a = new BigNum(hex2bin(self::$curves[$crv]['a']), 256);
+        $b = new BigNum(hex2bin(self::$curves[$crv]['b']), 256);
+        $p = new BigNum(hex2bin(self::$curves[$crv]['p']), 256);
+
+        // Check whether y^2 mod p = (x^3 + ax + b) mod p
+        $y2modp = $y->powmod(new BigNum(2), $p);
+        $x3axbmodp = $x->mod(new BigNum(3))->add($a->mul($x))->add($b)->mod($p);
+        return ($y2modp->cmp($x3axbmodp) === 0);
+    }
+
     protected function getThumbnailMembers() {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['crv', 'kty', 'x', 'y'];

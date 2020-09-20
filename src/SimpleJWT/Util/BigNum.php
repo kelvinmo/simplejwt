@@ -43,10 +43,10 @@ class BigNum {
     protected $value;
 
     /**
-     * Returns whether either the GMP or the BCMath library is installed.  If neither
-     * of these libraries are installed, the functions in this file will not work.
+     * Returns whether the GMP library is installed.  If this library is not
+     * installed, the functions in this file will not work.
      *
-     * @return bool true if either GMP or BCMath is installed.
+     * @return bool true if GMP is installed.
      */ 
     static function loaded() {
         return function_exists('gmp_init');

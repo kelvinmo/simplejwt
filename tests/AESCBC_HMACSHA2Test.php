@@ -3,8 +3,9 @@
 namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
+use PHPUnit\Framework\TestCase;
 
-class AESCBC_HMACSHA2Test extends \PHPUnit_Framework_TestCase {
+class AESCBC_HMACSHA2Test extends TestCase {
 
     protected function base64url($base64) {
         return Util::base64url_encode(base64_decode($base64));

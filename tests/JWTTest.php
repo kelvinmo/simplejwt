@@ -2,12 +2,14 @@
 
 namespace SimpleJWT;
 
+use PHPUnit\Framework\TestCase;
+
 // Override time() in current namespace for testing
 function time() {
     return 1300000000;
 }
 
-class JWTTest extends \PHPUnit_Framework_TestCase {
+class JWTTest extends TestCase {
 
     protected function getJWTClaims() {
         return [
@@ -154,20 +156,27 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
     function testAlgFailure() {
-        $this->setExpectedException('SimpleJWT\InvalidTokenException');
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
         $jwt = JWT::decode($token, $set, 'RS256'); // Error - should be ES256
     }
 
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
     function testSignatureFailure() {
-        $this->setExpectedException('SimpleJWT\InvalidTokenException');
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.NrP7T3zsezqVjBPI35nJBtIQeoOrsT7Rib5NdaOzpgM';
         $jwt = JWT::decode($token, $set, 'HS256');
     }
 
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
     function testTimeFailure() {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
@@ -175,7 +184,6 @@ class JWTTest extends \PHPUnit_Framework_TestCase {
         $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
         $token = $jwt->encode($set, null, false);
 
-        $this->setExpectedException('SimpleJWT\InvalidTokenException');
         $set2 = $this->getPublicKeySet();
         $jwt2 = JWT::decode($token, $set2, 'HS256');
     }

@@ -5,8 +5,9 @@ namespace SimpleJWT\Crypt;
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\RSAKey;
+use PHPUnit\Framework\TestCase;
 
-class RSAESTest extends \PHPUnit_Framework_TestCase {
+class RSAESTest extends TestCase {
     function testRSA1_5() {
         $cek = base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLHwj5wszw==');
 

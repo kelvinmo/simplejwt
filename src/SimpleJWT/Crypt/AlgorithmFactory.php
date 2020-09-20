@@ -61,7 +61,8 @@ class AlgorithmFactory {
         '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
 
         // Content encryption algorithms
-        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2'
+        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2',
+        '/^A\d+GCM$/' => 'SimpleJWT\Crypt\AESGCM'
     ];
 
     private static $use_map = [

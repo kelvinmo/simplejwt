@@ -6,9 +6,10 @@ use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\RSAKey;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Util\Util;
+use PHPUnit\Framework\TestCase;
 
 
-class JWETest extends \PHPUnit_Framework_TestCase {
+class JWETest extends TestCase {
     protected function getPrivateKeySet() {
         $set = new KeySet();
 

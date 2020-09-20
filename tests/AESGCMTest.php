@@ -20,10 +20,6 @@ class AESGCMTest extends TestCase {
         }
     }
 
-    protected function base64url($base64) {
-        return Util::base64url_encode(base64_decode($base64));
-    }
-
     protected function hex2base64url($hex) {
         return Util::base64url_encode(pack('H*', $hex));
     }

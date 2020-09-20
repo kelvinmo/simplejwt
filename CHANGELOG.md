@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Added: Support for AES GCM family of algorithms
+
 ## Version 0.4.1
 
 - Fixed: Composer dependencies on `symfony/console` for PHP 7 compatibility

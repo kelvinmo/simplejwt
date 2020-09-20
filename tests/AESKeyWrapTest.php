@@ -3,8 +3,9 @@
 namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
+use PHPUnit\Framework\TestCase;
 
-class AESKeyWrapTest extends \PHPUnit_Framework_TestCase {
+class AESKeyWrapTest extends TestCase {
 
     protected function getKeySet($kek) {
         return \SimpleJWT\Keys\KeySet::createFromSecret($kek, 'bin');

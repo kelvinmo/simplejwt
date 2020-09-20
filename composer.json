@@ -27,6 +27,7 @@
         "psr-4": { "SimpleJWT\\": "src/SimpleJWT" }
     },
     "scripts": {
-        "phar": [ "phing phar" ]
+        "phar": [ "phing phar" ],
+        "test": [ "@composer install", "phpunit" ]
     }
 }

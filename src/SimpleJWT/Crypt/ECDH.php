@@ -35,19 +35,154 @@
 
 namespace SimpleJWT\Crypt;
 
-use SimpleJWT\Keys\SymmetricKey;
+use SimpleJWT\Keys\ECKey;
+use SimpleJWT\Keys\KeyFactory;
 
+/**
+ * Implementation of the Elliptic Curve Diffie-Hellman 
+ * Ephemeral Static algorithm.
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.6
+ */
 class ECDH extends Algorithm implements KeyDerivationAlgorithm {
-    public function __construct($alg) {
+    private $default_key_size;
+
+    public function __construct($alg, $default_key_size = null) {
         parent::__construct($alg);
+        $this->default_key_size = $default_key_size;
     }
 
     public function getSupportedAlgs() {
-        // if PHP > 7.1 and openssl then something otherwise nothing
+        if (defined('OPENSSL_KEYTYPE_EC') && function_exists('openssl_pkey_derive')) {
+            // openssl_pkey_derive is made available from PHP 7.3?
+            return ['ECDH-ES'];
+        } else {
+            // Not supported
+            return [];
+        }
+    }
+
+    public function getKeyCriteria() {
+        return ['kty' => 'EC'];
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {
+        $key = $this->selectKey($keys, $kid);
+        if ($key == null) {
+            throw new CryptException('Key not found or is invalid');
+        }
+
+        // 1. Get the required key length and alg input into Concat KDF
+        if (isset($headers['enc'])) {
+            try {
+                $enc = AlgorithmFactory::create($headers['enc'], Algorithm::ENCRYPTION_ALGORITHM);
+                $size = $enc->getCEKSize();
+            } catch (\UnexpectedValueException $e) {
+                throw new CryptException('Unexpected enc algorithm', $e);
+            }
+        } elseif ($this->default_key_size != null) {
+            $size = $this->default_key_size;
+        } else {
+            throw new CryptException('Key size not specified');
+        }
+
+        if ($this->alg == 'ECDH-ES') {
+            $alg = $headers['enc'];
+        } else {
+            $alg = $this->alg;
+        }
+
+        // 2. If 'epk' header is present, check the ephemeral public key for compatibility
+        //    against (our) private key specified in $key
+        //
+        //    Otherwise, generate the ephemeral public key based on the recipient's public
+        //    key specified in $key
+        if (isset($headers['epk'])) {
+            // (a) Load the ephemeral public key
+            $ephemeral_public_key = KeyFactory::create($headers['epk'], 'php');
+            if (!($ephemeral_public_key instanceof ECKey)) {
+                throw new CryptException("Invalid epk: not an EC key");
+            }
+
+            // (b) Check that $key is a private key
+            if ($key->isPublic()) {
+                throw new CryptException('Key is a public key; private key expected');
+            }
+
+            // (c) Check whether the epk is on the private key's curve to mitigate
+            // against invalid curve attacks
+            if (!$key->isOnSameCurve($ephemeral_public_key)) {
+                throw new CryptException('Invalid epk: incompatible curve');
+            }
+
+            // (d) Set the ECDH keys
+            $dh_public_key = $ephemeral_public_key;
+            $dh_private_key = $key;
+        } else {
+            // (a) Check that $key is a public key (i.e. the recipient's)
+            if (!$key->isPublic()) {
+                throw new CryptException('Key is a private key; public key expected');
+            }
+
+            // (b) Create an ephemeral key pair with the same curve as the recipient's public
+            //     key, then set the epk header
+            $crv = $key->getCurve();
+            $ephemeral_private_key = $this->createEphemeralKey($crv);
+            $ephemeral_public_key = $ephemeral_private_key->getPublicKey();
+            $headers['epk'] = $ephemeral_public_key->getKeyData();
+
+            // (c) Set the ECDH keys
+            $dh_public_key = $key;
+            $dh_private_key = $ephemeral_private_key;
+        }
+
+        // 3. Calculate agreement key (Z)
+        $Z = $this->deriveAgreementKey($dh_public_key, $dh_private_key);
         
+        // 4. Derive key from Concat KDF
+        $apu = (isset($headers['apu'])) ? $headers['apu'] : '';
+        $apv = (isset($headers['apv'])) ? $headers['apv'] : '';
+        return $this->concatKDF($Z, $alg, $size, $apu, $apv);
+    }
+
+    private function createEphemeralKey($crv) {
+        if (!isset(ECKey::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
+        $openssl_curve_name = ECKey::$curves[$crv]['openssl'];
+
+        $pkey = openssl_pkey_new([
+            'curve_name' => $openssl_curve_name,
+            'private_key_type' => OPENSSL_KEYTYPE_EC,
+        ]);
+        if ($pkey === false) throw new CryptException('Unable to create ephemeral key');
+        
+        $result = openssl_pkey_export($key, $pem);
+        if ($result === false) throw new CryptException('Unable to create ephemeral key');
+
+        return new ECKey($pem, 'pem');
+    }
+
+    private function deriveAgreementKey($public_key, $private_key) {
+        assert(function_exists('openssl_pkey_derive'));
+
+        // x, y from $public_key and d from $private_key
+        return openssl_pkey_derive($public_key->toPEM(), $private_key->toPEM());
+    }
+
+    private function concatKDF($Z, $alg, $size, $apu = '', $apv = '') {
+        if ($apu == null) $apu = '';
+        if ($apv == null) $apv = '';
+
+        $apu = Util::base64url_decode($apu);
+        $apv = Util::base64url_decode($apv);
+
+        $input = pack('N', 1)
+            . $Z
+            . pack('N', strlen($alg)) . $alg
+            . pack('N', strlen($apu)) . $apu
+            . pack('N', strlen($apv)) . $apv
+            . pack('N', $size);
+        
+        return substr(hash('sha256', $input, true), 0, $size / 8);
     }
 }
 

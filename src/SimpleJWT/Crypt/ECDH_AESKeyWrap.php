@@ -37,7 +37,17 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Keys\KeySet;
 
-class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm {
+/**
+ * Implementation of the Elliptic Curve Diffie-Hellman 
+ * Ephemeral Static algorithm with AES Key Wrap
+ * 
+ * 
+ * 
+ * See {@link ECDH} for further information.
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.6
+ */
+class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm implements KeyDerivationAlgorithm {
     /** @var ECDH the underlying ECDH algorithm */
     private $ecdh;
 
@@ -65,14 +75,16 @@ class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm {
         return $this->ecdh->getKeyCriteria();
     }
 
+    public function deriveKey($keys, &$headers, $kid = null) {
+        return $this->ecdh->deriveKey($key, $headers, $kid);
+    }
+
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $shared_key = $this->ecdh->deriveKey($keys, $headers, $kid);
-        return $this->wrapKey($cek, $shared_key, $headers);
+        return $this->wrapKey($cek, $keys, $headers, $kid);
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        $shared_key = $this->ecdh->deriveKey($keys, $headers, $kid);
-        return $this->unwrapKey($encrypted_key, $shared_key, $headers);
+        return $this->unwrapKey($encrypted_key, $keys, $headers, $kid);
     }
 }
 

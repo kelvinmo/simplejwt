@@ -2,12 +2,14 @@
 
 namespace SimpleJWT;
 
+use PHPUnit\Framework\TestCase;
+
 // Override time() in current namespace for testing
 function time() {
     return 1300000000;
 }
 
-class JWTTest extends \PHPUnit_Framework_TestCase {
+class JWTTest extends TestCase {
 
     protected function getJWTClaims() {
         return [

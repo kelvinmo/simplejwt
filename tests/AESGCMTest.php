@@ -3,8 +3,9 @@
 namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
+use PHPUnit\Framework\TestCase;
 
-class AESGCMTest extends \PHPUnit_Framework_TestCase {
+class AESGCMTest extends TestCase {
     protected function isAlgAvailable($alg) {
         $aesgcm = new AESGCM(null);
         if (!in_array($alg, $aesgcm->getSupportedAlgs())) {
@@ -49,6 +50,9 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(base64_decode('AAAAAAAAAAAAAAAA'), $results);
     }
 
+    /**
+     * @expectedException SimpleJWT\Crypt\CryptException
+     */
     function testA128GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A128GCM')) return;
         
@@ -59,7 +63,6 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $additional = '';
 
         $alg = new AESGCM('A128GCM');
-        $this->setExpectedException('SimpleJWT\\Crypt\\CryptException');
         $results = $alg->decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv);
     }
 
@@ -93,6 +96,9 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(base64_decode('AAAAAAAAAAAAAAAA'), $results);
     }
 
+    /**
+     * @expectedException SimpleJWT\Crypt\CryptException
+     */
     function testA192GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A192GCM')) return;
         
@@ -103,7 +109,6 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $additional = '';
 
         $alg = new AESGCM('A192GCM');
-        $this->setExpectedException('SimpleJWT\\Crypt\\CryptException');
         $results = $alg->decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv);
     }
 
@@ -137,6 +142,9 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(base64_decode('AAAAAAAAAAAAAAAA'), $results);
     }
 
+    /**
+     * @expectedException SimpleJWT\Crypt\CryptException
+     */
     function testA256GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A256GCM')) return;
         
@@ -147,7 +155,6 @@ class AESGCMTest extends \PHPUnit_Framework_TestCase {
         $additional = '';
 
         $alg = new AESGCM('A256GCM');
-        $this->setExpectedException('SimpleJWT\\Crypt\\CryptException');
         $results = $alg->decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv);
     }
 }

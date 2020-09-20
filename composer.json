@@ -12,7 +12,7 @@
     "require-dev": {
         "ext-bz2": "*",
         "ext-Phar": "*",
-        "phpunit/phpunit": "4.*",
+        "phpunit/phpunit": "^4.8.35 || ^6.0",
         "phing/phing": "^2.0"
     },
     "license": "BSD-3-Clause",
@@ -27,6 +27,7 @@
         "psr-4": { "SimpleJWT\\": "src/SimpleJWT" }
     },
     "scripts": {
-        "phar": [ "@composer install", "phing phar" ]
+        "phar": [ "@composer install", "phing phar" ],
+        "test": [ "@composer install", "phpunit" ]
     }
 }

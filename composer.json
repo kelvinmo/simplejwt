@@ -1,6 +1,6 @@
 {
     "name": "kelvinmo/simplejwt",
-    "description": "An simple JSON Web Token library for PHP.",
+    "description": "A simple JSON Web Token library for PHP.",
     "keywords": [ "jwt", "jwe", "jose" ],
     "homepage": "https://github.com/kelvinmo/simplejwt",
     "require": {

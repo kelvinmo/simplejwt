@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
@@ -50,14 +51,14 @@ abstract class AESWrappedKeyAlgorithm extends Algorithm implements KeyEncryption
     private $aeskw;
 
     public function __construct($alg) {
-        parent::__construct($alg);
-
         if ($alg == null) {
             $this->aeskw = new AESKeyWrap(null);
         } else {
             list($dummy, $aeskw_alg) = explode('+', $alg, 2);
             $this->aeskw = new AESKeyWrap($aeskw_alg);
         }
+
+        parent::__construct($alg);
     }
 
     /**

@@ -13,7 +13,7 @@
         "ext-bz2": "*",
         "ext-Phar": "*",
         "phpunit/phpunit": "4.*",
-        "phing/phing": "2.*"
+        "phing/phing": "^2.0"
     },
     "license": "BSD-3-Clause",
     "authors": [
@@ -27,6 +27,6 @@
         "psr-4": { "SimpleJWT\\": "src/SimpleJWT" }
     },
     "scripts": {
-        "phar": [ "phing phar" ]
+        "phar": [ "@composer install", "phing phar" ]
     }
 }

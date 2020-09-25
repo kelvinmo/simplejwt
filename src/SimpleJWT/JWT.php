@@ -38,6 +38,7 @@ namespace SimpleJWT;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyException;
+use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
 /**
@@ -54,9 +55,9 @@ use SimpleJWT\Util\Util;
  */
 class JWT {
     /** @var string COMPACT_FORMAT Compact JWT serialisation format */
-    const COMPACT_FORMAT = 'compact';
+    const COMPACT_FORMAT = Helper::COMPACT_FORMAT;
     /** @var string JSON_FORMAT JSON JWT serialisation format */
-    const JSON_FORMAT = 'json';
+    const JSON_FORMAT = Helper::JSON_FORMAT;
 
     static public $TIME_ALLOWANCE = 300;
 

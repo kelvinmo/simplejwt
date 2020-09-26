@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## Upcoming
+## Version 0.4.2
 
-- Fixed: Unitialised values in SimpleJWT\JWT::deserialise() for JWTs encoded
+- Fixed: Uninitialised values in SimpleJWT\JWT::deserialise() for JWTs encoded
   in JSON serialisation format (#29)
 - Note: Arguments and/or return values for SimpleJWT\JWT::deserialise() may change
   in the next release

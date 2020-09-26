@@ -38,6 +38,7 @@ namespace SimpleJWT;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyException;
+use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
 /**
@@ -54,9 +55,9 @@ use SimpleJWT\Util\Util;
  */
 class JWT {
     /** @var string COMPACT_FORMAT Compact JWT serialisation format */
-    const COMPACT_FORMAT = 'compact';
+    const COMPACT_FORMAT = Helper::COMPACT_FORMAT;
     /** @var string JSON_FORMAT JSON JWT serialisation format */
-    const JSON_FORMAT = 'json';
+    const JSON_FORMAT = Helper::JSON_FORMAT;
 
     static public $TIME_ALLOWANCE = 300;
 
@@ -232,6 +233,9 @@ class JWT {
      * validate JWT, such as obtaining untrusted &quot;hints&quot; from the
      * claims may be a JWT.  This function provides such a deserialisation
      * mechanism
+     * 
+     * Note that if the JWT contains multiple signatures, an InvalidTokenException
+     * will be thrown.
      *
      * @param string $token the serialised JWT
      * @param string $format the JWT serialisation format
@@ -253,20 +257,22 @@ class JWT {
                 $payload = $obj['payload'];
 
                 if (isset($obj['signatures'])) {
-                    foreach ($obj['signatures'] as $signature_obj) {
-                        if (isset($signature_obj['header']['kid'])) {
-                            $target_kid = $signature_obj['header']['kid'];
-                            if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
-                                $unprotected = $signature_obj['header'];
-                                $protected = $signature_obj['protected'];
-                                $signature = $signature_obj['signature'];
-                                break;
-                            }
-                        }
-                        throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
-                    }
+                    if (count($obj['signatures']) != 1)
+                        throw new InvalidTokenException('Cannot deserialise JWT with multiple signatures', InvalidTokenException::UNSUPPORTED_ERROR);
+
+                    $signature_obj = $obj['signatures'][0];
+
+                    if (!isset($signature_obj['protected']) || !isset($signature_obj['signature']))
+                        throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+                    if (isset($signature_obj['header'])) $unprotected = $signature_obj['header'];
+                    $protected = $signature_obj['protected'];
+                    $signature = $signature_obj['signature'];
                 } else {
-                    $unprotected = $obj['header'];
+                    if (!isset($obj['protected']) || !isset($obj['signature']))
+                        throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+                    if (isset($obj['header'])) $unprotected = $obj['header'];
                     $protected = $obj['protected'];
                     $signature = $obj['signature'];
                 }

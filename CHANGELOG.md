@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 - Added: Support for AES GCM family of algorithms
 - Removed: SimpleJWT\Keys\Key::getSignature()
 
+## Version 0.4.2
+
+- Fixed: Uninitialised values in SimpleJWT\JWT::deserialise() for JWTs encoded
+  in JSON serialisation format (#29)
+- Note: Arguments and/or return values for SimpleJWT\JWT::deserialise() may change
+  in the next release
+
 ## Version 0.4.1
 
 - Fixed: Composer dependencies on `symfony/console` for PHP 7 compatibility

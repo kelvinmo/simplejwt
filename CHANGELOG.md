@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed: Unitialised values in SimpleJWT\JWT::deserialise() for JWTs encoded
   in JSON serialisation format (#29)
-- Deprecated: Arguments for SimpleJWT\JWT::deserialise() may change
+- Note: Arguments and/or return values for SimpleJWT\JWT::deserialise() may change
   in the next release
 
 ## Version 0.4.1

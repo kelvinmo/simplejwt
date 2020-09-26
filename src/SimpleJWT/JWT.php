@@ -93,14 +93,33 @@ class JWT {
      * should be ignored as part of the validation process (e.g. if expired tokens
      * are to be accepted), or false if all validation
      * is to be performed.
-     * @param string $format the JWT serialisation format
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = [], $format = self::COMPACT_FORMAT) {
+    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = []) {
         if ($skip_validation === false) $skip_validation = [];
         
-        list($headers, $claims, $signing_input, $signature) = self::deserialise($token, $format);
+        $deserialised = self::deserialise($token);
+        $claims = $deserialised['claims'];
+        if (count($deserialised['signatures']) > 1) {
+            // Multiple signatures, choose one
+            foreach ($deserialised['signatures'] as $signature_obj) {
+                if (isset($signature_obj['header']['kid'])) {
+                    $target_kid = $signature_obj['header']['kid'];
+                    if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
+                        $headers = $signature_obj['headers'];
+                        $signing_input = $signature_obj['signing_input'];
+                        $signature = $signature_obj['signature'];
+                        break;
+                    }
+                }
+                throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
+            }
+        } else {
+            $headers = $deserialised['signatures'][0]['headers'];
+            $signing_input = $deserialised['signatures'][0]['signing_input'];
+            $signature = $deserialised['signatures'][0]['signature'];
+        }
 
         // Process crit
         if (isset($headers['crit'])) {
@@ -244,12 +263,23 @@ class JWT {
      * parts of the serialised JWT) and signature
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function deserialise($token, $format = self::COMPACT_FORMAT) {
+    public static function deserialise($token) {
+        $detect_result = Helper::detect($token);
+        $format = $detect_result['format'];
+
+        $result = [];
+        $signatures = [];
+
         switch ($format) {
             case self::COMPACT_FORMAT:
                 $parts = explode('.', $token, 3);
                 if (count($parts) != 3) throw new InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
                 list($protected, $payload, $signature) = $parts;
+                $signatures[] = [ 
+                    'unprotected' => [],
+                    'protected' => $protected,
+                    'signature' => $signature
+                ];
                 break;
             case self::JSON_FORMAT:
                 $obj = json_decode($token, true);
@@ -257,41 +287,55 @@ class JWT {
                 $payload = $obj['payload'];
 
                 if (isset($obj['signatures'])) {
-                    if (count($obj['signatures']) != 1)
-                        throw new InvalidTokenException('Cannot deserialise JWT with multiple signatures', InvalidTokenException::UNSUPPORTED_ERROR);
+                    foreach ($obj['signatures'] as $signature_obj) {
+                        if (!isset($signature_obj['protected']) || !isset($signature_obj['signature']))
+                            throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
+                        
+                        $signature = [
+                            'unprotected' => [],
+                            'protected' => $signature_obj['protected'],
+                            'signature' => $signature_obj['signature']
+                        ];
 
-                    $signature_obj = $obj['signatures'][0];
+                        if (isset($signature_obj['header'])) $signature['unprotected'] = $signature_obj['header'];
 
-                    if (!isset($signature_obj['protected']) || !isset($signature_obj['signature']))
-                        throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
-
-                    if (isset($signature_obj['header'])) $unprotected = $signature_obj['header'];
-                    $protected = $signature_obj['protected'];
-                    $signature = $signature_obj['signature'];
+                        $signatures[] = $signature;
+                    }
                 } else {
                     if (!isset($obj['protected']) || !isset($obj['signature']))
                         throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
 
-                    if (isset($obj['header'])) $unprotected = $obj['header'];
-                    $protected = $obj['protected'];
-                    $signature = $obj['signature'];
+                    $signature = [
+                        'unprotected' => [],
+                        'protected' => $obj['protected'],
+                        'signature' => $obj['signature']
+                    ];
+                    if (isset($obj['header'])) $signature['unprotected'] = $obj['header'];
+
+                    $signatures[] = $signature;
                 }
                 break;
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
 
-        $headers = json_decode(Util::base64url_decode($protected), true);
-        if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
-        
-        if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
+        $result['claims'] = json_decode(Util::base64url_decode($payload), true);
+        if ($result['claims'] == null) throw new InvalidTokenException('Cannot decode claims', InvalidTokenException::TOKEN_PARSE_ERROR);
 
-        $claims = json_decode(Util::base64url_decode($payload), true);
-        if ($claims == null) throw new InvalidTokenException('Cannot decode claims', InvalidTokenException::TOKEN_PARSE_ERROR);
+        $result['signatures'] = [];
         
-        $signing_input = $protected . '.' . $payload;
+        foreach ($signatures as $signature) {
+            $headers = json_decode(Util::base64url_decode($signature['protected']), true);
+            if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+            $result['signatures'][] = [
+                'headers' => array_merge($headers, $signature['unprotected']),
+                'signing_input' => $signature['protected'] . '.' . $payload,
+                'signature' => $signature['signature']
+            ];
+        };
         
-        return [$headers, $claims, $signing_input, $signature];
+        return $result;
     }
 
     /**

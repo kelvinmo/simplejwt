@@ -125,14 +125,24 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
 
-    function testDeserialise() {
+    function testDeserialiseCompact() {
         $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
-        list($headers, $claims, $signing_input, $signature) = JWT::deserialise($token);
+        $result = JWT::deserialise($token);
 
-        $this->assertEquals('HS256', $headers['alg']);
-        $this->assertTrue($claims['http://example.com/is_root']);
-        $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $signing_input);
-        $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $signature);
+        $this->assertEquals('HS256', $result['signatures'][0]['headers']['alg']);
+        $this->assertTrue($result['claims']['http://example.com/is_root']);
+        $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $result['signatures'][0]['signing_input']);
+        $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $result['signatures'][0]['signature']);
+    }
+
+    function testDeserialiseJSON() {
+        $token = '{"payload":"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ","signatures":[{"protected":"eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9","signature":"dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"}]}';
+        $result = JWT::deserialise($token, JWT::JSON_FORMAT);
+
+        $this->assertEquals('HS256', $result['signatures'][0]['headers']['alg']);
+        $this->assertTrue($result['claims']['http://example.com/is_root']);
+        $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $result['signatures'][0]['signing_input']);
+        $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $result['signatures'][0]['signature']);
     }
 
     function testVerifyHMAC() {

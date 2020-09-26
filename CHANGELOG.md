@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - Added: Support for AES GCM family of algorithms
+- Changed: SimpleJWT\JWT::decode() no longer supports $format parameter
+  (format is automatically detected)
+- Changed: SimpleJWT\JWT::deserialise() no longer supports $format parameter
+  (format is automatically detected)
+- Changed: Return value of SimpleJWT\JWT::deserialise() changed
+- Removed: SimpleJWT\Keys\Key::getSignature()
+
+## Version 0.4.2
+
+- Fixed: Uninitialised values in SimpleJWT\JWT::deserialise() for JWTs encoded
+  in JSON serialisation format (#29)
+- Note: Arguments and/or return values for SimpleJWT\JWT::deserialise() may change
+  in the next release
 
 ## Version 0.4.1
 
@@ -16,7 +29,7 @@ All notable changes to this project will be documented in this file.
 - Changed: jwkstool build process
 - Fixed: Syntax error in SimpleJWT\JWE::decrypt()
 - Fixed: Arguments for SimpleJWT\JWT::deserialise()
- - Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
+- Deprecated: SimpleJWT\Keys\Key::getSignature() - use 
    SimpleJWT\Keys\Key::getThumbnail() instead
 
 ## Version 0.3.1

@@ -261,15 +261,6 @@ abstract class Key {
      */
     abstract protected function getThumbnailMembers();
 
-    /** 
-     * Alias for {@link getThumbnail()} for compatibility.
-     *
-     * @deprecated Use getThumbnail() instead
-     */
-    public function getSignature() {
-        return $this->getThumbnail();
-    }
-
     /**
      * Obtains a thumbnail for the key.  The thumbnail is derived from the
      * keys to the JSON web key object as returned by the {@link getThumbnailMembers()}

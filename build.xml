@@ -13,6 +13,7 @@
             <fileset dir="vendor">
                 <include name="autoload.php" />
                 <include name="composer/*" />
+                <include name="myclabs/**/**" />
                 <include name="symfony/**/**" />
             </fileset>
         </pharpackage>

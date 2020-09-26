@@ -30,6 +30,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
 - PHP:
     * PHP 7.1.0 or later; or
     * PHP 5.4.0 or later
+- `gmp` extension
 - `hash` extension
 - `openssl` extension
 

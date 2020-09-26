@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - Added: Support for AES GCM family of algorithms
+- Changed: SimpleJWT\JWT::decode() no longer supports $format parameter
+  (format is automatically detected)
+- Changed: SimpleJWT\JWT::deserialise() no longer supports $format parameter
+  (format is automatically detected)
+- Changed: Return value of SimpleJWT\JWT::deserialise() changed
 - Removed: SimpleJWT\Keys\Key::getSignature()
 
 ## Version 0.4.2

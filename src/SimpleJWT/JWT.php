@@ -258,9 +258,10 @@ class JWT {
      *
      * @param string $token the serialised JWT
      * @param string $format the JWT serialisation format
-     * @return array an array containing the deserialised header,
-     * deserialised claims, the signing input (i.e. the first two
-     * parts of the serialised JWT) and signature
+     * @return array an array containing `claims` (deserialised claims) and
+     * `signatures`, an array of arrays each containing `headers` (the
+     * deserialised header), `signing_input` (i.e. the first two
+     * parts of the serialised JWT) and `signature` (the signature)
      * @throws InvalidTokenException if the token is invalid for any reason
      */
     public static function deserialise($token) {

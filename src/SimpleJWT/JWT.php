@@ -261,11 +261,18 @@ class JWT {
                         throw new InvalidTokenException('Cannot deserialise JWT with multiple signatures', InvalidTokenException::UNSUPPORTED_ERROR);
 
                     $signature_obj = $obj['signatures'][0];
-                    $unprotected = $signature_obj['header'];
+
+                    if (!isset($signature_obj['protected']) || !isset($signature_obj['signature']))
+                        throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+                    if (isset($signature_obj['header'])) $unprotected = $signature_obj['header'];
                     $protected = $signature_obj['protected'];
                     $signature = $signature_obj['signature'];
                 } else {
-                    $unprotected = $obj['header'];
+                    if (!isset($obj['protected']) || !isset($obj['signature']))
+                        throw new InvalidTokenException('Missing protected or signature member', InvalidTokenException::TOKEN_PARSE_ERROR);
+
+                    if (isset($obj['header'])) $unprotected = $obj['header'];
                     $protected = $obj['protected'];
                     $signature = $obj['signature'];
                 }

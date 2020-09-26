@@ -131,16 +131,17 @@ You can also deserialise a JWT without verifying it using the deserialise functi
 
 ```php
 try {
-    list($headers, $claims, $signing_input, $signature) =
-        SimpleJWT\JWT::deserialise('abc.def.ghigjghr');
+    $result = SimpleJWT\JWT::deserialise('abc.def.ghigjghr');
 } catch (SimpleJWT\InvalidTokenException $e) {
 
 }
 
-print $header['alg'];
-print $header['sub'];
-print $signing_input;  // abc.def
-print $signature;      // ghigjghr
+print $result['claims']['sub'];
+print $result['signatures'][0]['headers']['alg'];
+print $result['signatures'][0]['signing_input'];  // abc.def
+print $result['signatures'][0]['signature'];      // ghigjghr
+// Additional indices under $result['signatures'] if the JWT has more than
+// one signature
 ```
 
 ### Creating a JWE

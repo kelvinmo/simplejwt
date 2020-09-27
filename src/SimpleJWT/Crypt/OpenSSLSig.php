@@ -60,9 +60,9 @@ class OpenSSLSig extends SHA2 {
     public function getKeyCriteria() {
         switch ($this->family) {
             case 'RS':
-                return ['kty' => 'RSA'];
+                return ['kty' => 'RSA', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
             case 'ES':
-                return ['kty' => 'EC'];
+                return ['kty' => 'EC', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
         }
     }
 

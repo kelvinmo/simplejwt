@@ -89,7 +89,9 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         $alg = $this->getAlg();
         return [
             'kty' => 'oct',
-            '~alg' => $this->getAlg()
+            '~alg' => $this->getAlg(),
+            '@use' => 'enc',
+            '@key_ops' => ['wrapKey', 'unwrapKey']
         ];
     }
 

@@ -70,7 +70,7 @@ class AESGCM extends Algorithm implements EncryptionAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return ['kty' => 'oct'];
+        return ['kty' => 'oct', '@use' => 'enc', '@key_ops' => ['encrypt', 'decrypt']];
     }
 
     // cek binary iv base64url

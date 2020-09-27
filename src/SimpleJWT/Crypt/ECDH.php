@@ -145,17 +145,26 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         return $this->concatKDF($Z, $alg, $size, $apu, $apv);
     }
 
-    private function createEphemeralKey($crv) {
+    protected function createEphemeralKey($crv) {
         if (!isset(ECKey::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
         $openssl_curve_name = ECKey::$curves[$crv]['openssl'];
 
+        if (!in_array($openssl_curve_name, openssl_get_curve_names()))
+            throw new CryptException('Unable to create ephemeral key: unsupported curve');
+
+        // Note openssl.cnf needs to be correctly configured for this to work.
+        // See https://www.php.net/manual/en/openssl.installation.php for the
+        // appropriate location of this configuration file
         $pkey = openssl_pkey_new([
             'curve_name' => $openssl_curve_name,
             'private_key_type' => OPENSSL_KEYTYPE_EC,
         ]);
-        if ($pkey === false) throw new CryptException('Unable to create ephemeral key');
+        if ($pkey === false) throw new CryptException('Unable to create ephemeral key (is openssl.cnf missing?)');
         
-        $result = openssl_pkey_export($key, $pem);
+        // Note openssl.cnf needs to be correctly configured for this to work.
+        // See https://www.php.net/manual/en/openssl.installation.php for the
+        // appropriate location of this configuration file
+        $result = openssl_pkey_export($pkey, $pem);
         if ($result === false) throw new CryptException('Unable to create ephemeral key');
 
         return new ECKey($pem, 'pem');

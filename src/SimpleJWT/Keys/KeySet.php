@@ -174,14 +174,30 @@ class KeySet {
     /**
      * Finds a key matching specified criteria.
      *
-     * The criteria is expressed as an associative array, with the keys being
-     * the name of JWK property to match (with an optional prefix `~`), and the
-     * values being the value to be matched.
+     * The criteria are expressed as an associative array, with the keys being
+     * the name of JWK property to match (with optional prefixes set out below),
+     * and the values being the value to be matched.  The value may be specified
+     * as an array, in which case any element of the array can be matched.
+     * 
+     * There are also a number of special properties that can be used to match
+     * keys:
+     * 
+     * - {@link Key::SIZE_PROPERTY}, which specifies the length of the key in bits
+     * - {@link Key::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
+     *   key
      *
-     * A criterion can be mandatory or optional.  A key matches the criteria if all of
-     * the mandatory criteria are fulfilled.  If there is more than one key in the
-     * key set that matches all of the mandatory criteria, the key which also matches
-     * the most optional criteria will be returned.
+     * A criterion can be mandatory, mandatory-if-present (indicated using a `@`
+     * prefix), or optional (indicated using a `~` prefix).  A key matches the
+     * criteria if:
+     * 
+     * - all of the mandatory criteria are fulfilled; and
+     * - for each of the mandatory-if-present criterion, if the property is
+     *   present in the key, the value matches the one specified in the
+     *   criterion.
+     * 
+     * If there is more than one key in the key set that matches the mandatory
+     * and mandatory-if-present criteria, the key which matches
+     * the most mandatory-if-present and optional criteria will be returned.
      *
      * @param array $criteria the criteria
      * @return Key the found key, or null
@@ -196,37 +212,75 @@ class KeySet {
     /**
      * Finds a key matching specified criteria.
      *
-     * The criteria is expressed as an associative array, with the keys being
-     * the name of JWK property to match (with an optional prefix `~`), and the
-     * values being the value to be matched.
+     * The criteria are expressed as an associative array, with the keys being
+     * the name of JWK property to match (with optional prefixes set out below),
+     * and the values being the value to be matched.  The value may be specified
+     * as an array, in which case any element of the array can be matched.
+     * 
+     * There are also a number of special properties that can be used to match
+     * keys:
+     * 
+     * - {@link Key::SIZE_PROPERTY}, which specifies the length of the key in bits
+     * - {@link Key::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
+     *   key
      *
-     * A criterion can be mandatory or optional.  A key matches the criteria if all of
-     * the mandatory criteria are fulfilled.  If there is more than one key in the
-     * key set that matches all of the mandatory criteria, the key which also matches
-     * the most optional criteria will be returned.
+     * A criterion can be mandatory, mandatory-if-present (indicated using a `@`
+     * prefix), or optional (indicated using a `~` prefix).  A key matches the
+     * criteria if:
+     * 
+     * - all of the mandatory criteria are fulfilled; and
+     * - for each of the mandatory-if-present criterion, if the property is
+     *   present in the key, the value matches the one specified in the
+     *   criterion.
+     * 
+     * If there is more than one key in the key set that matches the mandatory
+     * and mandatory-if-present criteria, then the function returns the keys
+     * sorted by decreasing order of mandatory-if-present and optional criteria 
+     * matched.
      *
      * @param array $criteria the criteria
-     * @return Key the found key, or null
+     * @return array an array of keys that matches the criteria, sorted
+     * by decreasing order of optional criteria matched, or null
      */
     protected function find($criteria) {
         $results = [];
 
-        // Round 1: All mandatory criteria
+        // 1. Sort the criteria into mandatory, mandatory-if-present
+        //    and optional criteria
+        $mandatory = [];
+        $mandatory_if_present = [];
+        $optional = [];
+
+        foreach ($criteria as $property => $value) {
+            if ($property[0] == '~') {
+                $optional[substr($property, 1)] = $value;
+            } elseif ($property[0] == '@') {
+                $mandatory_if_present[substr($property, 1)] = $value;
+            } else {
+                $mandatory[$property] = $value;
+            }
+        }
+
+        // 2. Mandatory and mandatory-if-present criteria
         foreach ($this->keys as $key) {
             $key_data = $key->getKeyData();
             $key_data[Key::SIZE_PROPERTY] = $key->getSize();
             $key_data[Key::PUBLIC_PROPERTY] = $key->isPublic();
             $kid = $key->getKeyId();
 
-            // Round 1: All mandatory criteria
             $found = true;
-            foreach ($criteria as $criterion => $value) {
-                if ($criterion[0] == '~') continue;
-
-                if (is_array($value) && (array_diff($value, $key_data[$criterion]) !== array_diff($key_data[$criterion], $value))) {
+            foreach ($mandatory as $property => $value) {
+                if (!isset($key_data[$property])) {
                     $found = false;
                     break;
-                } elseif ($key_data[$criterion] != $value) {
+                } elseif (!$this->isMatch($value, $key_data[$property])) {
+                    $found = false;
+                    break;
+                }
+            }
+            foreach ($mandatory_if_present as $property => $value) {
+                if (!isset($key_data[$property])) continue;
+                if (!$this->isMatch($value, $key_data[$property])) {
                     $found = false;
                     break;
                 }
@@ -234,31 +288,73 @@ class KeySet {
             if ($found) $results[$kid] = $key_data;
         }
 
+        // 3. If zero or one key is found after allowing for mandatory and
+        //    mandatory-if-present criteria, return
         if (count($results) == 0) return null;
         if (count($results) == 1) {
             $kids = array_keys($results);
             return [$this->getById($kids[0])];
         }
 
-        // Round 2: Optional criteria
-        $results = array_map(function($key_data) use ($criteria) {
-            foreach ($criteria as $criterion => $value) {
-                $count = 0;
+        // 4. Optional criteria
+        $non_mandatory = array_merge($mandatory_if_present, $optional);
 
-                if ($criterion[0] != '~') continue;
-                $criterion = substr($criterion, 1);
+        if (count($non_mandatory) == 0) {
+            $kids = array_keys($results);
+            return array_map(function($kid) {
+                return $this->getById($kid);
+            }, $kids);
+        }
 
-                if (isset($key_data[$criterion]) && ($key_data[$criterion] == $value)) {
+        $results = array_map(function($key_data) use ($non_mandatory) {
+            $count = 0;
+            foreach ($non_mandatory as $property => $value) {
+                if (!isset($key_data[$property])) continue;
+                if ($this->isMatch($value, $key_data[$property])) {
                     $count++;
                 }
             }
             return $count;
         }, $results);
-        asort($results);
+        arsort($results);
         $kids = array_keys($results);
         return array_map(function($kid) {
             return $this->getById($kid);
         }, $kids);
+    }
+
+    /**
+     * Determines whether the property value of a key matches that of
+     * a criterion in {@link KeySet::find()}.
+     * 
+     * The matching rules are the following:
+     * 
+     * - If both `$criterion_value` and `$key_value` are scalars, then a
+     *   match occurs if `$criterion_value` is equal to `$key_value`
+     * - If `$criterion_value` is a scalar and `$key_value` is an array,
+     *   then a match occurs if `$criterion_value` is in `$key_value`
+     * - If `$criterion_value` is an array and `$key_value` is a scalar,
+     *   then a match occurs if `$key_value` is in `$criterion_value`
+     * - If both `$criterion_value` and `$key_value` are arrays, then a
+     *   match occurs if any element in `$criterion_value` is in
+     *   `$key_value`
+     * - Otherwise, there is no match
+     * 
+     * @param mixed $criterion_value the value of a criterion
+     * @param mixed $key_value the value of a property in a key
+     * @return bool true if there is match
+     */
+    protected function isMatch($criterion_value, $key_value) {
+        if (is_scalar($criterion_value) && is_scalar($key_value)) {
+            return ($criterion_value == $key_value);
+        } elseif (is_scalar($criterion_value) && is_array($key_value)) {
+            return in_array($criterion_value, $key_value);
+        } elseif (is_array($criterion_value) && is_scalar($key_value)) {
+            return in_array($key_value, $criterion_value);
+        } elseif (is_array($criterion_value) && is_array($key_value)) {
+            return (count($key_value) != count($key_value, $criterion_value));
+        }
+        return false;
     }
 
     /**

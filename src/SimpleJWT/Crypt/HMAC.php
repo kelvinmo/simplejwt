@@ -54,7 +54,7 @@ class HMAC extends SHA2 {
     }
 
     public function getKeyCriteria() {
-        return ['kty' => 'oct'];
+        return ['kty' => 'oct', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
     }
 
     public function getSupportedAlgs() {

@@ -63,7 +63,11 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return ['kty' => 'RSA'];
+        return [
+            'kty' => 'RSA',
+            '@use' => 'enc',
+            '@key_ops' => ['wrapKey', 'unwrapKey']
+        ];
     }
 
     /**
@@ -78,7 +82,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true, '~use' => 'enc']);
+        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true]);
         if (($key == null) || !$key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }

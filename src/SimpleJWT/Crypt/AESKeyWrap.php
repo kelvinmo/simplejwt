@@ -77,7 +77,9 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
         return [
             'kty' => 'oct',
             Key::SIZE_PROPERTY => $size,
-            '~alg' => $this->getAlg()
+            '~alg' => $this->getAlg(),
+            '@use' => 'enc',
+            '@key_ops' => ['wrapKey', 'unwrapKey']
         ];
     }
 

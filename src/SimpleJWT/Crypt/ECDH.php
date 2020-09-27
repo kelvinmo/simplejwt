@@ -37,6 +37,7 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\KeyFactory;
+use SimpleJWT\Util\Util;
 
 /**
  * Implementation of the Elliptic Curve Diffie-Hellman 
@@ -86,10 +87,10 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
             throw new CryptException('Key size not specified');
         }
 
-        if ($this->alg == 'ECDH-ES') {
+        if ($this->getAlg() == 'ECDH-ES') {
             $alg = $headers['enc'];
         } else {
-            $alg = $this->alg;
+            $alg = $this->getAlg();
         }
 
         // 2. If 'epk' header is present, check the ephemeral public key for compatibility

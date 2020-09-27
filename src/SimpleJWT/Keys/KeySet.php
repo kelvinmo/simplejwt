@@ -298,6 +298,14 @@ class KeySet {
 
         // 4. Optional criteria
         $non_mandatory = array_merge($mandatory_if_present, $optional);
+
+        if (count($non_mandatory) == 0) {
+            $kids = array_keys($results);
+            return array_map(function($kid) {
+                return $this->getById($kid);
+            }, $kids);
+        }
+
         $results = array_map(function($key_data) use ($non_mandatory) {
             $count = 0;
             foreach ($non_mandatory as $property => $value) {

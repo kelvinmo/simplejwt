@@ -63,7 +63,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return ['kty' => 'EC'];
+        return ['kty' => 'EC', '@use' => 'enc', '@key_ops' => 'deriveKey'];
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {

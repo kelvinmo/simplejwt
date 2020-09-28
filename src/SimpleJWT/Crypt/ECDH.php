@@ -177,7 +177,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         $public_key_res = openssl_pkey_get_public($public_key->toPEM());
         if ($public_key_res === false) throw new CryptException('Public key load error: ' . openssl_error_string());
 
-        $private_key_res = openssl_pkey_get_private($private_key->toPKCS8());
+        $private_key_res = openssl_pkey_get_private($private_key->toPEM());
         if ($private_key_res === false) throw new CryptException('Private key load error: ' . openssl_error_string());
 
         $result = openssl_pkey_derive($public_key_res, $private_key_res);

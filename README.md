@@ -21,6 +21,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
     * RSAES with OAEP (RSA-OAEP, RSA-OAEP-256)
     * AES key wrap (A128KW, A192KW, A256KW)
     * PBES2 (PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW)
+    * Elliptic Curve Diffie-Hellman (ECDH-ES) - requires PHP 7.3 or later
 - Content encryption algorithms
     * AES_CBC_HMAC_SHA2 family (A128CBC-HS256, A192CBC-HS384, A256CBC-HS512)
     * AES GCM family (A128GCM, A192GCM, A256GCM) - requires PHP 7.1 or later
@@ -33,6 +34,10 @@ SimpleJWT is a simple JSON web token library written in PHP.
 - `gmp` extension
 - `hash` extension
 - `openssl` extension
+
+A working `openssl.cnf` configuration is also required if the `ECDH-ES`
+algorithm is used.  See the [PHP manual](https://www.php.net/manual/en/openssl.installation.php)
+for details.
 
 ## Installation
 

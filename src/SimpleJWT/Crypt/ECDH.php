@@ -174,16 +174,20 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
     private function deriveAgreementKey($public_key, $private_key) {
         assert(function_exists('openssl_pkey_derive'));
 
-        // x, y from $public_key and d from $private_key
-        return openssl_pkey_derive($public_key->toPEM(), $private_key->toPEM());
+        $public_key_res = openssl_pkey_get_public($public_key->toPEM());
+        if ($public_key_res === false) throw new CryptException('Public key load error: ' . openssl_error_string());
+
+        $private_key_res = openssl_pkey_get_private($private_key->toPKCS8());
+        if ($private_key_res === false) throw new CryptException('Private key load error: ' . openssl_error_string());
+
+        $result = openssl_pkey_derive($public_key_res, $private_key_res);
+        if ($result === false) throw new CryptException('Key agreement error: ' . openssl_error_string());
+        return $result;
     }
 
     private function concatKDF($Z, $alg, $size, $apu = '', $apv = '') {
-        if ($apu == null) $apu = '';
-        if ($apv == null) $apv = '';
-
-        $apu = Util::base64url_decode($apu);
-        $apv = Util::base64url_decode($apv);
+        $apu = ($apu == null) ? '' : Util::base64url_decode($apu);
+        $apv = ($apv == null) ? '' : Util::base64url_decode($apv);
 
         $input = pack('N', 1)
             . $Z

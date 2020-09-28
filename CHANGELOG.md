@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - Changed: SimpleJWT\JWT::deserialise() no longer supports $format parameter
   (format is automatically detected)
 - Changed: Return value of SimpleJWT\JWT::deserialise() changed
+- Changed: SimpleJWT\JWE::decrypt() no longer supports $format parameter
+  (format is automatically detected)
 - Removed: SimpleJWT\Keys\Key::getSignature()
 
 ## Version 0.4.2

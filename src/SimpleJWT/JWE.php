@@ -71,11 +71,13 @@ class JWE {
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
-     * @param string $format the JWE serialisation format
      * @return JWE the decrypted JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decrypt($token, $keys, $expected_alg, $format = self::COMPACT_FORMAT) {
+    public static function decrypt($token, $keys, $expected_alg) {
+        $detect_result = Helper::detect($token);
+        $format = $detect_result['format'];
+
         switch ($format) {
             case self::COMPACT_FORMAT:
                 $parts = explode('.', $token, 5);

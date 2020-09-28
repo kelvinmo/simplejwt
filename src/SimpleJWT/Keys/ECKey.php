@@ -200,6 +200,47 @@ class ECKey extends Key {
         return !isset($this->data['d']);
     }
 
+    /**
+     * Checks whether this EC key is valid, in that its `x` and `y` values satisfies
+     * the elliptic curve function specified by the `crv` value.
+     * 
+     * This check is required to prevent invalid curve attacks, whereby an
+     * untrusted key contains `x` and `y` parameters are not on the curve, which
+     * may result in differential attacks
+     * 
+     * @return true if the EC key is valid
+     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
+     */
+    public function isValid() {
+        $x = new BigNum(Util::base64url_decode($this->data['x']), 256);
+        $y = new BigNum(Util::base64url_decode($this->data['y']), 256);
+
+        $crv = $this->data['crv'];
+        $a = new BigNum(hex2bin(self::$curves[$crv]['a']), 256);
+        $b = new BigNum(hex2bin(self::$curves[$crv]['b']), 256);
+        $p = new BigNum(hex2bin(self::$curves[$crv]['p']), 256);
+
+        // Check whether y^2 mod p = (x^3 + ax + b) mod p
+        $y2modp = $y->powmod(new BigNum(2), $p);
+        $x3axbmodp = $x->pow(new BigNum(3))->add($a->mul($x))->add($b)->mod($p);
+
+        return ($y2modp->cmp($x3axbmodp) === 0);
+    }
+
+    /**
+     * Checks whether another EC key is on the same curve as this key.
+     * 
+     * @param ECKey $public_key the public key to check
+     * @return true if the EC key is on the same curve
+     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
+     */
+    public function isOnSameCurve($public_key) {
+        if (!($public_key instanceof ECKey)) return false;
+        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
+
+        return ($this->isValid() && $public_key->isValid());
+    }
+
     public function getPublicKey() {
         return new ECKey([
             'kid' => $this->data['kid'],
@@ -245,31 +286,6 @@ class ECKey extends Key {
      */
     public function getCurve() {
         return $this->data['crv'];
-    }
-
-    /**
-     * Checks whether another EC key is on the same curve as this key.
-     * 
-     * @param ECKey $public_key the public key to check
-     * @return true if the EC key is on the same curve
-     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
-     */
-    public function isOnSameCurve($public_key) {
-        if (!($public_key instanceof ECKey)) return false;
-        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
-
-        $x = new BigNum(Util::base64url_decode($public_key->data['x']), 256);
-        $y = new BigNum(Util::base64url_decode($public_key->data['y']), 256);
-
-        $crv = $this->data['crv'];
-        $a = new BigNum(hex2bin(self::$curves[$crv]['a']), 256);
-        $b = new BigNum(hex2bin(self::$curves[$crv]['b']), 256);
-        $p = new BigNum(hex2bin(self::$curves[$crv]['p']), 256);
-
-        // Check whether y^2 mod p = (x^3 + ax + b) mod p
-        $y2modp = $y->powmod(new BigNum(2), $p);
-        $x3axbmodp = $x->mod(new BigNum(3))->add($a->mul($x))->add($b)->mod($p);
-        return ($y2modp->cmp($x3axbmodp) === 0);
     }
 
     protected function getThumbnailMembers() {

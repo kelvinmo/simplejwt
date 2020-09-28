@@ -194,7 +194,7 @@ class BigNum {
      */
     function pow($exp) {
         $result = new BigNum(0);
-        $result->value = $this->_mul($this->value, $exp->value);
+        $result->value = $this->_pow($this->value, $exp->value);
         return $result;
     }
 
@@ -295,7 +295,9 @@ class BigNum {
      * @return resource a bignum representing base ^ exp
      */
     function _pow($base, $exp) {
-        if (is_resource($exp) && (get_resource_type($exp) == 'gmp')) $exp = gmp_intval($exp);
+        if ((is_resource($exp) && (get_resource_type($exp) == 'gmp'))
+            || (is_object($exp) && (get_class($exp) == 'GMP')))
+            $exp = gmp_intval($exp);
         return gmp_pow($base, $exp);
     }
 

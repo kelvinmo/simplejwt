@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Changed: SimpleJWT\JWE::decrypt() no longer supports $format parameter
   (format is automatically detected)
 - Removed: SimpleJWT\Keys\Key::getSignature()
+- Fixed: Autoload issue in jwkstool (#31)
 
 ## Version 0.4.2
 

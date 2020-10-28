@@ -45,7 +45,7 @@ class AESGCMTest extends TestCase {
 
         // [Keylen = 128] [IVlen = 96] [PTlen = 128] [AADlen = 0] [Taglen = 128] [Count = 0]
         $cek = hex2bin('e98b72a9881a84ca6b76e0f43e68647a');
-        $ciphertext = hex2bin('5a3c1cf1985dbb8bed818036fdd5ab42');
+        $ciphertext = $this->hex2base64url('5a3c1cf1985dbb8bed818036fdd5ab42');
         $tag = $this->hex2base64url('23c7ab0f952b7091cd324835043b5eb5');
         $iv = $this->hex2base64url('8b23299fde174053f3d652ba');
         $additional = '';
@@ -63,7 +63,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A128GCM')) return;
         
         $cek = hex2bin('e98b72a9881a84ca6b76e0f43e68647a');
-        $ciphertext = hex2bin('5a3c1cf1985dbb8bed818036fdd5ab42');
+        $ciphertext = $this->hex2base64url('5a3c1cf1985dbb8bed818036fdd5ab42');
         $tag = $this->hex2base64url('23c7ab0f952b7091cd324835043b5eb6');
         $iv = $this->hex2base64url('8b23299fde174053f3d652ba');
         $additional = '';
@@ -93,7 +93,7 @@ class AESGCMTest extends TestCase {
         
         // [Keylen = 192] [IVlen = 96] [PTlen = 128] [AADlen = 0] [Taglen = 128] [Count = 0]
         $cek = hex2bin('7a7c5b6a8a9ab5acae34a9f6e41f19a971f9c330023c0f0c');
-        $ciphertext = hex2bin('132ae95bd359c44aaefa6348632cafbd');
+        $ciphertext = $this->hex2base64url('132ae95bd359c44aaefa6348632cafbd');
         $tag = $this->hex2base64url('19d7c7d5809ad6648110f22f272e7d72');
         $iv = $this->hex2base64url('aa4c38bf587f94f99fee77d5');
         $additional = '';
@@ -111,7 +111,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A192GCM')) return;
         
         $cek = hex2bin('7a7c5b6a8a9ab5acae34a9f6e41f19a971f9c330023c0f0c');
-        $ciphertext = hex2bin('132ae95bd359c44aaefa6348632cafbd');
+        $ciphertext = $this->hex2base64url('132ae95bd359c44aaefa6348632cafbd');
         $tag = $this->hex2base64url('19d7c7d5809ad6648110f22f272e7d73');
         $iv = $this->hex2base64url('aa4c38bf587f94f99fee77d5');
         $additional = '';
@@ -141,7 +141,7 @@ class AESGCMTest extends TestCase {
         
         // [Keylen = 256] [IVlen = 96] [PTlen = 128] [AADlen = 0] [Taglen = 128] [Count = 0]
         $cek = hex2bin('4c8ebfe1444ec1b2d503c6986659af2c94fafe945f72c1e8486a5acfedb8a0f8');
-        $ciphertext = hex2bin('d2c78110ac7e8f107c0df0570bd7c90c');
+        $ciphertext = $this->hex2base64url('d2c78110ac7e8f107c0df0570bd7c90c');
         $tag = $this->hex2base64url('c26a379b6d98ef2852ead8ce83a833a7');
         $iv = $this->hex2base64url('473360e0ad24889959858995');
         $additional = '';
@@ -159,7 +159,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A256GCM')) return;
         
         $cek = hex2bin('4c8ebfe1444ec1b2d503c6986659af2c94fafe945f72c1e8486a5acfedb8a0f8');
-        $ciphertext = hex2bin('d2c78110ac7e8f107c0df0570bd7c90c');
+        $ciphertext = $this->hex2base64url('d2c78110ac7e8f107c0df0570bd7c90c');
         $tag = $this->hex2base64url('c26a379b6d98ef2852ead8ce83a833a8');
         $iv = $this->hex2base64url('473360e0ad24889959858995');
         $additional = '';

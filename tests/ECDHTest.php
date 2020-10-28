@@ -103,26 +103,6 @@ class ECDHTest extends TestCase {
         $this->assertEquals('VqqN6vgjbSBcIijNcacQGg', Util::base64url_encode($result));
     }
 
-    /*private function setOpenSslConfig() {
-        putenv('OPENSSL_CONF=' . __DIR__ . '/openssl.cnf');
-    }
-
-    public function testEphemeralKeyGen() {
-        $openssl_cnf = __DIR__ . '/openssl.cnf';
-
-        $this->setOpenSslConfig();
-
-
-        $pkey = openssl_pkey_new([
-            'curve_name' => 'prime256v1',
-            'private_key_type' => OPENSSL_KEYTYPE_EC,
-            'config' => $openssl_cnf
-        ]);
-        $this->assertNotEquals(false, $pkey);
-        
-        $result = openssl_pkey_export($pkey, $pem, NULL, ['config' => $openssl_cnf]);
-        $this->assertNotEquals(false, $result);
-    }*/
 }
 
 ?>

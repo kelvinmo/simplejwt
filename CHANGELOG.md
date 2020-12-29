@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Version 0.5.0
 
 - Added: Support for AES GCM family of algorithms
 - Changed: SimpleJWT\JWT::decode() no longer supports $format parameter

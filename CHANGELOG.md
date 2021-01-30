@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Version 0.5.1
 
 - Added: Support for PHP 8 (#35)
 

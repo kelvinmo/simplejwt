@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015
+ * Copyright (C) Kelvin Mo 2015-2021
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,7 +33,17 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-include __DIR__ . '/../vendor/autoload.php';
+$autoload_paths = [
+    __DIR__.'/../vendor/autoload.php', // local
+    __DIR__.'/../../../autoload.php' // dependency
+];
+
+foreach ($autoload_paths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        break;
+    }
+}
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;

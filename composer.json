@@ -4,7 +4,7 @@
     "keywords": [ "jwt", "jwe", "jose" ],
     "homepage": "https://github.com/kelvinmo/simplejwt",
     "require": {
-        "php": "^5.4 || ^7.1",
+        "php": "^5.4 || ^7.1 || ^8.0",
         "ext-openssl": "*",
         "ext-hash": "*",
         "ext-gmp": "*",
@@ -13,7 +13,7 @@
     "require-dev": {
         "ext-bz2": "*",
         "ext-Phar": "*",
-        "phpunit/phpunit": "^4.8.35 || ^6.0",
+        "phpunit/phpunit": "^4.8.35 || ^6.0 || ^9.3",
         "phing/phing": "^2.0"
     },
     "license": "BSD-3-Clause",
@@ -29,6 +29,7 @@
     },
     "scripts": {
         "phar": [ "@composer install", "phing phar" ],
-        "test": [ "@composer install", "phpunit" ]
+        "test": [ "@composer install", "phpunit" ],
+        "update-copyright": [ "@composer install", "phing update-copyright" ]
     }
 }

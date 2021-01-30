@@ -61,6 +61,10 @@ class AESGCMTest extends TestCase {
      */
     function testA128GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A128GCM')) return;
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\Crypt\CryptException');
+        }
         
         $cek = hex2bin('e98b72a9881a84ca6b76e0f43e68647a');
         $ciphertext = $this->hex2base64url('5a3c1cf1985dbb8bed818036fdd5ab42');
@@ -110,6 +114,10 @@ class AESGCMTest extends TestCase {
     function testA192GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A192GCM')) return;
         
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\Crypt\CryptException');
+        }
+        
         $cek = hex2bin('7a7c5b6a8a9ab5acae34a9f6e41f19a971f9c330023c0f0c');
         $ciphertext = $this->hex2base64url('132ae95bd359c44aaefa6348632cafbd');
         $tag = $this->hex2base64url('19d7c7d5809ad6648110f22f272e7d73');
@@ -158,6 +166,10 @@ class AESGCMTest extends TestCase {
     function testA256GCMIncorrectTag() {
         if (!$this->isAlgAvailable('A256GCM')) return;
         
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\Crypt\CryptException');
+        }
+
         $cek = hex2bin('4c8ebfe1444ec1b2d503c6986659af2c94fafe945f72c1e8486a5acfedb8a0f8');
         $ciphertext = $this->hex2base64url('d2c78110ac7e8f107c0df0570bd7c90c');
         $tag = $this->hex2base64url('c26a379b6d98ef2852ead8ce83a833a8');

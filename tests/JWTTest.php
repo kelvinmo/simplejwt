@@ -170,6 +170,10 @@ class JWTTest extends TestCase {
      * @expectedException SimpleJWT\InvalidTokenException
      */
     function testAlgFailure() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+        }
+
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
         $jwt = JWT::decode($token, $set, 'RS256'); // Error - should be ES256
@@ -179,6 +183,10 @@ class JWTTest extends TestCase {
      * @expectedException SimpleJWT\InvalidTokenException
      */
     function testSignatureFailure() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+        }
+        
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.NrP7T3zsezqVjBPI35nJBtIQeoOrsT7Rib5NdaOzpgM';
         $jwt = JWT::decode($token, $set, 'HS256');
@@ -188,6 +196,10 @@ class JWTTest extends TestCase {
      * @expectedException SimpleJWT\InvalidTokenException
      */
     function testTimeFailure() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+        }
+        
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $claims['exp'] = 1;

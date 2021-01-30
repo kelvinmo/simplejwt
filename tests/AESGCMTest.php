@@ -63,7 +63,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A128GCM')) return;
 
         if (method_exists($this, 'expectException')) {
-            $this->expectException(CryptException::class);
+            $this->expectException('SimpleJWT\Crypt\CryptException');
         }
         
         $cek = hex2bin('e98b72a9881a84ca6b76e0f43e68647a');
@@ -115,7 +115,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A192GCM')) return;
         
         if (method_exists($this, 'expectException')) {
-            $this->expectException(CryptException::class);
+            $this->expectException('SimpleJWT\Crypt\CryptException');
         }
         
         $cek = hex2bin('7a7c5b6a8a9ab5acae34a9f6e41f19a971f9c330023c0f0c');
@@ -167,7 +167,7 @@ class AESGCMTest extends TestCase {
         if (!$this->isAlgAvailable('A256GCM')) return;
         
         if (method_exists($this, 'expectException')) {
-            $this->expectException(CryptException::class);
+            $this->expectException('SimpleJWT\Crypt\CryptException');
         }
 
         $cek = hex2bin('4c8ebfe1444ec1b2d503c6986659af2c94fafe945f72c1e8486a5acfedb8a0f8');

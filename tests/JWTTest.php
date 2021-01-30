@@ -171,7 +171,7 @@ class JWTTest extends TestCase {
      */
     function testAlgFailure() {
         if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidTokenException::class);
+            $this->expectException('SimpleJWT\InvalidTokenException');
         }
 
         $set = $this->getPublicKeySet();
@@ -184,7 +184,7 @@ class JWTTest extends TestCase {
      */
     function testSignatureFailure() {
         if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidTokenException::class);
+            $this->expectException('SimpleJWT\InvalidTokenException');
         }
         
         $set = $this->getPublicKeySet();
@@ -197,7 +197,7 @@ class JWTTest extends TestCase {
      */
     function testTimeFailure() {
         if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidTokenException::class);
+            $this->expectException('SimpleJWT\InvalidTokenException');
         }
         
         $set = $this->getPrivateKeySet();

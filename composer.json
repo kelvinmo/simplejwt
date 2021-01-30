@@ -28,6 +28,7 @@
     },
     "scripts": {
         "phar": [ "@composer install", "phing phar" ],
-        "test": [ "@composer install", "phpunit" ]
+        "test": [ "@composer install", "phpunit" ],
+        "update-copyright": [ "@composer install", "phing update-copyright" ]
     }
 }

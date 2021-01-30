@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Added: Support for PHP 8 (#35)
+
 ## Version 0.5.0
 
 - Added: Support for AES GCM family of algorithms

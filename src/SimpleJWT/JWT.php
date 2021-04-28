@@ -266,6 +266,8 @@ class JWT {
      */
     public static function deserialise($token) {
         $detect_result = Helper::detect($token);
+        if ($detect_result == null)
+            throw new \InvalidArgumentException('Unrecognised token format');
         $format = $detect_result['format'];
 
         $result = [];

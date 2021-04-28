@@ -31,7 +31,7 @@ class HelperTest extends TestCase {
         "signature":
          "DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q"}]
         }
-        END;
+END;
 
         $results = Helper::detect($complete_json);
         $this->assertEquals('JWT', $results['type']);
@@ -47,7 +47,7 @@ class HelperTest extends TestCase {
         "signature":
         "DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q"
         }
-        END;
+END;
 
         $results = Helper::detect($flattened_json);
         $this->assertEquals('JWT', $results['type']);
@@ -85,7 +85,7 @@ class HelperTest extends TestCase {
         "tag":
         "Mz-VPPyU4RlcuYv1IwIvzw"
         }
-        END;
+END;
 
         $results = Helper::detect($complete_json);
         $this->assertEquals('JWE', $results['type']);
@@ -108,7 +108,7 @@ class HelperTest extends TestCase {
         "tag":
         "Mz-VPPyU4RlcuYv1IwIvzw"
         }
-        END;
+END;
 
         $results = Helper::detect($flattened_json);
         $this->assertEquals('JWE', $results['type']);

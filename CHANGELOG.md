@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fixed: Undefined index when calling JWT::deserialise() and
+  JWE::decrypt() with unrecognised format (#37)
+
 ## Version 0.5.1
 
 - Added: Support for PHP 8 (#35)

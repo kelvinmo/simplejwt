@@ -87,4 +87,18 @@ class JWETest extends TestCase {
         $test_jwe = JWE::decrypt($token, $private_set, 'dir');
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    function testInvalidToken() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\InvalidArgumentException');
+        }
+
+        $invalid_token = '12345';
+        $dummy_set = $this->getPrivateKeySet();
+
+        $result = JWE::decrypt($invalid_token, $dummy_set, 'dummy');
+    }
 }

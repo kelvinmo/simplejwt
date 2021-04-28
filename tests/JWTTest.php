@@ -209,5 +209,17 @@ class JWTTest extends TestCase {
         $set2 = $this->getPublicKeySet();
         $jwt2 = JWT::decode($token, $set2, 'HS256');
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    function testInvalidToken() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\InvalidArgumentException');
+        }
+
+        $invalid_token = '12345';
+        $result = JWT::deserialise($invalid_token);
+    }
 }
 ?>

@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Version 0.5.2
 
 - Fixed: Undefined index when calling JWT::deserialise() and
-  JWE::decrypt() with unrecognised format (#37)
+  JWE::decrypt() with an unrecognised token format (#37)
 
 ## Version 0.5.1
 

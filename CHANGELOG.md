@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fixed: typos in documentation leading to deprecation error (#39)
+
 ## Version 0.5.2
 
 - Fixed: Undefined index when calling JWT::deserialise() and

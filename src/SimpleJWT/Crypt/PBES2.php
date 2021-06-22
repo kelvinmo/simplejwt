@@ -140,27 +140,4 @@ class PBES2 extends AESWrappedKeyAlgorithm {
         return hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);
     }
 }
-
-if (!function_exists('hash_pbkdf2') && function_exists('hash_hmac')) {
-    function hash_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $raw_output = false) {
-        $result = '';
-        $hLen = strlen(hash($algo, '', true));
-        if ($length == 0) {
-            $length = $hLen;
-            if (!$raw_output) $length *= 2;
-        }
-        $l = ceil($length / $hLen);
-
-        for ($i = 1; $i <= $l; $i++) {
-            $U = hash_hmac($algo, $salt . pack('N', $i), $password, true);
-            $T = $U;
-            for ($j = 1; $j < $iterations; $j++) {
-                $T ^= ($U = hash_hmac($algo, $U, $password, true));
-            }
-            $result .= $T;
-        }
-
-        return substr(($raw_output) ? $result : bin2hex($result), 0, $length);
-    }
-}
 ?>

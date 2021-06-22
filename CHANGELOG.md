@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fixed: typos in documentation leading to deprecation error (#39)
+- Removed: support for PHP 5
+
+## Version 0.5.2
+
+- Fixed: Undefined index when calling JWT::deserialise() and
+  JWE::decrypt() with an unrecognised token format (#37)
+
 ## Version 0.5.1
 
 - Added: Support for PHP 8 (#35)

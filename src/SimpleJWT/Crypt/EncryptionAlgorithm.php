@@ -44,7 +44,7 @@ interface EncryptionAlgorithm {
      *
      * @param string $plaintext the plaintext to encrypt
      * @param string $cek the content encryption key as a binary string
-     * @param string $addtional additional authenticated data as a binary string
+     * @param string $additional additional authenticated data as a binary string
      * @param string $iv the initialisation vector, where required, as a base64url
      * encoded string
      * @return array an array containing the following keys: `ciphertext` (the ciphertext),
@@ -62,7 +62,7 @@ interface EncryptionAlgorithm {
      * @param string $tag the authentication tag, as a base64url encoded
      * string
      * @param string $cek the content encryption key as a binary string
-     * @param string $addtional additional authenticated data as a binary string
+     * @param string $additional additional authenticated data as a binary string
      * @return string the plaintext as a binary string
      * @throws CryptException if there is an error in the cryptographic process, including
      * if the authentication tag does not match

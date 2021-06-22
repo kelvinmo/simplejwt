@@ -76,6 +76,8 @@ class JWE {
      */
     public static function decrypt($token, $keys, $expected_alg) {
         $detect_result = Helper::detect($token);
+        if ($detect_result == null)
+            throw new \InvalidArgumentException('Unrecognised token format');
         $format = $detect_result['format'];
 
         switch ($format) {

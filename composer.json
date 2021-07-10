@@ -13,7 +13,7 @@
         "ext-bz2": "*",
         "ext-Phar": "*",
         "phpunit/phpunit": "^7.0 || ^9.3",
-        "phing/phing": "^2.0"
+        "consolidation/robo": "^1.0"
     },
     "license": "BSD-3-Clause",
     "authors": [
@@ -27,8 +27,8 @@
         "psr-4": { "SimpleJWT\\": "src/SimpleJWT" }
     },
     "scripts": {
-        "phar": [ "@composer install", "phing phar" ],
+        "phar": [ "@composer install", "robo phar" ],
         "test": [ "@composer install", "phpunit" ],
-        "update-copyright": [ "@composer install", "phing update-copyright" ]
+        "update-copyright": [ "@composer install", "robo update_copyright" ]
     }
 }

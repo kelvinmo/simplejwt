@@ -1,0 +1,40 @@
+name: jwkstool
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build jwkstool
+    runs-on: ubuntu-latest
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: bz2, Phar
+          ini-values: phar.readonly=0
+          tools: composer
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: "~/.composer/cache"
+          key: "composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "composer-"
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Build phar
+        run: composer phar
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: bin/jwkstool.phar
+          token: ${{ secrets.GITHUB_TOKEN }}

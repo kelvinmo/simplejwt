@@ -13,7 +13,7 @@
         "ext-bz2": "*",
         "ext-Phar": "*",
         "phpunit/phpunit": "^7.0 || ^9.3",
-        "consolidation/robo": "^1.0"
+        "consolidation/robo": "^3.0"
     },
     "license": "BSD-3-Clause",
     "authors": [

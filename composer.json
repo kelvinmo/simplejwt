@@ -13,7 +13,8 @@
         "ext-bz2": "*",
         "ext-Phar": "*",
         "phpunit/phpunit": "^7.0 || ^9.3",
-        "consolidation/robo": "^3.0"
+        "consolidation/robo": "^3.0",
+        "phpstan/phpstan": "^0.12.96"
     },
     "license": "BSD-3-Clause",
     "authors": [
@@ -29,6 +30,7 @@
     "scripts": {
         "phar": [ "@composer install", "robo phar" ],
         "test": [ "@composer install", "phpunit" ],
+        "phpstan": [ "@composer install", "phpstan analyse" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ]
     }
 }

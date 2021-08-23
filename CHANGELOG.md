@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Version 0.5.3
 
 - Fixed: typos in documentation leading to deprecation error (#39)
+- Fixed: incorrect treatment of recipients object in JWE
 - Removed: support for PHP 5
 
 ## Version 0.5.2

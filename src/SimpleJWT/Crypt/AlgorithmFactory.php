@@ -59,6 +59,8 @@ class AlgorithmFactory {
         '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\RSAES',
         '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
         '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
+        '/^ECDH-ES$/' => 'SimpleJWT\Crypt\ECDH',
+        '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\ECDH_AESKeyWrap',
 
         // Content encryption algorithms
         '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2',

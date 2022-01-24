@@ -1,0 +1,4 @@
+# Minimal openssl.cnf file required to create and export EC private keys
+
+[ req ]
+default_bits = 2048

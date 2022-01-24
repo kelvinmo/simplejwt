@@ -36,6 +36,7 @@
 namespace SimpleJWT\Keys;
 
 use SimpleJWT\Util\ASN1;
+use SimpleJWT\Util\BigNum;
 use SimpleJWT\Util\Util;
 
 /**
@@ -53,11 +54,40 @@ class ECKey extends Key {
     const P384_OID = '1.3.132.0.34';
     const P521_OID = '1.3.132.0.35';
 
+    // Curve parameters are from http://www.secg.org/sec2-v2.pdf
     static $curves = [
-        self::P256_OID => ['crv' => 'P-256', 'len' => 64],
-        self::SECP256K1_OID => ['crv' => 'secp256k1', 'len' => 64],
-        self::P384_OID => ['crv' => 'P-384', 'len' => 96],
-        self::P521_OID => ['crv' => 'P-521', 'len' => 132],
+        'P-256' => [
+            'oid' => self::P256_OID,
+            'openssl' => 'prime256v1', // = secp256r1
+            'len' => 64,
+            'a' => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC',
+            'b' => '5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B',
+            'p' => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF',
+        ],
+        'P-384' => [
+            'oid' => self::P384_OID,
+            'openssl' => 'secp384r1',
+            'len' => 96,
+            'a' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC',
+            'b' => 'B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF',
+            'p' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF',
+        ],
+        'P-521' => [
+            'oid' => self::P521_OID,
+            'openssl' => 'secp521r1',
+            'len' => 132,
+            'a' => '01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC',
+            'b' => '0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00',
+            'p' => '01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+        ],
+        'secp256k1' => [
+            'oid' => self::SECP256K1_OID,
+            'openssl' => 'secp256k1',
+            'len' => 64,
+            'a' => '0000000000000000000000000000000000000000000000000000000000000000',
+            'b' => '0000000000000000000000000000000000000000000000000000000000000007',
+            'p' => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F',
+        ],
     ];
 
     /**
@@ -98,9 +128,10 @@ class ECKey extends Key {
                     $algorithm = ASN1::decodeOID($algorithm);
                     if ($algorithm != self::EC_OID) throw new KeyException('Not EC key');
 
-                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1::decodeOID($curve);
-                    if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
+                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
+                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve = $this->getCurveNameFromOID($curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
@@ -113,7 +144,7 @@ class ECKey extends Key {
                     $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = self::$curves[$curve]['crv'];
+                    $jwk['crv'] = $curve;
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
@@ -129,9 +160,10 @@ class ECKey extends Key {
                     $offset += ASN1::readDER($der, $offset, $d);  // OCTET STRING [d]
 
                     $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[0]
-                    $offset += ASN1::readDER($der, $offset, $curve);  // OBJECT IDENTIFIER - parameters
-                    $curve = ASN1::decodeOID($curve);
-                    if (!isset(self::$curves, $curve)) throw new KeyException('Unrecognised EC parameter: ' . $curve);
+                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
+                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve = $this->getCurveNameFromOID($curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
@@ -145,7 +177,7 @@ class ECKey extends Key {
                     $y = substr($point, 1 + $len / 2);
 
                     $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = self::$curves[$curve]['crv'];
+                    $jwk['crv'] = $curve;
                     $jwk['d'] = Util::base64url_encode($d);
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
@@ -168,6 +200,47 @@ class ECKey extends Key {
         return !isset($this->data['d']);
     }
 
+    /**
+     * Checks whether this EC key is valid, in that its `x` and `y` values satisfies
+     * the elliptic curve function specified by the `crv` value.
+     * 
+     * This check is required to prevent invalid curve attacks, whereby an
+     * untrusted key contains `x` and `y` parameters are not on the curve, which
+     * may result in differential attacks
+     * 
+     * @return true if the EC key is valid
+     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
+     */
+    public function isValid() {
+        $x = new BigNum(Util::base64url_decode($this->data['x']), 256);
+        $y = new BigNum(Util::base64url_decode($this->data['y']), 256);
+
+        $crv = $this->data['crv'];
+        $a = new BigNum(hex2bin(self::$curves[$crv]['a']), 256);
+        $b = new BigNum(hex2bin(self::$curves[$crv]['b']), 256);
+        $p = new BigNum(hex2bin(self::$curves[$crv]['p']), 256);
+
+        // Check whether y^2 mod p = (x^3 + ax + b) mod p
+        $y2modp = $y->powmod(new BigNum(2), $p);
+        $x3axbmodp = $x->pow(new BigNum(3))->add($a->mul($x))->add($b)->mod($p);
+
+        return ($y2modp->cmp($x3axbmodp) === 0);
+    }
+
+    /**
+     * Checks whether another EC key is on the same curve as this key.
+     * 
+     * @param ECKey $public_key the public key to check
+     * @return true if the EC key is on the same curve
+     * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
+     */
+    public function isOnSameCurve($public_key) {
+        if (!($public_key instanceof ECKey)) return false;
+        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
+
+        return ($this->isValid() && $public_key->isValid());
+    }
+
     public function getPublicKey() {
         return new ECKey([
             'kid' => $this->data['kid'],
@@ -179,7 +252,7 @@ class ECKey extends Key {
     }
 
     public function toPEM() {
-        $oid = $this->getOID($this->data['crv']);
+        $oid = self::$curves[$this->data['crv']]['oid'];
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
 
         if ($this->isPublic()) {
@@ -205,14 +278,24 @@ class ECKey extends Key {
         }
     }
 
+    /**
+     * Gets the elliptic curve for the key.  The elliptic curve is specified in
+     * the `crv` parameter.
+     * 
+     * @return string the elliptic curve
+     */
+    public function getCurve() {
+        return $this->data['crv'];
+    }
+
     protected function getThumbnailMembers() {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['crv', 'kty', 'x', 'y'];
     }
 
-    private function getOID($crv) {
-        foreach (self::$curves as $oid => $params) {
-            if ($params['crv'] == $crv) return $oid;
+    private function getCurveNameFromOID($curve_oid) {
+        foreach (self::$curves as $crv => $params) {
+            if ($params['oid'] == $curve_oid) return $crv;
         }
         return null;
     }

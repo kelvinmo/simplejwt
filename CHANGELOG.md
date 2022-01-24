@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Added: Support for Elliptic Curve Diffie-Hellman key derivation
+  algorithm
+
 ## Version 0.5.3
 
 - Fixed: typos in documentation leading to deprecation error (#39)
@@ -20,8 +25,6 @@ All notable changes to this project will be documented in this file.
 ## Version 0.5.0
 
 - Added: Support for AES GCM family of algorithms
-- Added: Support for Elliptic Curve Diffie-Hellman key derivation
-  algorithm
 - Changed: SimpleJWT\JWT::decode() no longer supports $format parameter
   (format is automatically detected)
 - Changed: SimpleJWT\JWT::deserialise() no longer supports $format parameter

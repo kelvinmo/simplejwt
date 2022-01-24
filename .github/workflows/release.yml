@@ -1,4 +1,4 @@
-name: jwkstool
+name: release
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build jwkstool
+    name: Build and release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,11 +35,19 @@ jobs:
       - name: Install dependencies
         run: composer install
 
-      - name: Build phar
+      - name: Get semantic version
+        id: semver
+        uses: booxmedialtd/ws-action-parse-semver@v1
+        with:
+          input_string: ${{ github.ref }}
+          version_extractor_regex: '\/v(.*)$'
+
+      - name: Build jwkstool.phar
         run: composer phar
 
-      - name: Release
+      - name: Create Github release
         uses: ncipollo/release-action@v1
         with:
           artifacts: bin/jwkstool.phar
           token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ !!steps.semver.outputs.prerelease }}

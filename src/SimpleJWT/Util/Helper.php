@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2021
+ * Copyright (C) Kelvin Mo 2015-2022
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -106,6 +106,7 @@ class Helper {
      * @throws InvalidTokenException if the token is invalid for any reason
      */
     function getObject($keys, $expected_alg, $kid = null) {
+        // @phpstan-ignore-next-line
         switch ($this->type) {
             case 'JWT':
                 return JWT::decode($this->data, $keys, $expected_alg, $kid, [], $this->format);
@@ -137,6 +138,7 @@ class Helper {
      * @throws InvalidTokenException if the token is invalid for any reason
      */
     function getJWTObject($keys, $expected_jwe_alg, $expected_jwt_alg, $jwe_kid = null, $jwt_kid = null) {
+        // @phpstan-ignore-next-line
         switch ($this->type) {
             case 'JWT':
                 return $this->getObject($keys, $expected_jwt_alg, $jwt_kid);

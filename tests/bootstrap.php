@@ -1,11 +1,6 @@
 <?php
-
-set_include_path(implode(PATH_SEPARATOR, [
-    dirname(__FILE__) . '/../src/',
-    dirname(__FILE__) . '/',
-    get_include_path(),
-]));
-
+// Change the directory to the 'tests' directory to pick up local
+// test data files
 chdir(dirname(__FILE__) . '/');
 include '../vendor/autoload.php';
 

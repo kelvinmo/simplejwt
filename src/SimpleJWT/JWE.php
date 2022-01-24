@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2021
+ * Copyright (C) Kelvin Mo 2015-2022
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,6 +39,7 @@ use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Crypt\KeyDerivationAlgorithm;
 use SimpleJWT\Crypt\KeyEncryptionAlgorithm;
 use SimpleJWT\Keys\SymmetricKey;
+use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
@@ -97,11 +98,11 @@ class JWE {
 
                 if (isset($obj['recipients'])) {
                     foreach ($obj['recipients'] as $recipient) {
-                        if (isset($recipient_obj['header']['kid'])) {
-                            $target_kid = $recipient_obj['header']['kid'];
+                        if (isset($recipient['header']['kid'])) {
+                            $target_kid = $recipient['header']['kid'];
                             if ($keys->getById($target_kid) != null) {
-                                $unprotected = (isset($unprotected)) ? array_merge($unprotected, $recipient_obj['header']) : $recipient_obj['header'];
-                                $encrypted_key = $recipient_obj['encrypted_key'];
+                                $unprotected = (isset($unprotected)) ? array_merge($unprotected, $recipient['header']) : $recipient['header'];
+                                $encrypted_key = $recipient['encrypted_key'];
                                 break;
                             }
                         }
@@ -255,7 +256,7 @@ class JWE {
                 // Key agreement with wrapping
                 $agreed_symmetric_key = new SymmetricKey([
                     'kty' => SymmetricKey::KTY,
-                    'alg' => $headers['alg'],
+                    'alg' => $this->headers['alg'],
                     'k' => Util::base64url_encode($agreed_key),
                 ], 'php');
                 $kid = $agreed_symmetric_key->getThumbnail();

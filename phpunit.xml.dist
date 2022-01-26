@@ -8,4 +8,13 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <coverage ignoreDeprecatedCodeUnits="true">
+        <include>
+            <directory suffix=".php">src/</directory>
+        </include>
+        <report>
+            <html outputDirectory="tests/coverage"/>
+            <clover outputFile="tests/coverage/clover.xml"/>
+        </report>
+    </coverage>
 </phpunit>

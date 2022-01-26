@@ -31,6 +31,7 @@
     "scripts": {
         "phar": [ "@composer install", "robo phar" ],
         "test": [ "@composer install", "phpunit" ],
+        "coverage": [ "@composer install", "phpdbg -qrr vendor/bin/phpunit --coverage-text" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ]
     }

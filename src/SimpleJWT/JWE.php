@@ -268,7 +268,7 @@ class JWE {
             }
         }
 
-        if (!isset($cek)) $cek = Util::random_bytes($content_enc->getCEKSize() / 8);
+        if (!isset($cek)) $cek = $this->generateCEK($content_enc->getCEKSize() / 8);
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
             $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
@@ -311,6 +311,20 @@ class JWE {
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
+    }
+
+    /**
+     * Generates a content encryption key.
+     * 
+     * (This method is separated from the rest of the {@link encrypt()}
+     * function to enable testing.)
+     * 
+     * @param int $length the length of the content encryption key, in bytes
+     * @return string the generated content encryption key as a binary
+     * string
+     */
+    protected function generateCEK($length) {
+        return Util::random_bytes($length);
     }
 }
 

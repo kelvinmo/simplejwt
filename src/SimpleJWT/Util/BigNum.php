@@ -36,21 +36,11 @@
 namespace SimpleJWT\Util;
  
 /**
- * A generic big integer using the GMP or the BCMath library.
+ * A generic big integer using the GMP library.
  */
 class BigNum {
     /** @var resource the internal representation of the value */
     protected $value;
-
-    /**
-     * Returns whether the GMP library is installed.  If this library is not
-     * installed, the functions in this file will not work.
-     *
-     * @return bool true if GMP is installed.
-     */ 
-    static function loaded() {
-        return function_exists('gmp_init');
-    }
 
     /**
      * Creates a bignum.
@@ -91,75 +81,6 @@ class BigNum {
         }
 
         throw new \RuntimeException();
-    }
-
-    /**
-     * Converts a bignum into a string representation (base 2 to 36) or a byte stream
-     * (base 256)
-     *
-     * @param int $base an integer between 2 and 36, or 256
-     * @return string the converted bignum
-     */
-    function val($base = 10) {
-        switch ($base) {
-            case 10:
-                return gmp_strval($this->value, 10);
-                break;
-        
-            case 256:
-                $cmp = $this->_cmp($this->value, 0);
-                if ($cmp < 0) {
-                    return FALSE;
-                }
-        
-                if ($cmp == 0) {
-                    return "\x00";
-                }
-        
-                $bytes = array();
-                $num = $this->value;
-          
-                while ($this->_cmp($num, 0) > 0) {
-                    array_unshift($bytes, $this->_mod($num, 256));
-                    $num = $this->_div($num, 256);
-                }
-          
-                if ($bytes && ($bytes[0] > 127)) {
-                    array_unshift($bytes, 0);
-                }
-          
-                $byte_stream = '';
-                foreach ($bytes as $byte) {
-                    $byte_stream .= pack('C', $byte);
-                }
-          
-                return $byte_stream;
-                break;
-            default:
-                if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
-
-                $cmp = $this->_cmp($this->value, 0);
-                if ($cmp < 0) {
-                    return FALSE;
-                }
-        
-                if ($cmp == 0) {
-                    return "0";
-                }
-
-                $str = '';
-                $num = $this->value;
-
-                while ($this->_cmp($num, 0) > 0) {
-                    $r = gmp_intval($this->_mod($num, $base));
-                    $str = base_convert($r, 10, $base) . $str;
-                    $num = $this->_div($num, $base);
-                }
-     
-                return $str;
-        }
-        
-        return FALSE;
     }
 
     /**

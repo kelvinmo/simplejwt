@@ -49,7 +49,7 @@ use SimpleJWT\Keys\KeySet;
  */
 class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm implements KeyDerivationAlgorithm {
     /** @var ECDH the underlying ECDH algorithm */
-    private $ecdh;
+    protected $ecdh;
 
     public function __construct($alg) {
         parent::__construct($alg);
@@ -65,18 +65,18 @@ class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm implements KeyDerivationAlg
     }
 
     public function getSupportedAlgs() {
-        if (len($this->ecdh->getSupportedAlgs()) == 0) return [];
+        if (len($this->getECDH()->getSupportedAlgs()) == 0) return [];
 
         $aeskw_algs = $this->getAESKWAlgs();
         return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
     public function getKeyCriteria() {
-        return $this->ecdh->getKeyCriteria();
+        return $this->getECDH()->getKeyCriteria();
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {
-        return $this->ecdh->deriveKey($key, $headers, $kid);
+        return $this->getECDH()->deriveKey($key, $headers, $kid);
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
@@ -85,6 +85,15 @@ class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm implements KeyDerivationAlg
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
         return $this->unwrapKey($encrypted_key, $keys, $headers, $kid);
+    }
+
+    /**
+     * Returns the underlying ECDH algorithm
+     * 
+     * @return ECDH the underlying ECDH algorithm
+     */
+    public function getECDH() {
+        return $this->ecdh;
     }
 }
 

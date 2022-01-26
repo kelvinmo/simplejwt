@@ -173,6 +173,12 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
+    function testTokenHash() {
+        $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
+        $token_hash = JWT::tokenHash($token);
+        $this->assertEquals('RjS03KyiSWS85I4iFG-24w', $token_hash);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */

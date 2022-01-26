@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - Added: Support for Elliptic Curve Diffie-Hellman Ephemeral Static algorithms
+- Added: JWT::tokenHash() to calculate OpenID Connect access token hash values
 - Fixed: Decoding JSON formatted JWEs
 
 ## Version 0.5.3

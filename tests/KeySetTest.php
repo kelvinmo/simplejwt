@@ -34,6 +34,17 @@ class KeySetTest extends TestCase {
         return $keys;
     }
 
+    function testPassword() {
+        $password = 'test_password';
+
+        $keys = $this->getKeySet();
+        $jwks = $keys->toJWKS($password);
+
+        $loaded_keys = new KeySet();
+        $loaded_keys->load($jwks, $password);
+        $this->assertEquals($keys->getById('oct1')->toBinary(), $loaded_keys->getById('oct1')->toBinary());
+    }
+
     function testMandatoryCriteria() {
         $keys = $this->getKeySet();
         $key = $keys->get(['kty' => 'EC']);

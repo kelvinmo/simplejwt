@@ -276,8 +276,16 @@ class JWT {
         switch ($format) {
             case self::COMPACT_FORMAT:
                 $parts = explode('.', $token, 3);
-                if (count($parts) != 3) throw new InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
-                list($protected, $payload, $signature) = $parts;
+
+                if (count($parts) == 3) {
+                    list($protected, $payload, $signature) = $parts;
+                } elseif (count($parts) == 2) {
+                    list($protected, $payload) = $parts;
+                    $signature = '';
+                } else {
+                    throw new InvalidTokenException('Cannot decode compact serialisation', InvalidTokenException::TOKEN_PARSE_ERROR);
+                }
+                
                 $signatures[] = [ 
                     'unprotected' => [],
                     'protected' => $protected,

@@ -2,6 +2,7 @@
 
 namespace SimpleJWT;
 
+use SimpleJWT\Crypt\AlgorithmFactory;
 use PHPUnit\Framework\TestCase;
 
 // Override time() in current namespace for testing
@@ -167,6 +168,43 @@ class JWTTest extends TestCase {
     }
 
     /**
+     * @expectedException \UnexpectedValueException
+     */
+    function testNoneDefault() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\UnexpectedValueException');
+        }
+
+        $set = new Keys\KeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
+        $jwt = JWT::decode($token, $set, 'none');
+    }
+
+    function testNoneWithAdd() {
+        $set = new Keys\KeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
+        AlgorithmFactory::addNoneAlg();
+        $jwt = JWT::decode($token, $set, 'none');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    function testNoneWithRemove() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\UnexpectedValueException');
+        }
+
+        $set = new Keys\KeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
+        AlgorithmFactory::addNoneAlg();
+        AlgorithmFactory::removeNoneAlg();
+        $jwt = JWT::decode($token, $set, 'none');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
+    }
+
+    /**
      * @expectedException SimpleJWT\InvalidTokenException
      */
     function testAlgFailure() {
@@ -189,6 +227,19 @@ class JWTTest extends TestCase {
         
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.NrP7T3zsezqVjBPI35nJBtIQeoOrsT7Rib5NdaOzpgM';
+        $jwt = JWT::decode($token, $set, 'HS256');
+    }
+
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
+    function testMissingSignature() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+        }
+        
+        $set = $this->getPublicKeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
         $jwt = JWT::decode($token, $set, 'HS256');
     }
 

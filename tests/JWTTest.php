@@ -2,6 +2,7 @@
 
 namespace SimpleJWT;
 
+use SimpleJWT\InvalidTokenException;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -249,6 +250,7 @@ class JWTTest extends TestCase {
     function testTimeFailure() {
         if (method_exists($this, 'expectException')) {
             $this->expectException('SimpleJWT\InvalidTokenException');
+            $this->expectExceptionCode(InvalidTokenException::TOO_LATE_ERROR);
         }
         
         $set = $this->getPrivateKeySet();
@@ -259,6 +261,23 @@ class JWTTest extends TestCase {
 
         $set2 = $this->getPublicKeySet();
         $jwt2 = JWT::decode($token, $set2, 'HS256');
+    }
+
+    function testTimeFailureExceptionDetails() {
+        $expiry = 1;
+
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $claims['exp'] = $expiry;
+        $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
+        $token = $jwt->encode($set, null, false);
+
+        $set2 = $this->getPublicKeySet();
+        try {
+            $jwt2 = JWT::decode($token, $set2, 'HS256');
+        } catch (InvalidTokenException $e) {
+            $this->assertEquals($expiry, $e->getTime());
+        }
     }
 
     /**

@@ -85,6 +85,11 @@ class JWTTest extends TestCase {
         $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
         $token = $jwt->encode($set, null, false);
         $this->assertEquals('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.0stp4GfJhgUSjqUtkZ1Hfmt1bvPKiHSzojeTw3sr7R8', $token);
+
+        $token_json = json_decode($jwt->encode($set, null, false, null, JWT::JSON_FORMAT), true);
+        $this->assertEquals('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9', $token_json['protected']);
+        $this->assertEquals('eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ', $token_json['payload']);
+        $this->assertEquals('0stp4GfJhgUSjqUtkZ1Hfmt1bvPKiHSzojeTw3sr7R8', $token_json['signature']);
     }
 
     function testGenerateRSA() {
@@ -247,7 +252,7 @@ class JWTTest extends TestCase {
     /**
      * @expectedException SimpleJWT\InvalidTokenException
      */
-    function testTimeFailure() {
+    function testTimeFailureExp() {
         if (method_exists($this, 'expectException')) {
             $this->expectException('SimpleJWT\InvalidTokenException');
             $this->expectExceptionCode(InvalidTokenException::TOO_LATE_ERROR);
@@ -256,6 +261,25 @@ class JWTTest extends TestCase {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $claims['exp'] = 1;
+        $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
+        $token = $jwt->encode($set, null, false);
+
+        $set2 = $this->getPublicKeySet();
+        $jwt2 = JWT::decode($token, $set2, 'HS256');
+    }
+
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
+    function testTimeFailureNbf() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+            $this->expectExceptionCode(InvalidTokenException::TOO_EARLY_ERROR);
+        }
+        
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $claims['nbf'] = 1400000000;
         $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
         $token = $jwt->encode($set, null, false);
 
@@ -278,6 +302,21 @@ class JWTTest extends TestCase {
         } catch (InvalidTokenException $e) {
             $this->assertEquals($expiry, $e->getTime());
         }
+    }
+
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
+    function testCrit() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+            $this->expectExceptionCode(InvalidTokenException::UNSUPPORTED_ERROR);
+        }
+
+        $set = $this->getPublicKeySet();
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImNyaXQiOlsiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiXX0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.-ZDHC7uzUcCgHJ4s6mMjYBimzUsqg4gWjtusMhK-eaU';
+        $jwt = JWT::decode($token, $set, 'HS256');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
     /**

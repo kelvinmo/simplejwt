@@ -351,6 +351,8 @@ class JWT {
 
     /**
      * Alias for {@link JWT::deserialise()}.
+     * 
+     * @codeCoverageIgnore
      */
     public static function deserialize($token, $format = self::COMPACT_FORMAT) {
         return self::deserialise($token, $format);

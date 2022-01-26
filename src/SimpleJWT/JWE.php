@@ -309,9 +309,9 @@ class JWE {
                 $obj = [
                     'protected' => $protected,
                     'ciphertext' => $ciphertext,
-                    'tag' => $tag,
-                    'encrypted_key' => $encrypted_key
+                    'tag' => $tag
                 ];
+                if ($encrypted_key) $obj['encrypted_key'] = $encrypted_key;
                 if ($iv) $obj['iv'] = $iv;
 
                 return json_encode($obj);

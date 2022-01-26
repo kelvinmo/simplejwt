@@ -88,6 +88,27 @@ class JWETest extends TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
+    public function testEncryptDirect() {
+        $plaintext = 'Live long and prosper.';
+        $public_set = $this->getDirectKeySet();
+
+        $stub = $this->getMockBuilder('SimpleJWT\JWE')
+            ->setConstructorArgs([["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK"], $plaintext])
+            ->setMethods(['generateIV'])
+            ->getMock();
+
+        $stub->method('generateIV')->willReturn('h7LOWyYIlzq4BJV5V1vxhg');
+        
+        $token = $stub->encrypt($public_set);
+        $this->assertEquals('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiWUkzRW9JSyJ9..h7LOWyYIlzq4BJV5V1vxhg.aZEMslyY-kybAWlb8hM6aWCocQ3TMghMhNwk4Meyjb4.IDEVZS1i76IHNSd5sAt7tA', $token);
+
+        $token_json = json_decode($stub->encrypt($public_set, null, JWE::JSON_FORMAT), true);
+        $this->assertEquals('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiWUkzRW9JSyJ9', $token_json['protected']);
+        $this->assertEquals('aZEMslyY-kybAWlb8hM6aWCocQ3TMghMhNwk4Meyjb4', $token_json['ciphertext']);
+        $this->assertEquals('h7LOWyYIlzq4BJV5V1vxhg', $token_json['iv']);
+        $this->assertEquals('IDEVZS1i76IHNSd5sAt7tA', $token_json['tag']);
+    }
+
     public function testDecryptDirect() {
         $plaintext = 'Live long and prosper.';
 

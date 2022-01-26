@@ -77,7 +77,7 @@ class SymmetricKey extends Key {
             case 'base64':
                 $jwk = [
                     'kty' => self::KTY,
-                    'k' => Util::base64url_encode(base64_decode($data))
+                    'k' => trim(strtr($data, '+/', '-_'), '=')  // convert base64 to base64url
                 ];
                 parent::__construct($jwk);
                 break;

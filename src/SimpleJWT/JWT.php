@@ -357,5 +357,30 @@ class JWT {
     public static function deserialize($token, $format = self::COMPACT_FORMAT) {
         return self::deserialise($token, $format);
     }
+
+    /**
+     * Calculates an OpenID Connect short hash of a serialised JWT.  The JWT must be
+     * in a compact JWT serialisation format.
+     *
+     * The short hash is the left-most half of the hash, with the hash algorithm
+     * being the one specified by the `alg` header parameter.  For instance, if the signature
+     * algorithm is RS256, the underlying hash algorithm is SHA-256, and this function
+     * will return the encoded value of the left-most 128 bits of the SHA-256 hash.
+     *
+     * @param string $token the serialised JWT
+     * @return string the base64url encoded short hash
+     * @throws \InvalidArgumentException if the supplied token is not in a compact format
+     * @throws \SimpleJWT\Crypt\CryptException if there is an error in the cryptographic process
+     */
+    public static function shortHash($token) {
+        $detect_result = Helper::detect($token);
+        if ($detect_result['format'] != self::COMPACT_FORMAT)
+            throw new \InvalidArgumentException('Only compact format JWTs are permitted');
+        
+        $deserialised = self::deserialise($token);
+        $alg = $deserialised['signatures'][0]['headers']['alg'];
+        $signer = AlgorithmFactory::create($alg);
+        return $signer->shortHash($token);
+    }
 }
 ?>

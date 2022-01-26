@@ -91,7 +91,7 @@ class JWE {
                 $obj = json_decode($token, true);
                 if ($obj == null) throw new InvalidTokenException('Cannot decode JSON', InvalidTokenException::TOKEN_PARSE_ERROR);
                 $protected = $obj['protected'];
-                $unprotected = $obj['unprotected'];
+                $unprotected = (isset($obj['unprotected'])) ? $obj['unprotected'] : [];
                 $iv = $obj['iv'];
                 $ciphertext = $obj['ciphertext'];
                 $tag = $obj['tag'];
@@ -101,7 +101,7 @@ class JWE {
                         if (isset($recipient['header']['kid'])) {
                             $target_kid = $recipient['header']['kid'];
                             if ($keys->getById($target_kid) != null) {
-                                $unprotected = (isset($unprotected)) ? array_merge($unprotected, $recipient['header']) : $recipient['header'];
+                                if (isset($recipient['header'])) $unprotected = array_merge($unprotected, $recipient['header']);
                                 $encrypted_key = $recipient['encrypted_key'];
                                 break;
                             }
@@ -109,8 +109,8 @@ class JWE {
                         throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
                     }
                 } else {
-                    $unprotected = (isset($unprotected)) ? array_merge($unprotected, $obj['header']) : $obj['header'];
-                    $encrypted_key = $obj['encrypted_key'];
+                    if (isset($obj['header'])) $unprotected = array_merge($unprotected, $obj['header']);
+                    $encrypted_key = (isset($obj['encrypted_key'])) ? $obj['encrypted_key'] : '';
                 }
                 break;
             default:

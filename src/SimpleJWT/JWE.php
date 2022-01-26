@@ -289,10 +289,17 @@ class JWE {
         }
 
         $protected = Util::base64url_encode(json_encode($this->headers));
-        $results = $content_enc->encryptAndSign($plaintext, $cek, $protected);
+        
+        if ($content_enc->getIVSize() > 0) {
+            $iv = $this->generateIV($content_enc->getIVSize() / 8);
+        } else {
+            $iv = '';
+        }
+
+        $results = $content_enc->encryptAndSign($plaintext, $cek, $protected, $iv);
 
         $ciphertext = $results['ciphertext'];
-        $iv = (isset($results['iv'])) ? $results['iv'] : '';
+        if (isset($results['iv'])) $iv = $results['iv'];
         $tag = $results['tag'];
 
         switch ($format) {
@@ -325,6 +332,20 @@ class JWE {
      */
     protected function generateCEK($length) {
         return Util::random_bytes($length);
+    }
+
+    /**
+     * Generates a initialisation vector.
+     * 
+     * (This method is separated from the rest of the {@link encrypt()}
+     * function to enable testing.)
+     * 
+     * @param int $length the length of the initialisation vector, in bytes
+     * @return string the generated initialisation vector as a base64url
+     * encoded string
+     */
+    protected function generateIV($length) {
+        return Util::base64url_encode(Util::random_bytes($length));
     }
 }
 

@@ -52,7 +52,7 @@ interface EncryptionAlgorithm {
      * with all values as base64url encoded strings
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function encryptAndSign($plaintext, $cek, $additional, $iv = null);
+    public function encryptAndSign($plaintext, $cek, $additional, ?string $iv);
 
     /**
      * Decrypts ciphertext and verifies the authentication tag.

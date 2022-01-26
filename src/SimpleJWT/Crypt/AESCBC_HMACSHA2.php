@@ -73,7 +73,7 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
     }
 
     // cek binary iv base64url
-    public function encryptAndSign($plaintext, $cek, $additional, $iv = null) {
+    public function encryptAndSign($plaintext, $cek, $additional, $iv) {
         $params = self::$alg_params[$this->getAlg()];
 
         if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');

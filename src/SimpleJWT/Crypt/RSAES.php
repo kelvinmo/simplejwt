@@ -48,9 +48,9 @@ use SimpleJWT\Keys\Key;
  */
 class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     static protected $alg_params = [
-        'RSA1_5' => ['padding' => OPENSSL_PKCS1_PADDING],
-        'RSA-OAEP' => ['padding' => OPENSSL_PKCS1_OAEP_PADDING],
-        'RSA-OAEP-256' => ['padding' => OPENSSL_NO_PADDING, 'oaep' => 'sha256']
+        'RSA1_5' => ['openssl_padding' => OPENSSL_PKCS1_PADDING],
+        'RSA-OAEP' => ['openssl_padding' => OPENSSL_PKCS1_OAEP_PADDING],
+        'RSA-OAEP-256' => ['openssl_padding' => OPENSSL_NO_PADDING, 'encoding' => 'oaep', 'hash' => 'sha256']
     ];
 
 
@@ -86,24 +86,23 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
         if (($key == null) || !$key->isPublic()) {
             throw new CryptException('Key not found or is invalid');
         }
-        $headers['kid'] = $key->getKeyId();
 
         $params = self::$alg_params[$this->getAlg()];
 
-        if (isset($params['oaep'])) {
+        if (isset($params['encoding']) && ($params['encoding'] == 'oaep')) {
             // $key->getSize() ignores the first octet when calculating the key size,
             // therefore we need to add it back in
-            $cek = $this->oaep_encode($cek, 1 + $key->getSize() / 8, $params['oaep']);
+            $cek = $this->oaep_encode($cek, 1 + $key->getSize() / 8, $params['hash']);
         }
 
-        $ciphertext = '';
-        if (!openssl_public_encrypt($cek, $ciphertext, $key->toPEM(), $params['padding'])) {
+        $encrypted_key = '';
+        if (!openssl_public_encrypt($cek, $encrypted_key, $key->toPEM(), $params['openssl_padding'])) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
             throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages));
         }
 
-        return Util::base64url_encode($ciphertext);
+        return Util::base64url_encode($encrypted_key);
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
@@ -115,16 +114,16 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
         $params = self::$alg_params[$this->getAlg()];
 
         $cek = '';
-        if (!openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), $params['padding'])) {
+        if (!openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), $params['openssl_padding'])) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
             throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages));
         }
 
-        if (isset($params['oaep'])) {
+        if (isset($params['encoding']) && ($params['encoding'] == 'oaep')) {
             // $key->getSize() ignores the first octet when calculating the key size,
             // therefore we need to add it back in
-            $cek = $this->oaep_decode($cek, 1 + $key->getSize() / 8, $params['oaep']);
+            $cek = $this->oaep_decode($cek, 1 + $key->getSize() / 8, $params['hash']);
         }
 
         return $cek;

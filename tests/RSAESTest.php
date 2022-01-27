@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class RSAESTest extends TestCase {
     function testRSA1_5() {
-        $cek = base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLHwj5wszw==');
+        $cek = base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLEA8I+cLM8=');
 
         $private_set = new KeySet();
         $private_set->add(new RSAKey([

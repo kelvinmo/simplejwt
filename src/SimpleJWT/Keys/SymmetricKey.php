@@ -103,10 +103,16 @@ class SymmetricKey extends Key {
         return false;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getPublicKey() {
         return null;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function toPEM() {
         throw new KeyException('Unsupported key format');
     }

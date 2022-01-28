@@ -38,11 +38,24 @@ jobs:
       - name: Build jwkstool.phar
         run: composer phar
 
+      - name: Upload jwkstool.phar
+        uses: actions/upload-artifact@v2
+        with:
+          name: jwkstool
+          path: bin/jwkstool.phar
+
   release:
+    name: Release
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Download jwkstool.phar
+        uses: actions/download-artifact@v2
+        with:
+          name: jwkstool
 
       - name: Get semantic version
         id: semver
@@ -61,6 +74,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: bin/jwkstool.phar
+          artifacts: jwkstool.phar
           body: ${{ steps.changelog.outputs.text }}
           prerelease: ${{ !!steps.semver.outputs.prerelease }}

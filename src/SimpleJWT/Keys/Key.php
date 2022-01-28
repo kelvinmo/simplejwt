@@ -222,9 +222,11 @@ abstract class Key {
      * using PBES2 key encryption.
      *
      * @param string $password the password
+     * @param string $format the serialisation format for the JWE (ignored if the
+     * key is a public key)
      * @return string the key set
      */
-    public function toJWK($password = null) {
+    public function toJWK($password = null, $format = JWE::COMPACT_FORMAT) {
         $json = json_encode($this->data);
         if (($password == null) || $this->isPublic()) return $json;
 
@@ -235,7 +237,7 @@ abstract class Key {
             'cty' => 'jwk+json'
         ];
         $jwe = new JWE($headers, $json);
-        return $jwe->encrypt($keys);
+        return $jwe->encrypt($keys, null, $format);
     }
 
     /**

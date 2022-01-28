@@ -82,9 +82,10 @@ class KeySet {
      * If `$password` is not null, a JWE is created using PBES2 key encryption.
      *
      * @param string $password the password
+     * @param string $format the serialisation format for the JWE
      * @return string the key set
      */
-    function toJWKS($password = null) {
+    function toJWKS($password = null, $format = JWE::COMPACT_FORMAT) {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);
@@ -98,7 +99,7 @@ class KeySet {
             'cty' => 'jwk-set+json'
         ];
         $jwe = new JWE($headers, $json);
-        return $jwe->encrypt($keys);
+        return $jwe->encrypt($keys, null, $format);
     }
 
     /**

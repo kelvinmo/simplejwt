@@ -53,6 +53,10 @@ class RoboFile extends \Robo\Tasks {
         foreach($finder as $file) {
             $phar_task->addFile($file->getRelativePathname(), $file->getRealPath());
         }
+        $finder->in($temp)->name('*.cnf');
+        foreach($finder as $file) {
+            $phar_task->addFile($file->getRelativePathname(), $file->getRealPath());
+        }
         
         // 6. chmod
         $main_collection->taskFilesystemStack()->chmod($phar_file, 0755);

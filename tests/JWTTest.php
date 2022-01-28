@@ -320,9 +320,9 @@ class JWTTest extends TestCase {
         }
 
         $set = $this->getPublicKeySet();
-        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImNyaXQiOlsiaHR0cDovL2V4YW1wbGUuY29tL2lzX3Jvb3QiXX0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.-ZDHC7uzUcCgHJ4s6mMjYBimzUsqg4gWjtusMhK-eaU';
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImNyaXQiOlsieC11bmtub3duLWNyaXRpY2FsIl0sIngtdW5rbm93bi1jcml0aWNhbCI6dHJ1ZX0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODB9.lLajjIbnhRpthOPhbJTaxoQ8JHYSAwSUl1Vxc4eQcIU';
         $jwt = JWT::decode($token, $set, 'HS256');
-        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
+        $this->assertTrue($jwt->getClaim('iss'));
     }
 
     /**

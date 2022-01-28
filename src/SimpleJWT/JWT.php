@@ -114,7 +114,7 @@ class JWT {
                     }
                 }
             }
-            if (!isset($signature)) throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
+            if (!isset($signature)) throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
         } else {
             $headers = $deserialised['signatures'][0]['headers'];
             $signing_input = $deserialised['signatures'][0]['signing_input'];

@@ -33,10 +33,6 @@ SimpleJWT is a simple JSON web token library written in PHP.
 - `hash` extension
 - `openssl` extension
 
-A working `openssl.cnf` configuration is also required if the `ECDH-ES`
-algorithm is used.  See the [PHP manual](https://www.php.net/manual/en/openssl.installation.php)
-for details.
-
 ## Installation
 
 You can install via [Composer](http://getcomposer.org/).

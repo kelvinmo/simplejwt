@@ -46,11 +46,26 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
 class ECDH extends Algorithm implements KeyDerivationAlgorithm {
-    private $default_key_size;
+    private $key_size;
 
-    public function __construct($alg, $default_key_size = null) {
+    /**
+     * Creates an ECDH algorithm.
+     *
+     * This algorithm can be used directly to generate a content encryption key,
+     * or as an intermediate step to create a key to wrap the content
+     * encryption key (using a key wrapping algorithm).
+     * 
+     * Where an underlying algorithm is used, the size of the derived key needs
+     * to be specified in the $key_size parameter.
+     *
+     * @param string $alg the algorithm, either `null` or the string `ECDH-ES`
+     * @param int $key_size the required size of the derived key in bits
+     * @throws \UnexpectedValueException if the `$alg` parameter is not supported
+     * by this class
+     */
+    public function __construct($alg, $key_size = null) {
         parent::__construct($alg);
-        $this->default_key_size = $default_key_size;
+        $this->key_size = $key_size;
     }
 
     public function getSupportedAlgs() {
@@ -81,8 +96,8 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
             } catch (\UnexpectedValueException $e) {
                 throw new CryptException('Unexpected enc algorithm', $e);
             }
-        } elseif ($this->default_key_size != null) {
-            $size = $this->default_key_size;
+        } elseif ($this->key_size != null) {
+            $size = $this->key_size;
         } else {
             throw new CryptException('Key size not specified');
         }
@@ -159,13 +174,14 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         $pkey = openssl_pkey_new([
             'curve_name' => $openssl_curve_name,
             'private_key_type' => OPENSSL_KEYTYPE_EC,
+            'config' => dirname(__FILE__) . '/openssl.cnf'
         ]);
         if ($pkey === false) throw new CryptException('Unable to create ephemeral key (is openssl.cnf missing?)');
         
         // Note openssl.cnf needs to be correctly configured for this to work.
         // See https://www.php.net/manual/en/openssl.installation.php for the
         // appropriate location of this configuration file
-        $result = openssl_pkey_export($pkey, $pem);
+        $result = openssl_pkey_export($pkey, $pem, null, [ 'config' => dirname(__FILE__) . '/openssl.cnf' ]);
         if ($result === false) throw new CryptException('Unable to create ephemeral key');
 
         return new ECKey($pem, 'pem');

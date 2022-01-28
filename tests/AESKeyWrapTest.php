@@ -5,6 +5,10 @@ namespace SimpleJWT\Crypt;
 use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Test vectors are sourced from
+ * https://datatracker.ietf.org/doc/html/rfc3394#section-4
+ */
 class AESKeyWrapTest extends TestCase {
 
     protected function getKeySet($kek) {

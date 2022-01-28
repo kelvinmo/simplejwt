@@ -5,6 +5,10 @@ namespace SimpleJWT\Crypt;
 use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Test vectors are sourced from
+ * https://tools.ietf.org/id/draft-mcgrew-aead-aes-cbc-hmac-sha2-02.html#rfc.appendix.A
+ */
 class AESCBC_HMACSHA2Test extends TestCase {
 
     protected function base64url($base64) {

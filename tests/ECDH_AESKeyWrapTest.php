@@ -7,10 +7,10 @@ use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;
 
 class ECDH_AESKeyWrapTest extends TestCase {
-    protected function isAlgAvailable() {
+    protected function isAlgAvailable($alg) {
         $ecdh = new ECDH_AESKeyWrap(null);
         if (count($ecdh->getSupportedAlgs()) == 0) {
-            $this->markTestSkipped('Alg not available: ECDH-ES+AxxxKW');
+            $this->markTestSkipped('Alg not available: ' . $alg);
             return false;
         } else {
             return true;
@@ -43,6 +43,8 @@ class ECDH_AESKeyWrapTest extends TestCase {
     }
 
     function testECDHES_A128KW() {
+        if (!$this->isAlgAvailable('ECDH-ES+A128KW')) return;
+
         $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new ECDH_AESKeyWrap('ECDH-ES+A128KW');
@@ -59,6 +61,8 @@ class ECDH_AESKeyWrapTest extends TestCase {
     }
 
     function testECDHES_A192KW() {
+        if (!$this->isAlgAvailable('ECDH-ES+A192KW')) return;
+
         $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new ECDH_AESKeyWrap('ECDH-ES+A192KW');
@@ -76,6 +80,8 @@ class ECDH_AESKeyWrapTest extends TestCase {
     }
 
     function testECDHES_A256KW() {
+        if (!$this->isAlgAvailable('ECDH-ES+A256KW')) return;
+
         $key = pack('H*', '00112233445566778899AABBCCDDEEFF');
 
         $alg = new ECDH_AESKeyWrap('ECDH-ES+A256KW');

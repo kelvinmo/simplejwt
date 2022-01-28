@@ -47,53 +47,38 @@ use SimpleJWT\Keys\KeySet;
  * 
  * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
-class ECDH_AESKeyWrap extends AESWrappedKeyAlgorithm implements KeyDerivationAlgorithm {
-    /** @var ECDH the underlying ECDH algorithm */
-    protected $ecdh;
+class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
+    use AESKeyWrapTrait;
 
     public function __construct($alg) {
-        parent::__construct($alg);
-
         if ($alg == null) {
-            $this->ecdh = new ECDH(null);
+            $this->initAESKW(null);
+            $size = null;
         } else {
-            list($ecdh_alg, $dummy) = explode('+', $alg, 2);
+            list($ecdh_alg, $aeskw_alg) = explode('+', $alg, 2);
 
+            $this->initAESKW($aeskw_alg);
             $size = $this->getAESKWKeySize();
-            $this->ecdh = new ECDH($ecdh_alg, $size);
         }
+
+        parent::__construct($alg, $size);
     }
 
     public function getSupportedAlgs() {
-        if (len($this->getECDH()->getSupportedAlgs()) == 0) return [];
+        if (count(parent::getSupportedAlgs()) == 0) return [];
 
         $aeskw_algs = $this->getAESKWAlgs();
         return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
-    public function getKeyCriteria() {
-        return $this->getECDH()->getKeyCriteria();
-    }
-
-    public function deriveKey($keys, &$headers, $kid = null) {
-        return $this->getECDH()->deriveKey($key, $headers, $kid);
-    }
-
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        return $this->wrapKey($cek, $keys, $headers, $kid);
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->wrapKey($cek, $wrapping_key, $headers);
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        return $this->unwrapKey($encrypted_key, $keys, $headers, $kid);
-    }
-
-    /**
-     * Returns the underlying ECDH algorithm
-     * 
-     * @return ECDH the underlying ECDH algorithm
-     */
-    public function getECDH() {
-        return $this->ecdh;
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->unwrapKey($encrypted_key, $wrapping_key, $headers);
     }
 }
 

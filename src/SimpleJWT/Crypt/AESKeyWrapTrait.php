@@ -40,25 +40,28 @@ use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
 /**
- * Abstract class for the AES Key Wrap encryption algorithm, where the key to be wrapped
+ * Trait for implementing the AES Key Wrap encryption algorithm, where the key to be wrapped
  * is derived from a key derivation algorithm.
  * 
  * This is a convenience class for algorithms implementing the `x+AyyyKW` family of
  * algorithms.  Subclasses can call methods in this class for the AES Key Wrap functions.
  */
-abstract class AESWrappedKeyAlgorithm extends Algorithm implements KeyEncryptionAlgorithm {
+trait AESKeyWrapTrait {
     /** @var AESKeyWrap the underlying AES key wrap algorithm */
     private $aeskw;
 
-    public function __construct($alg) {
+    /**
+     * Initialises the underlying AES key wrap algorithm.  This method
+     * must be called from the constructor.
+     * 
+     * @param string $alg the AES key wrap algorithm parameter
+     */
+    protected function initAESKW($alg = null) {
         if ($alg == null) {
             $this->aeskw = new AESKeyWrap(null);
         } else {
-            list($dummy, $aeskw_alg) = explode('+', $alg, 2);
-            $this->aeskw = new AESKeyWrap($aeskw_alg);
+            $this->aeskw = new AESKeyWrap($alg);
         }
-
-        parent::__construct($alg);
     }
 
     /**
@@ -110,6 +113,15 @@ abstract class AESWrappedKeyAlgorithm extends Algorithm implements KeyEncryption
         $keys = new KeySet();
         $keys->add(new SymmetricKey($key, 'bin'));
         return $keys;
+    }
+
+    /**
+     * Returns the underlying AES key wrap algorithm
+     * 
+     * @return AESKeyWrap the underlying AES key wrap algorithm
+     */
+    public function getAESKW() {
+        return $this->aeskw;
     }
 }
 

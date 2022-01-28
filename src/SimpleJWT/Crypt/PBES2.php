@@ -45,7 +45,8 @@ use SimpleJWT\Keys\SymmetricKey;
  *
  * @see https://tools.ietf.org/html/rfc7518#section-4.8
  */
-class PBES2 extends AESWrappedKeyAlgorithm {
+class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
+    use AESKeyWrapTrait;
 
     static protected $alg_params = [
         'PBES2-HS256+A128KW' => ['hash' => 'sha256'],
@@ -58,11 +59,16 @@ class PBES2 extends AESWrappedKeyAlgorithm {
     protected $iterations = 4096;
 
     public function __construct($alg) {
-        parent::__construct($alg);
-
         if ($alg != null) {
             $this->hash_alg = self::$alg_params[$alg]['hash'];
+
+            list($pbes2_alg, $aeskw_alg) = explode('+', $alg, 2);
+            $this->initAESKW($aeskw_alg);
+        } else {
+            $this->initAESKW();
         }
+        
+        parent::__construct($alg);
     }
 
     public function getSupportedAlgs() {

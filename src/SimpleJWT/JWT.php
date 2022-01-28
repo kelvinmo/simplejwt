@@ -104,8 +104,8 @@ class JWT {
         if (count($deserialised['signatures']) > 1) {
             // Multiple signatures, choose one
             foreach ($deserialised['signatures'] as $signature_obj) {
-                if (isset($signature_obj['header']['kid'])) {
-                    $target_kid = $signature_obj['header']['kid'];
+                if (isset($signature_obj['headers']['kid'])) {
+                    $target_kid = $signature_obj['headers']['kid'];
                     if (($target_kid == $kid) || ($keys->getById($target_kid) != null)) {
                         $headers = $signature_obj['headers'];
                         $signing_input = $signature_obj['signing_input'];
@@ -113,8 +113,8 @@ class JWT {
                         break;
                     }
                 }
-                throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
             }
+            if (!isset($signature)) throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
         } else {
             $headers = $deserialised['signatures'][0]['headers'];
             $signing_input = $deserialised['signatures'][0]['signing_input'];

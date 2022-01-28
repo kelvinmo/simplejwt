@@ -106,8 +106,8 @@ class JWE {
                                 break;
                             }
                         }
-                        throw new InvalidTokenException('Cannot find verifiable signature', InvalidTokenException::TOKEN_PARSE_ERROR);
                     }
+                    if (!isset($encrypted_key)) throw new InvalidTokenException('Cannot find recipient with decryptable key', InvalidTokenException::TOKEN_PARSE_ERROR);
                 } else {
                     if (isset($obj['header'])) $unprotected = array_merge($unprotected, $obj['header']);
                     $encrypted_key = (isset($obj['encrypted_key'])) ? $obj['encrypted_key'] : '';

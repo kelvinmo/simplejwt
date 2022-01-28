@@ -10,12 +10,32 @@ use PHPUnit\Framework\TestCase;
 
 
 class JWETest extends TestCase {
+    protected $multi_token = '     {
+      "protected":
+       "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
+      "unprotected":
+       {"jku":"https://server.example.com/keys.jwks"},
+      "recipients":[
+       {"header":
+         {"alg":"RSA1_5","kid":"2011-04-29"},
+        "encrypted_key":
+         "UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7Zx0-kFm1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgNZ__deLKxGHZ7PcHALUzoOegEI-8E66jX2E4zyJKx-YxzZIItRzC5hlRirb6Y5Cl_p-ko3YvkkysZIFNPccxRU7qve1WYPxqbb2Yw8kZqa2rMWI5ng8OtvzlV7elprCbuPhcCdZ6XDP0_F8rkXds2vE4X-ncOIM8hAYHHi29NX0mcKiRaD0-D-ljQTP-cFPgwCp6X-nZZd9OHBv-B3oWh2TbqmScqXMR4gp_A"},
+       {"header":
+         {"alg":"A128KW","kid":"7"},
+        "encrypted_key":
+         "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ"}],
+      "iv": "AxY8DCtDaGlsbGljb3RoZQ",
+      "ciphertext": "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY",
+      "tag": "Mz-VPPyU4RlcuYv1IwIvzw"
+     }';
+
+
     protected function getPrivateKeySet() {
         $set = new KeySet();
 
         $set->add(new RSAKey([
             "kty" => "RSA",
-            "kid" => "rsa1_5",
+            "kid" => "2011-04-29",
             "n" => "sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw",
             "e" => "AQAB",
             "d" => "VFCWOqXr8nvZNyaaJLXdnNPXZKRaWCjkU5Q2egQQpTBMwhprMzWzpR8Sxq1OPThh_J6MUD8Z35wky9b8eEO0pwNS8xlh1lOFRRBoNqDIKVOku0aZb-rynq8cxjDTLZQ6Fz7jSjR1Klop-YKaUHc9GsEofQqYruPhzSA-QgajZGPbE_0ZaVDJHfyd7UUBUKunFMScbflYAAOYJqVIVwaYR5zWEEceUjNnTNo_CVSj-VvXLO5VZfCUAVLgW4dpf1SrtZjSt34YLsRarSb127reG_DUwg9Ch-KyvjT1SkHgUWRVGcyly7uvVGRSDwsXypdrNinPA4jlhoNdizK2zF2CWQ",
@@ -28,6 +48,7 @@ class JWETest extends TestCase {
 
         $set->add(new SymmetricKey([
             "kty" => "oct",
+            "kid" => "7",
             "k" => "GawgguFyGrWKav7AX4VKUg"
         ], 'php'));
 
@@ -124,12 +145,23 @@ class JWETest extends TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
-    public function testDecryptAESKWJSON() {
+    public function testDecryptJSONFlat() {
         $plaintext = 'Live long and prosper.';
 
         $token = '{"protected":"eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0","encrypted_key":"6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ","iv":"AxY8DCtDaGlsbGljb3RoZQ","ciphertext":"KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY","tag":"U0m_YmjN04DJvceFICbCVQ"}';
         $private_set = $this->getPrivateKeySet();
         $test_jwe = JWE::decrypt($token, $private_set, 'A128KW');
+        $this->assertEquals($plaintext, $test_jwe->getPlaintext());
+    }
+
+    public function testDecryptMulti() {
+        $plaintext = 'Live long and prosper.';
+
+        $key = $this->getPrivateKeySet()->getById('7');
+        $private_set = new KeySet();
+        $private_set->add($key);
+
+        $test_jwe = JWE::decrypt($this->multi_token, $private_set, 'A128KW');
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
@@ -250,5 +282,18 @@ class JWETest extends TestCase {
         $dummy_set = $this->getPrivateKeySet();
 
         $result = JWE::decrypt($invalid_token, $dummy_set, 'dummy');
+    }
+
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
+    function testMultiNoDecryptableRecipient() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+            $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
+        }
+
+        $private_set = new KeySet();
+        $test_jwe = JWE::decrypt($this->multi_token, $private_set, 'A128KW');
     }
 }

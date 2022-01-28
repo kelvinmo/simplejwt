@@ -13,6 +13,22 @@ function time() {
 
 class JWTTest extends TestCase {
 
+    protected $multi_token = '{
+      "payload":
+       "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
+      "signatures":[
+       {"protected":"eyJhbGciOiJSUzI1NiJ9",
+        "header":
+         {"kid":"2010-12-29"},
+        "signature":
+         "cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5jujGbds9uJdbF9CUAr7t1dnZcAcQjbKBYNX4BAynRFdiuB--f_nZLgrnbyTyWzO75vRK5h6xBArLIARNPvkSjtQBMHlb1L07Qe7K0GarZRmB_eSN9383LcOLn6_dO--xi12jzDwusC-eOkHWEsqtFZESc6BfI7noOPqvhJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrBp0igcN_IoypGlUPQGe77Rw"},
+       {"protected":"eyJhbGciOiJFUzI1NiJ9",
+        "header":
+         {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"},
+        "signature":
+         "DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q"}]
+     }';
+
     protected function getJWTClaims() {
         return [
             "iss" => "joe",
@@ -40,7 +56,7 @@ class JWTTest extends TestCase {
             "dp" => "BwKfV3Akq5_MFZDFZCnW-wzl-CCo83WoZvnLQwCTeDv8uzluRSnm71I3QCLdhrqE2e9YkxvuxdBfpT_PI7Yz-FOKnu1R6HsJeDCjn12Sk3vmAktV2zb34MCdy7cpdTh_YVr7tss2u6vneTwrA86rZtu5Mbr1C1XsmvkxHQAdYo0",
             "dq" => "h_96-mK1R_7glhsum81dZxjTnYynPbZpHziZjeeHcXYsXaaMwkOlODsWa7I9xXDoRwbKgB719rrmI2oKr6N3Do9U0ajaHF-NKJnwgjMd2w9cjz3_-kyNlxAr2v4IKhGNpmM5iIgOS1VZnOZ68m6_pbLBSp3nssTdlqvd0tIiTHU",
             "qi" => "IYd7DHOhrWvxkwPQsRM2tOgrjbcrfvtQJipd-DlcxyVuuM9sQLdgjVk2oy26F0EmpScGLq2MowX7fhd_QJQ3ydy5cY7YIBi87w93IKLEdfnbJtoOPLUW0ITrJReOgo1cq9SbsxYawBgfp_gh6A5603k2-ZQwVK0JKSHuLFkuQ3U",
-            "kid" => "RSA"
+            "kid" => "2010-12-29"
         ], 'php'));
 
         $set->add(new Keys\ECKey([
@@ -49,7 +65,7 @@ class JWTTest extends TestCase {
             "x" => "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
             "y" => "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
             "d" => "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI",
-            "kid" => "EC"
+            "kid" => "e9bc097a-ce51-4036-9562-d2ade882db0d"
         ], 'php'));
 
         $set->add(new Keys\ECKey([
@@ -104,12 +120,12 @@ class JWTTest extends TestCase {
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
         $jwt = new JWT(['alg' => 'ES256'], $claims);
-        $token = $jwt->encode($set, 'EC', false);
+        $token = $jwt->encode($set, 'e9bc097a-ce51-4036-9562-d2ade882db0d', false);
 
         // Note that ECDSA generates a different signature every time, as a random
         // number is used as part of the algorithm.
         $set2 = $this->getPublicKeySet();
-        $jwt2 = JWT::decode($token, $set2, 'ES256', 'EC');
+        $jwt2 = JWT::decode($token, $set2, 'ES256', 'e9bc097a-ce51-4036-9562-d2ade882db0d');
         $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
     }
 
@@ -142,14 +158,21 @@ class JWTTest extends TestCase {
         $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $result['signatures'][0]['signature']);
     }
 
-    function testDeserialiseJSON() {
-        $token = '{"payload":"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ","signatures":[{"protected":"eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9","signature":"dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"}]}';
+    function testDeserialiseJSONFlat() {
+        $token = '{"payload":"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ","protected":"eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9","signature":"dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"}';
         $result = JWT::deserialise($token, JWT::JSON_FORMAT);
 
         $this->assertEquals('HS256', $result['signatures'][0]['headers']['alg']);
         $this->assertTrue($result['claims']['http://example.com/is_root']);
         $this->assertEquals('eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ', $result['signatures'][0]['signing_input']);
         $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $result['signatures'][0]['signature']);
+    }
+
+    function testDeserialiseMulti() {
+        $result = JWT::deserialise($this->multi_token);
+        
+        $this->assertTrue($result['claims']['http://example.com/is_root']);
+        $this->assertEquals(2, count($result['signatures']));
     }
 
     function testVerifyHMAC() {
@@ -169,7 +192,15 @@ class JWTTest extends TestCase {
     function testVerifyEC() {
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
-        $jwt = JWT::decode($token, $set, 'ES256', 'EC');
+        $jwt = JWT::decode($token, $set, 'ES256', 'e9bc097a-ce51-4036-9562-d2ade882db0d');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
+    }
+
+    function testVerifyMulti() {
+        $public_key = $this->getPublicKeySet()->getById('e9bc097a-ce51-4036-9562-d2ade882db0d');
+        $set = new Keys\KeySet();
+        $set->add($public_key);
+        $jwt = JWT::decode($this->multi_token, $set, 'ES256');
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
@@ -335,6 +366,20 @@ class JWTTest extends TestCase {
 
         $invalid_token = '12345';
         $result = JWT::deserialise($invalid_token);
+    }
+
+    /**
+     * @expectedException SimpleJWT\InvalidTokenException
+     */
+    function testMultiNoVerifiableSignature() {
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('SimpleJWT\InvalidTokenException');
+            $this->expectExceptionCode(InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
+        }
+
+        $set = new Keys\KeySet();
+        $jwt = JWT::decode($this->multi_token, $set, 'ES256');
+        $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 }
 ?>

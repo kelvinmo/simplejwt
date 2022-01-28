@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.6.0
 
 - Added: Support for Elliptic Curve Diffie-Hellman Ephemeral Static algorithms
 - Added: JWT::tokenHash() to calculate OpenID Connect access token hash values
@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
   TOKEN_PARSE_ERROR to SIGNATURE_VERIFICATION_ERROR (for JWSs) and
   DECRYPTION_ERROR (for JWEs), so that they are consistent with their
   single-recipient equivalents
-- Fixed: Decoding JSON formatted JWEs
+- Fixed: Decoding JSON formatted JWEs and JWKs
 - Fixed: Parsing multi-recipient JWTs and JWEs
 
 ## 0.5.3

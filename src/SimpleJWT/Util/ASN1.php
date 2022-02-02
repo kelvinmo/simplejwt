@@ -110,7 +110,7 @@ class ASN1 {
      * @param string $value the value to encode
      * @param bool $primitive whether the object is of a primitive or
      * constructed type
-     * @return string the encoded object
+     * @return string|null the encoded object
      */
     static function encodeDER($type, $value = '', $primitive = true, $class = 0) {
         $tag_header = $class;
@@ -226,7 +226,7 @@ class ASN1 {
      * - otherwise, pad the data string with a null character
      *
      * @param string $data the data string representing a signed integer
-     * @return string the unsigned integer, or null if the integer is
+     * @return string|null the unsigned integer, or null if the integer is
      * a negative number
      */
     static public function intToUint($data) {

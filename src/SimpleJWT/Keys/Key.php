@@ -199,7 +199,7 @@ abstract class Key {
     /**
      * Returns the public key.
      *
-     * @return Key the public key, or null if the public key does not exist (e.g. is a symmetric key)
+     * @return Key|null the public key, or null if the public key does not exist (e.g. is a symmetric key)
      */
     abstract public function getPublicKey();
 

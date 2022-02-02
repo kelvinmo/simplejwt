@@ -56,7 +56,7 @@ class None extends Algorithm implements SignatureAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return null;
+        return [];
     }
 
     public function getSupportedAlgs() {

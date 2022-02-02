@@ -167,7 +167,7 @@ class KeyFactory {
             return new SymmetricKey($data, $format);
         }
 
-        return null;
+        throw new KeyException('Invalid key format');
     }
 }
 

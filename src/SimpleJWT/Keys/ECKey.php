@@ -208,7 +208,7 @@ class ECKey extends Key {
      * untrusted key contains `x` and `y` parameters are not on the curve, which
      * may result in differential attacks
      * 
-     * @return true if the EC key is valid
+     * @return bool true if the EC key is valid
      * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
      */
     public function isValid() {
@@ -231,7 +231,7 @@ class ECKey extends Key {
      * Checks whether another EC key is on the same curve as this key.
      * 
      * @param ECKey $public_key the public key to check
-     * @return true if the EC key is on the same curve
+     * @return bool true if the EC key is on the same curve
      * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
      */
     public function isOnSameCurve($public_key) {

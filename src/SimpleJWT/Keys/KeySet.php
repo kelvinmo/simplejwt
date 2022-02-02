@@ -156,7 +156,7 @@ class KeySet {
      *
      * @param string $kid the key ID
      * @param bool $fuzzy whether fuzzy search is to be used
-     * @return Key the found key, or null
+     * @return Key|null the found key, or null
      */
     function getById($kid, $fuzzy = false) {
         $fuzzy_keys = [];
@@ -201,7 +201,7 @@ class KeySet {
      * the most mandatory-if-present and optional criteria will be returned.
      *
      * @param array $criteria the criteria
-     * @return Key the found key, or null
+     * @return Key|null the found key, or null
      */
     function get($criteria) {
         $keys = $this->find($criteria);
@@ -240,7 +240,7 @@ class KeySet {
      * matched.
      *
      * @param array $criteria the criteria
-     * @return array an array of keys that matches the criteria, sorted
+     * @return array|null an array of keys that matches the criteria, sorted
      * by decreasing order of optional criteria matched, or null
      */
     protected function find($criteria) {

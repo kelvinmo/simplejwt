@@ -81,7 +81,8 @@ interface SignatureAlgorithm {
      * to be used to sign the payload
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
-     * @return Key the signing key
+     * @return Key|null the signing key, or null if there is no appropriate
+     * key in $keys
      */
     public function getSigningKey($keys, $kid = null);
 

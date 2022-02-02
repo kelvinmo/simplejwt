@@ -39,7 +39,7 @@ namespace SimpleJWT\Util;
  * A generic big integer using the GMP library.
  */
 class BigNum {
-    /** @var resource the internal representation of the value */
+    /** @var \GMP the internal representation of the value */
     protected $value;
 
     /**
@@ -68,7 +68,8 @@ class BigNum {
                 return;
                 break;
             default:
-                if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+                if (!is_integer($base) || ($base < 2) || ($base > 36))
+                    throw new \InvalidArgumentException('$base cannot be less than 2 or greater than 36');
 
                 $value = (new BigNum(0))->value;
 
@@ -178,9 +179,9 @@ class BigNum {
     /**
      * Adds two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a + b
+     * @param \GMP $a
+     * @param \GMP $b
+     * @return \GMP a bignum representing a + b
      */
     protected function _add($a, $b) {
         return gmp_add($a, $b);
@@ -189,9 +190,9 @@ class BigNum {
     /**
      * Multiplies two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a * b
+     * @param \GMP $a
+     * @param \GMP $b
+     * @return \GMP a bignum representing a * b
      */
     protected function _mul($a, $b) {
         return gmp_mul($a, $b);
@@ -200,9 +201,9 @@ class BigNum {
     /**
      * Divides two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a / b
+     * @param \GMP $a
+     * @param \GMP $b
+     * @return \GMP a bignum representing a / b
      */
     protected function _div($a, $b) {
         return gmp_div($a, $b);
@@ -211,9 +212,9 @@ class BigNum {
     /**
      * Raise base to power exp
      *
-     * @param resource $base the base
+     * @param \GMP $base the base
      * @param mixed $exp the exponent, as an integer or a bignum
-     * @return resource a bignum representing base ^ exp
+     * @return \GMP a bignum representing base ^ exp
      */
     function _pow($base, $exp) {
         if ((is_resource($exp) && (get_resource_type($exp) == 'GMP integer'))
@@ -225,9 +226,9 @@ class BigNum {
     /**
      * Returns n modulo d
      *
-     * @param resource $n
-     * @param resource $d
-     * @return resource a bignum representing n mod d
+     * @param \GMP $n
+     * @param \GMP $d
+     * @return \GMP a bignum representing n mod d
      */
     protected function _mod($n, $d) {
         return gmp_mod($n, $d);
@@ -236,10 +237,10 @@ class BigNum {
     /**
      * Raise a number into power with modulo
      *
-     * @param resource $base the base
-     * @param resource $exp the exponent
-     * @param resource $mod the modulo
-     * @return resource a bignum representing base ^ exp mod mod
+     * @param \GMP $base the base
+     * @param \GMP $exp the exponent
+     * @param \GMP $mod the modulo
+     * @return \GMP a bignum representing base ^ exp mod mod
      */
     protected function _powmod($base, $exp, $mod) {
         return gmp_powm($base, $exp, $mod);
@@ -248,8 +249,8 @@ class BigNum {
     /**
      * Compares two bignum
      *
-     * @param resource $a
-     * @param resource $b
+     * @param \GMP $a
+     * @param \GMP $b
      * @return int positive value if a > b, zero if a = b and a negative value if a < b
      */
     protected function _cmp($a, $b) {

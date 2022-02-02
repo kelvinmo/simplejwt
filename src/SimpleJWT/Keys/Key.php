@@ -101,7 +101,7 @@ abstract class Key {
         } else {
             $keys = KeySet::createFromSecret($password, 'bin');
             try {
-                $jwe = JWE::decrypt($data, $keys, $alg, (isset($data['ciphertext'])) ? JWE::JSON_FORMAT : JWE::COMPACT_FORMAT);
+                $jwe = JWE::decrypt($data, $keys, $alg);
                 return json_decode($jwe->getPlaintext(), true);
             } catch (CryptException $e) {
                 throw new KeyException('Cannot decrypt key', 0, $e);

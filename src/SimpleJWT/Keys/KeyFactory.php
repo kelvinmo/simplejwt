@@ -119,7 +119,7 @@ class KeyFactory {
             } else {
                 $keys = KeySet::createFromSecret($password, 'bin');
                 try {
-                    $jwe = JWE::decrypt($data, $keys, $alg, (isset($data['ciphertext'])) ? JWE::JSON_FORMAT : JWE::COMPACT_FORMAT);
+                    $jwe = JWE::decrypt($data, $keys, $alg);
                     $data = json_decode($jwe->getPlaintext());
                     $format = 'php';
                 } catch (CryptException $e) {

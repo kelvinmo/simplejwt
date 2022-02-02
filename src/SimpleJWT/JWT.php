@@ -354,8 +354,8 @@ class JWT {
      * 
      * @codeCoverageIgnore
      */
-    public static function deserialize($token, $format = self::COMPACT_FORMAT) {
-        return self::deserialise($token, $format);
+    public static function deserialize($token) {
+        return self::deserialise($token);
     }
 
     /**

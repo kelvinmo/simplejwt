@@ -109,9 +109,9 @@ class Helper {
         // @phpstan-ignore-next-line
         switch ($this->type) {
             case 'JWT':
-                return JWT::decode($this->data, $keys, $expected_alg, $kid, [], $this->format);
+                return JWT::decode($this->data, $keys, $expected_alg, $kid, []);
             case 'JWE':
-                return JWE::decrypt($this->data, $keys, $expected_alg, $kid, $this->format);
+                return JWE::decrypt($this->data, $keys, $expected_alg, $kid);
         }
     }
 
@@ -143,7 +143,7 @@ class Helper {
             case 'JWT':
                 return $this->getObject($keys, $expected_jwt_alg, $jwt_kid);
             case 'JWE':
-                $jwe = JWE::decrypt($this->data, $keys, $expected_jwe_alg, $jwe_kid, $this->format);
+                $jwe = JWE::decrypt($this->data, $keys, $expected_jwe_alg, $jwe_kid);
                 if ($jwe->getHeader('cty') != 'JWT') {
                     throw new InvalidTokenException('Not a nested JWT', InvalidTokenException::TOKEN_PARSE_ERROR);
                 }

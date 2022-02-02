@@ -98,6 +98,9 @@ class JWT {
      */
     public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = []) {
         if ($skip_validation === false) $skip_validation = [];
+
+        $headers = [];
+        $signing_input = '';
         
         $deserialised = self::deserialise($token);
         $claims = $deserialised['claims'];

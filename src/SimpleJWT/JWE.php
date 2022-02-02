@@ -75,7 +75,7 @@ class JWE {
      * @return JWE the decrypted JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decrypt($token, $keys, $expected_alg) {
+    public static function decrypt($token, $keys, $expected_alg, $kid = null) {
         $detect_result = Helper::detect($token);
         if ($detect_result == null)
             throw new \InvalidArgumentException('Unrecognised token format');
@@ -178,7 +178,7 @@ class JWE {
             }
         }
 
-        if (!$cek) throw new InvalidTokenException('alg parameter incorrect', InvalidTokenException::TOKEN_PARSE_ERROR);
+        if (!isset($cek)) throw new InvalidTokenException('alg parameter incorrect', InvalidTokenException::TOKEN_PARSE_ERROR);
 
         try {
             $plaintext = $content_enc->decryptAndVerify($ciphertext, $tag, $cek, $protected, $iv);

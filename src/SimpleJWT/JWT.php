@@ -135,6 +135,7 @@ class JWT {
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
+        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($expected_alg);
 
         try {
@@ -151,10 +152,12 @@ class JWT {
         // Check time, etc
         $time = time();
         if (isset($claims['nbf']) && !in_array('nbf', $skip_validation)) {
+            if (!is_numeric($claims['nbf'])) throw new InvalidTokenException('nbf claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
             if ($time < $claims['nbf'] - self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too early due to nbf claim', InvalidTokenException::TOO_EARLY_ERROR, null, $claims['nbf']);
         }
 
         if (isset($claims['exp']) && !in_array('exp', $skip_validation)) {
+            if (!is_numeric($claims['exp'])) throw new InvalidTokenException('exp claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
             if ($time > $claims['exp'] + self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too late due to exp claim', InvalidTokenException::TOO_LATE_ERROR, null, $claims['exp']);
         }
 
@@ -222,6 +225,7 @@ class JWT {
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
+            /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
             $signer = AlgorithmFactory::create($this->headers['alg']);
         } catch (\UnexpectedValueException $e) {
             throw new CryptException($e->getMessage(), 0, $e);
@@ -260,7 +264,6 @@ class JWT {
      * will be thrown.
      *
      * @param string $token the serialised JWT
-     * @param string $format the JWT serialisation format
      * @return array an array containing `claims` (deserialised claims) and
      * `signatures`, an array of arrays each containing `headers` (the
      * deserialised header), `signing_input` (i.e. the first two
@@ -382,6 +385,8 @@ class JWT {
         
         $deserialised = self::deserialise($token);
         $alg = $deserialised['signatures'][0]['headers']['alg'];
+
+        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($alg);
         return $signer->shortHash($token);
     }

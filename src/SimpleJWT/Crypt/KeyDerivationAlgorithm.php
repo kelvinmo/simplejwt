@@ -35,6 +35,9 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\KeyException;
+
 /**
  * Interface for key derivation algorithms.  These are used for the following
  * JWE key management modes:
@@ -47,14 +50,14 @@ interface KeyDerivationAlgorithm extends KeyManagementAlgorithm {
     /**
      * Derives the content encryption key.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * required to derive the CEK
      * @param array &$headers the JWE header, which can be modified by
      * implementing algorithms
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the content encryption key as a binary string
-     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * @throws KeyException if there is an error in obtaining the
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */

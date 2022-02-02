@@ -35,6 +35,10 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\KeyException;
+
 /**
  * Interface for signature algorithms.
  */
@@ -43,12 +47,12 @@ interface SignatureAlgorithm {
      * Signs a payload.
      *
      * @param string $data the payload to sign
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * to be used to sign the payload
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the base64url encoded signature
-     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * @throws KeyException if there is an error in obtaining the
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
@@ -57,14 +61,14 @@ interface SignatureAlgorithm {
     /**
      * Verifies a signature.
      *
-     * @param string $singature the base64url encoded signature to verify
+     * @param string $signature the base64url encoded signature to verify
      * @param string $data the payload the signature of which is to be verified
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * to be used to verify the signature
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return bool true if the signature is valid
-     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * @throws KeyException if there is an error in obtaining the
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
@@ -73,11 +77,11 @@ interface SignatureAlgorithm {
     /**
      * Obtains the key that will be used to sign the payload.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * to be used to sign the payload
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
-     * @return SimpleJWT\Keys\Key the signing key
+     * @return Key the signing key
      */
     public function getSigningKey($keys, $kid = null);
 
@@ -89,7 +93,7 @@ interface SignatureAlgorithm {
      * algorithm is RS256, the underlying hash algorithm is SHA-256, and this function
      * will return the encoded value of the left-most 128 bits of the SHA-256 hash.
      *
-     * @param string the data to hash
+     * @param string $data the data to hash
      * @return string the base64url encoded short hash.
      * @throws CryptException if there is an error in the cryptographic process
      */

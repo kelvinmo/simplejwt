@@ -96,7 +96,7 @@ class Helper {
      * Decrypts or verifies the signature of the token and returns
      * the SimpleJWT object representing the token.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the decryption or
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption or
      * verification keys
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
@@ -124,7 +124,7 @@ class Helper {
      * If the supplied token is a JWE, the JWE is firstly decrypted, then the underlying
      * plaintext is treated as a JWT, and further decoded.
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the decryption
+     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption
      * and verification keys
      * @param string $expected_jwe_alg the expected value of the `alg` parameter for the
      * JWE, which should be agreed between the parties out-of-band

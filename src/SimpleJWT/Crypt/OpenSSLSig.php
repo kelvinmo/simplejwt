@@ -63,6 +63,8 @@ class OpenSSLSig extends SHA2 {
                 return ['kty' => 'RSA', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
             case 'ES':
                 return ['kty' => 'EC', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
+            default:
+                throw new \UnexpectedValueException('Invalid algorithm family');
         }
     }
 

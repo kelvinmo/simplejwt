@@ -135,6 +135,8 @@ class JWE {
 
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::DECRYPTION_ERROR);
         $key_enc = AlgorithmFactory::create($headers['alg']);
+
+        /** @var \SimpleJWT\Crypt\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($headers['enc']);
 
         if ($key_enc instanceof KeyDerivationAlgorithm) {
@@ -245,6 +247,8 @@ class JWE {
         if (!isset($this->headers['enc'])) throw new \InvalidArgumentException('enc parameter missing');
 
         $key_enc = AlgorithmFactory::create($this->headers['alg']);
+        
+        /** @var \SimpleJWT\Crypt\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($this->headers['enc']);
 
         if ($kid != null) $this->headers['kid'] = $kid;

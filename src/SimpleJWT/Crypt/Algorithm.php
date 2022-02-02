@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\KeySet;
+
 /**
  * The base class representing a family of JSON web algorithms.  A family of
  * algorithms is a set of algorithms related in some way: e.g. same underlying
@@ -103,14 +105,11 @@ abstract class Algorithm {
      * 2. a string containing the key ID; or
      * 3. an array compatible with the {@link SimpleJWT\Keys\KeySet::get()} function
      *
-     * @param SimpleJWT\Keys\KeySet $keys the key set from which the key will
+     * @param KeySet $keys the key set from which the key will
      * be selected
-     * @param array|string $criteria the criteria
+     * @param array|string $args the criteria
      */
-    protected function selectKey() {
-        $args = func_get_args();
-        $keys = array_shift($args);
-        
+    protected function selectKey($keys, ...$args) {
         $criteria = $this->getKeyCriteria();
         
         foreach ($args as $arg) {
@@ -128,7 +127,7 @@ abstract class Algorithm {
     /**
      * Returns the criteria for selecting keys
      *
-     * @param array the key selection criteria
+     * @return array the key selection criteria
      */
     abstract public function getKeyCriteria();
 }

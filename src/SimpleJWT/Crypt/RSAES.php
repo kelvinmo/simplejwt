@@ -154,7 +154,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     /**
      * Decodes a message using EME-OAEP.
      *
-     * @param string $message the message to decode
+     * @param string $encoded the message to decode
      * @param int $key_length the length of the RSA key in octets
      * @param string $hash the hash algorithm - must be one supported by `hash_algos()`
      * @param string $label the label

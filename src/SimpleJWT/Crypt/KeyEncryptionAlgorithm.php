@@ -35,6 +35,9 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\KeyException;
+
 /**
  * Interface for key encryption algorithms.  These are used for the following
  * JWE key management modes:
@@ -48,14 +51,14 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * Encrypts a content encryption key.
      *
      * @param string $cek the content encryption key as a binary string
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * to be used to encrypt the cek
      * @param array &$headers the JWE header, which can be modified by
      * implementing algorithms
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the base64url encoded encrypted content encryption key
-     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * @throws KeyException if there is an error in obtaining the
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
@@ -65,13 +68,13 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * Decrypts a content encryption key.
      *
      * @param string $encrypted_key the base64url encoded encrypted content encryption key
-     * @param SimpleJWT\Keys\KeySet $keys the key set containing the key
+     * @param KeySet $keys the key set containing the key
      * to be used to encrypt the cek
      * @param array $headers the JWE header
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the decrypted content encryption key as a binary string
-     * @throws SimpleJWT\Keys\KeyException if there is an error in obtaining the
+     * @throws KeyException if there is an error in obtaining the
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */

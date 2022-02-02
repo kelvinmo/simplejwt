@@ -172,7 +172,7 @@ class BigNum {
      * @return string
      */
     function __toString() {
-        return $this->val();
+        return gmp_strval($this->value, 10);
     }
 
     /**

@@ -57,7 +57,7 @@ class JWE {
      * Creates a new JWE.
      *
      * @param array $headers the headers
-     * @param array $plaintext the plaintext to encrypt
+     * @param string $plaintext the plaintext to encrypt
      */
     public function __construct($headers, $plaintext) {
         $this->headers = $headers;

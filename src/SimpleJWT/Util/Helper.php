@@ -100,8 +100,8 @@ class Helper {
      * verification keys
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
-     * @param string $kid the ID of the key to use for decryption or verification. If null, this
-     * is automatically retrieved
+     * @param string $kid the ID of the key to use for verification of a JWT. If null, this
+     * is automatically retrieved.  For a JWE, this parameter is ignored.
      * @return JWT|JWE the decoded JWT or JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
@@ -111,7 +111,7 @@ class Helper {
             case 'JWT':
                 return JWT::decode($this->data, $keys, $expected_alg, $kid, []);
             case 'JWE':
-                return JWE::decrypt($this->data, $keys, $expected_alg, $kid);
+                return JWE::decrypt($this->data, $keys, $expected_alg);
         }
     }
 
@@ -130,20 +130,19 @@ class Helper {
      * JWE, which should be agreed between the parties out-of-band
      * @param string $expected_jwt_alg the expected value of the `alg` parameter for the
      * underlying JWT, which should be agreed between the parties out-of-band
-     * @param string $jwe_kid the ID of the key to use for decryption. If null, this
-     * is automatically retrieved
+     * @param string $dummy parameter ignored - to be removed
      * @param string $jwt_kid the ID of the key to use for verification. If null, this
      * is automatically retrieved
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    function getJWTObject($keys, $expected_jwe_alg, $expected_jwt_alg, $jwe_kid = null, $jwt_kid = null) {
+    function getJWTObject($keys, $expected_jwe_alg, $expected_jwt_alg, $dummy = null, $jwt_kid = null) {
         // @phpstan-ignore-next-line
         switch ($this->type) {
             case 'JWT':
                 return $this->getObject($keys, $expected_jwt_alg, $jwt_kid);
             case 'JWE':
-                $jwe = JWE::decrypt($this->data, $keys, $expected_jwe_alg, $jwe_kid);
+                $jwe = JWE::decrypt($this->data, $keys, $expected_jwe_alg);
                 if ($jwe->getHeader('cty') != 'JWT') {
                     throw new InvalidTokenException('Not a nested JWT', InvalidTokenException::TOKEN_PARSE_ERROR);
                 }

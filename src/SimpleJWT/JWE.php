@@ -75,7 +75,7 @@ class JWE {
      * @return JWE the decrypted JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decrypt($token, $keys, $expected_alg, $kid = null) {
+    public static function decrypt($token, $keys, $expected_alg) {
         $detect_result = Helper::detect($token);
         if ($detect_result == null)
             throw new \InvalidArgumentException('Unrecognised token format');

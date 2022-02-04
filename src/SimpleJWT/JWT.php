@@ -87,12 +87,11 @@ class JWT {
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
-     * @param string $kid the ID of the key to use to verify the signature. If null, this
-     * is automatically retrieved
+     * @param string $kid the ID of the key to use to verify the signature if this is not
+     * specified in the JWT header. If null, this is automatically determine
      * @param bool|array $skip_validation an array of headers or claims that
      * should be ignored as part of the validation process (e.g. if expired tokens
-     * are to be accepted), or false if all validation
-     * is to be performed.
+     * are to be accepted), or false if all validations are to be performed.
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
@@ -139,6 +138,7 @@ class JWT {
         $signer = AlgorithmFactory::create($expected_alg);
 
         try {
+            // Override $kid argument with value from JWT header if present
             if (isset($headers['kid'])) $kid = $headers['kid'];
             $result = $signer->verify($signature, $signing_input, $keys, $kid);
         } catch (KeyException $e) {

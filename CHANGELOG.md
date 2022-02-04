@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Changed: JWT::deserialise() no longer takes a `$format` parameter (which
+  is already ignored)
+- Changed: KeyFactory::create() now throws a KeyException if the supplied key
+  cannot be decoded
+- Changed: OpenSSLSig::getKeyCriteria() now throws an UnexpectedValueException
+  if the supplied algorithm (`alg` header) is not valid
+- Deprecated: Helper::getJWTObject() now ignores the `$jwe_kid` parameter
+  and will be removed in future versions
+- Fixed: API documentation for better static analysis checks
+
 ## 0.6.0
 
 - Added: Support for Elliptic Curve Diffie-Hellman Ephemeral Static algorithms

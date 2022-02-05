@@ -78,7 +78,7 @@ class KeyFactory {
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
      * - `jwe` - Encrypted JSON web key
      *
-     * @param string $data the key data
+     * @param string|array $data the key data
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
@@ -140,6 +140,7 @@ class KeyFactory {
         // 4. PEM
         if ($format == 'pem') {
             if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
+                /** @var string|bool $der */
                 $der = base64_decode($matches[1]);
                 if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 

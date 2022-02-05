@@ -75,6 +75,7 @@ class RSAKey extends Key {
                 $jwk = [];
 
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
+                    /** @var string|bool $der */
                     $der = base64_decode($matches[1]);
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
@@ -97,6 +98,7 @@ class RSAKey extends Key {
                     $jwk['n'] = Util::base64url_encode(ASN1::intToUint($n));
                     $jwk['e'] = Util::base64url_encode($e);
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
+                    /** @var string|bool $der */
                     $der = base64_decode($matches[1]);
 
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');

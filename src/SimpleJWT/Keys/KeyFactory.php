@@ -54,15 +54,20 @@ use SimpleJWT\Util\ASN1;
  *
  */
 class KeyFactory {
+    /** @var array<string, string> $jwk_kty_map */
     static $jwk_kty_map = [
         RSAKey::KTY => 'SimpleJWT\Keys\RSAKey',
         ECKey::KTY => 'SimpleJWT\Keys\ECKey',
         SymmetricKey::KTY => 'SimpleJWT\Keys\SymmetricKey'
     ];
+
+    /** @var array<string, string> $pem_map */
     static $pem_map = [
         RSAKey::PEM_PRIVATE => 'SimpleJWT\Keys\RSAKey',
         ECKey::PEM_PRIVATE => 'SimpleJWT\Keys\ECKey'
     ];
+
+    /** @var array<string, string> $oid_map */
     static $oid_map = [
         RSAKey::OID => 'SimpleJWT\Keys\RSAKey',
         ECKey::EC_OID => 'SimpleJWT\Keys\ECKey'
@@ -78,7 +83,7 @@ class KeyFactory {
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
      * - `jwe` - Encrypted JSON web key
      *
-     * @param string|array $data the key data
+     * @param string|array<string, mixed> $data the key data
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected

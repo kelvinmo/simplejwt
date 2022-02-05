@@ -58,7 +58,7 @@ class RSAKey extends Key {
      * - `jwe` - Encrypted JSON web key
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
      *
-     * @param string|array $data the key data
+     * @param string|array<string, mixed> $data the key data
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected

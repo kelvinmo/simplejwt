@@ -37,6 +37,7 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\SymmetricKey;
 
 /**
  * Implementation of direct encryption.  The key selected from the key set is
@@ -59,6 +60,7 @@ class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {
+        /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');

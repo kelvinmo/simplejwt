@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Crypt;
 
+use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
 
 /**
@@ -55,6 +56,7 @@ abstract class Algorithm {
     const ENCRYPTION_ALGORITHM = 'enc';
     const KEY_ALGORITHM = 'key';
 
+    /** @var string|null $alg */
     private $alg;
 
     /**
@@ -87,7 +89,7 @@ abstract class Algorithm {
      *
      * Implementations should test the host system's configuration
      *
-     * @return array supported algorithms
+     * @return array<string> supported algorithms
      */
     abstract public function getSupportedAlgs();
 
@@ -107,7 +109,8 @@ abstract class Algorithm {
      *
      * @param KeySet $keys the key set from which the key will
      * be selected
-     * @param array|string $args the criteria
+     * @param array<string, mixed>|string $args the criteria
+     * @return Key|null the found key, or null
      */
     protected function selectKey($keys, ...$args) {
         $criteria = $this->getKeyCriteria();
@@ -127,7 +130,7 @@ abstract class Algorithm {
     /**
      * Returns the criteria for selecting keys
      *
-     * @return array the key selection criteria
+     * @return array<string, mixed> the key selection criteria
      */
     abstract public function getKeyCriteria();
 }

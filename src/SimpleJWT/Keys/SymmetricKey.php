@@ -55,7 +55,7 @@ class SymmetricKey extends Key {
      * - `base64` - the symmetric key encoded in Base64 format
      * - `bin` - the symmetric key encoded in binary format
      *
-     * @param string|array $data the key data
+     * @param string|array<string, mixed> $data the key data
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected

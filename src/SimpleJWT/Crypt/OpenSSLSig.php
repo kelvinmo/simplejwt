@@ -46,12 +46,14 @@ use SimpleJWT\Util\Util;
  * `ES512` and `ES256K`.
  */
 class OpenSSLSig extends SHA2 {
+    /** @var string $family */
     private $family;
 
     public function __construct($alg) {
         if ($alg == null) {
             parent::__construct(null, null);
         } else {
+            // @phpstan-ignore-next-line
             parent::__construct($alg, filter_var($alg, FILTER_SANITIZE_NUMBER_INT));
             $this->family = substr($alg, 0, 2);
         }

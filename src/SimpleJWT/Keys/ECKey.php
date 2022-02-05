@@ -55,6 +55,7 @@ class ECKey extends Key {
     const P521_OID = '1.3.132.0.35';
 
     // Curve parameters are from http://www.secg.org/sec2-v2.pdf
+    /** @var array<string, mixed> $curves */
     static $curves = [
         'P-256' => [
             'oid' => self::P256_OID,
@@ -100,7 +101,7 @@ class ECKey extends Key {
      * - `jwe` - Encrypted JSON web key
      * - `pem` - the public or private key encoded in PEM (base64 encoded DER) format
      *
-     * @param string|array $data the key data
+     * @param string|array<string, mixed> $data the key data
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
@@ -295,7 +296,7 @@ class ECKey extends Key {
         return ['crv', 'kty', 'x', 'y'];
     }
 
-    private function getCurveNameFromOID($curve_oid) {
+    private function getCurveNameFromOID(string $curve_oid): ?string {
         foreach (self::$curves as $crv => $params) {
             if ($params['oid'] == $curve_oid) return $crv;
         }

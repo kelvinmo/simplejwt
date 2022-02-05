@@ -46,6 +46,7 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
 class ECDH extends Algorithm implements KeyDerivationAlgorithm {
+    /** @var int $key_size */
     private $key_size;
 
     /**
@@ -83,6 +84,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {
+        /** @var ECKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
@@ -162,7 +164,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         return $this->concatKDF($Z, $alg, $size, $apu, $apv);
     }
 
-    protected function createEphemeralKey($crv) {
+    protected function createEphemeralKey(string $crv): ECKey {
         if (!isset(ECKey::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
         $openssl_curve_name = ECKey::$curves[$crv]['openssl'];
 
@@ -188,7 +190,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         return new ECKey($pem, 'pem');
     }
 
-    private function deriveAgreementKey($public_key, $private_key) {
+    private function deriveAgreementKey(ECKey $public_key, ECKey $private_key): string {
         assert(function_exists('openssl_pkey_derive'));
 
         $public_key_res = openssl_pkey_get_public($public_key->toPEM());
@@ -202,7 +204,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         return $result;
     }
 
-    private function concatKDF($Z, $alg, $size, $apu = '', $apv = '') {
+    private function concatKDF(string $Z, string $alg, int $size, string $apu = '', string $apv = ''): string {
         $apu = ($apu == null) ? '' : Util::base64url_decode($apu);
         $apv = ($apv == null) ? '' : Util::base64url_decode($apv);
 

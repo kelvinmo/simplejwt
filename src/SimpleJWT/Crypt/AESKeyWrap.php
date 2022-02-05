@@ -37,6 +37,7 @@ namespace SimpleJWT\Crypt;
 
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\SymmetricKey;
 
 /**
  * Implementation of the AES Key Wrap algorithms.
@@ -48,6 +49,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
 
     const RFC3394_IV = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
 
+    /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'A128KW' => ['cipher' => 'AES-128-ECB', 'key' => 16],
         'A192KW' => ['cipher' => 'AES-192-ECB', 'key' => 24],
@@ -84,6 +86,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
+        /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
@@ -111,6 +114,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+        /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');

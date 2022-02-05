@@ -67,6 +67,7 @@ class InvalidTokenException extends \RuntimeException {
      * using the {@link getTime()} function. */
     const TOO_LATE_ERROR = 257;
 
+    /** @var int $time */
     protected $time;
 
     /**

@@ -49,6 +49,7 @@ class HMAC extends SHA2 {
         if ($alg == null) {
             parent::__construct(null, null);
         } else {
+            // @phpstan-ignore-next-line
             parent::__construct($alg, filter_var($alg, FILTER_SANITIZE_NUMBER_INT));
         }
     }

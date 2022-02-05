@@ -55,6 +55,7 @@ trait AESKeyWrapTrait {
      * must be called from the constructor.
      * 
      * @param string $alg the AES key wrap algorithm parameter
+     * @return void
      */
     protected function initAESKW($alg = null) {
         if ($alg == null) {
@@ -67,7 +68,7 @@ trait AESKeyWrapTrait {
     /**
      * Returns the supported AES Key Wrap algorithms
      * 
-     * @return array an array of AES Key Wrap algorithms
+     * @return array<string> an array of AES Key Wrap algorithms
      */
     protected function getAESKWAlgs() {
         return $this->aeskw->getSupportedAlgs();
@@ -88,7 +89,7 @@ trait AESKeyWrapTrait {
      * 
      * @param string $plain_key the key to wrap as a binary string
      * @param string $wrapping_key the key wrapping key as a binary string
-     * @param array &$headers the JWE header, which can be modified
+     * @param array<string, mixed> &$headers the JWE header, which can be modified
      * @return string the wrapped key as a binary string
      */
     protected function wrapKey($plain_key, $wrapping_key, &$headers) {
@@ -101,7 +102,7 @@ trait AESKeyWrapTrait {
      * 
      * @param string $encrypted_key the key to unwrap as a binary string
      * @param string $unwrapping_key the key wrapping key as a binary string
-     * @param array $headers the JWE header, which can be modified
+     * @param array<string, mixed> $headers the JWE header, which can be modified
      * @return string the unwrapped key as a binary string
      */
     protected function unwrapKey($encrypted_key, $unwrapping_key, $headers) {
@@ -109,6 +110,10 @@ trait AESKeyWrapTrait {
         return $this->aeskw->decryptKey($encrypted_key, $keys, $headers);
     }
 
+    /**
+     * @param string $key
+     * @return KeySet
+     */
     private function createKeySet($key) {
         $keys = new KeySet();
         $keys->add(new SymmetricKey($key, 'bin'));

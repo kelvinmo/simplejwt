@@ -48,6 +48,7 @@ abstract class Key {
     const SIZE_PROPERTY = '#size';
     const PUBLIC_PROPERTY = '#public';
 
+    /** @var array<string, mixed> $data */
     protected $data;
 
     /**
@@ -59,7 +60,7 @@ abstract class Key {
      *
      * Subclasses may support additional formats.
      *
-     * @param array|string $data the underlying key parameters, in JSON web key format
+     * @param array<string, mixed>|string $data the underlying key parameters, in JSON web key format
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
@@ -93,7 +94,7 @@ abstract class Key {
      * @param string $data the underlying key parameters, in JSON web key format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
-     * @return array the decrypted data
+     * @return array<mixed> the decrypted data
      */
     private static function decrypt($data, $password, $alg) {
         if ($password == null) {
@@ -122,6 +123,7 @@ abstract class Key {
      * Sets the key ID
      *
      * @param string $kid the key ID
+     * @return void
      */
     public function setKeyId($kid) {
         $this->data['kid'] = $kid;
@@ -151,6 +153,7 @@ abstract class Key {
      * The usage can be one of: sig, enc
      *
      * @param string $use the allowed usage
+     * @return void
      */
     public function setUse($use) {
         $this->data['use'] = $use;
@@ -159,7 +162,7 @@ abstract class Key {
     /**
      * Returns the allowed operations for the key
      *
-     * @return array the allowed operations
+     * @return array<string> the allowed operations
      */
     public function getOperations() {
         return (isset($this->data['key_ops'])) ? $this->data['key_ops'] : null;
@@ -171,7 +174,8 @@ abstract class Key {
      * The values can be one or more of: sign, verify, encrypt, decrypt
      * wrapKey, unwrapKey, deriveKey, deriveBits
      *
-     * @param array $ops the allowed operations
+     * @param array<string> $ops the allowed operations
+     * @return void
      */
     public function setOperations($ops) {
         if (!is_array($ops)) $ops = explode(',', $ops);
@@ -206,7 +210,7 @@ abstract class Key {
     /**
      * Returns the underlying parameters for the key
      *
-     * @return array the parameters
+     * @return array<string, mixed> the parameters
      */
     public function getKeyData() {
         return $this->data;
@@ -258,7 +262,7 @@ abstract class Key {
      * - if it is a symmetric key, the key itself
      * - if it is an asymmetric key, all the parameters for the public key
      *
-     * @return array the array of keys
+     * @return array<string> the array of keys
      * @see https://tools.ietf.org/html/rfc7638
      */
     abstract protected function getThumbnailMembers();

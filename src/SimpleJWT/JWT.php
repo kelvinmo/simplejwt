@@ -59,20 +59,23 @@ class JWT {
     /** @var string JSON_FORMAT JSON JWT serialisation format */
     const JSON_FORMAT = Helper::JSON_FORMAT;
 
+    /** @var int $TIME_ALLOWANCE */
     static public $TIME_ALLOWANCE = 300;
 
+    /** @var array<string, mixed> $headers */
     protected $headers = [
         'typ' => 'JWT',
         'alg' => 'RS256'
     ];
 
+    /** @var array<string, mixed> $claims */
     protected $claims = [];
 
     /**
      * Creates a new JWT.
      *
-     * @param array $headers the headers
-     * @param array $claims the claims
+     * @param array<string, mixed> $headers the headers
+     * @param array<string, mixed> $claims the claims
      */
     public function __construct($headers, $claims) {
         $this->headers = $headers;
@@ -89,7 +92,7 @@ class JWT {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use to verify the signature if this is not
      * specified in the JWT header. If null, this is automatically determine
-     * @param bool|array $skip_validation an array of headers or claims that
+     * @param bool|array<string> $skip_validation an array of headers or claims that
      * should be ignored as part of the validation process (e.g. if expired tokens
      * are to be accepted), or false if all validations are to be performed.
      * @return JWT the decoded JWT
@@ -167,7 +170,7 @@ class JWT {
     /**
      * Returns the JWT's headers.
      *
-     * @return array the headers
+     * @return array<string, mixed> the headers
      */
     public function getHeaders() {
         return $this->headers;
@@ -186,7 +189,7 @@ class JWT {
     /**
      * Returns the JWT's claims.
      *
-     * @return array the claims
+     * @return array<string, mixed> the claims
      */
     public function getClaims() {
         return $this->claims;
@@ -209,7 +212,7 @@ class JWT {
      * JWT
      * @param string $kid the ID of the key to use to sign. If null, this
      * is automatically retrieved
-     * @param bool|array $auto_complete an array of headers or claims that
+     * @param bool|array<string> $auto_complete an array of headers or claims that
      * should be automatically completed, or false if no auto-completion is
      * to be performed
      * @param string $alg if not null, override the `alg` header
@@ -264,7 +267,7 @@ class JWT {
      * will be thrown.
      *
      * @param string $token the serialised JWT
-     * @return array an array containing `claims` (deserialised claims) and
+     * @return array<string, mixed> an array containing `claims` (deserialised claims) and
      * `signatures`, an array of arrays each containing `headers` (the
      * deserialised header), `signing_input` (i.e. the first two
      * parts of the serialised JWT) and `signature` (the signature)
@@ -359,6 +362,7 @@ class JWT {
      * Alias for {@link JWT::deserialise()}.
      * 
      * @codeCoverageIgnore
+     * @phpstan-ignore-next-line
      */
     public static function deserialize($token) {
         return self::deserialise($token);

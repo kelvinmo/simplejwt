@@ -49,14 +49,16 @@ class JWE {
     /** @var string JSON_FORMAT JSON JWE serialisation format */
     const JSON_FORMAT = Helper::JSON_FORMAT;
 
+    /** @var array<string, mixed> $headers */
     protected $headers = ['typ' => 'JWE'];
 
+    /** @var string $plaintext */
     protected $plaintext = null;
 
     /**
      * Creates a new JWE.
      *
-     * @param array $headers the headers
+     * @param array<string, mixed> $headers the headers
      * @param string $plaintext the plaintext to encrypt
      */
     public function __construct($headers, $plaintext) {
@@ -204,7 +206,7 @@ class JWE {
     /**
      * Returns the JWE's headers.
      *
-     * @return array the headers
+     * @return array<string, mixed> the headers
      */
     public function getHeaders() {
         return $this->headers;

@@ -53,7 +53,7 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * @param string $cek the content encryption key as a binary string
      * @param KeySet $keys the key set containing the key
      * to be used to encrypt the cek
-     * @param array &$headers the JWE header, which can be modified by
+     * @param array<string, mixed> &$headers the JWE header, which can be modified by
      * implementing algorithms
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
@@ -70,7 +70,7 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * @param string $encrypted_key the base64url encoded encrypted content encryption key
      * @param KeySet $keys the key set containing the key
      * to be used to encrypt the cek
-     * @param array $headers the JWE header
+     * @param array<string, mixed> $headers the JWE header
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
      * @return string the decrypted content encryption key as a binary string

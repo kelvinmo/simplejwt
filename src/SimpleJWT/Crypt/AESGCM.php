@@ -43,7 +43,7 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-5.3
  */
 class AESGCM extends Algorithm implements EncryptionAlgorithm {
-
+    /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'A128GCM' => ['cipher' => 'aes-128-gcm', 'key' => 16],
         'A192GCM' => ['cipher' => 'aes-192-gcm', 'key' => 24],

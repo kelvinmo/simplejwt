@@ -47,6 +47,7 @@ use SimpleJWT\Keys\Key;
  * @see https://tools.ietf.org/html/rfc3447
  */
 class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
+    /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'RSA1_5' => ['openssl_padding' => OPENSSL_PKCS1_PADDING],
         'RSA-OAEP' => ['openssl_padding' => OPENSSL_PKCS1_OAEP_PADDING],

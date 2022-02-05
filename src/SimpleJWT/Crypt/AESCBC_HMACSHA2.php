@@ -43,7 +43,7 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-5.2
  */
 class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
-
+    /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'A128CBC-HS256' => ['cipher' => 'AES-128-CBC', 'hash' => 'sha256', 'key' => 32, 'tag' => 16],
         'A192CBC-HS384' => ['cipher' => 'AES-192-CBC', 'hash' => 'sha384', 'key' => 48, 'tag' => 24],

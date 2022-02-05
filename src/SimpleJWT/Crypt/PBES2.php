@@ -48,14 +48,17 @@ use SimpleJWT\Keys\SymmetricKey;
 class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     use AESKeyWrapTrait;
 
+    /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'PBES2-HS256+A128KW' => ['hash' => 'sha256'],
         'PBES2-HS384+A192KW' => ['hash' => 'sha384'],
         'PBES2-HS512+A256KW' => ['hash' => 'sha512']
     ];
 
+    /** @var string $hash_alg */
     protected $hash_alg;
 
+    /** @var int $iterations */
     protected $iterations = 4096;
 
     public function __construct($alg) {
@@ -101,6 +104,7 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
      * Sets the number of iterations to use in PBKFD2 key generation.
      *
      * @param int $iterations number of iterations
+     * @return void
      */
     public function setIterations($iterations) {
         $this->iterations = $iterations;
@@ -111,6 +115,7 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         $headers['p2s'] = Util::base64url_encode($salt_input);
         $headers['p2c'] = $this->iterations;
 
+        /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
@@ -121,6 +126,7 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+        /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
@@ -140,7 +146,10 @@ class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
         return Util::random_bytes(8);
     }
 
-    private function generateKeyFromPassword($password, $headers) {
+    /**
+     * @param array<string, mixed> $headers
+     */
+    private function generateKeyFromPassword(string $password, array $headers): string {
         $salt = $headers['alg'] . "\x00" . Util::base64url_decode($headers['p2s']);
 
         return hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);

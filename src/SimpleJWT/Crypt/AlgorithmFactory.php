@@ -45,6 +45,7 @@ namespace SimpleJWT\Crypt;
  *
  */
 class AlgorithmFactory {
+    /** @var array<string, string> $alg_map */
     static $alg_map = [
         // Signature algorithms
         '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
@@ -67,6 +68,7 @@ class AlgorithmFactory {
         '/^A\d+GCM$/' => 'SimpleJWT\Crypt\AESGCM'
     ];
 
+    /** @var array<string, string> $use_map */
     private static $use_map = [
         Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\SignatureAlgorithm',
         Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\EncryptionAlgorithm',
@@ -106,7 +108,7 @@ class AlgorithmFactory {
      * The uses can be one of the constants in the {@link Algorithm} class.
      *
      * @param string $use the use
-     * @return array an array of algorithms.
+     * @return array<string> an array of algorithms
      */
     static public function getSupportedAlgs($use) {
         $results = [];
@@ -133,6 +135,7 @@ class AlgorithmFactory {
      * `none` algorithm is required (e.g. in non-security sensitive JWTs).
      *
      * @see removeNoneAlg()
+     * @return void
      */
     static public function addNoneAlg() {
         self::$alg_map['/^none$/'] = 'SimpleJWT\Crypt\None';
@@ -142,6 +145,7 @@ class AlgorithmFactory {
      * Removes the `none` algorithm to the repository.
      *
      * @see addNoneAlg()
+     * @return void
      */
     static public function removeNoneAlg() {
         if (isset(self::$alg_map['/^none$/'])) unset(self::$alg_map['/^none$/']);

@@ -110,6 +110,7 @@ class ASN1 {
      * @param string $value the value to encode
      * @param bool $primitive whether the object is of a primitive or
      * constructed type
+     * @param int $class the class of the DER tag
      * @return string|null the encoded object
      */
     static function encodeDER($type, $value = '', $primitive = true, $class = 0) {

@@ -46,6 +46,9 @@ abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
 
     /**
      * Creates an instance of this algorithm.
+     * 
+     * @param ?string $alg the algorithm
+     * @param ?int $size the length, in bits, of the SHA-2 hash
      */
     protected function __construct($alg, $size) {
         parent::__construct($alg);

@@ -52,7 +52,7 @@ interface KeyDerivationAlgorithm extends KeyManagementAlgorithm {
      *
      * @param KeySet $keys the key set containing the key
      * required to derive the CEK
-     * @param array &$headers the JWE header, which can be modified by
+     * @param array<string, mixed> &$headers the JWE header, which can be modified by
      * implementing algorithms
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.

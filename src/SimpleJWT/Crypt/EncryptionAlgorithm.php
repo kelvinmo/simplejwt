@@ -47,9 +47,9 @@ interface EncryptionAlgorithm {
      * @param string $additional additional authenticated data as a binary string
      * @param string $iv the initialisation vector, where required, as a base64url
      * encoded string
-     * @return array an array containing the following keys: `ciphertext` (the ciphertext),
-     * `tag` (the authentication tag), and optionally `iv` (the initialisation vector)
-     * with all values as base64url encoded strings
+     * @return array<string, string> an array containing the following keys:
+     * `ciphertext` (the ciphertext), `tag` (the authentication tag), and optionally
+     * `iv` (the initialisation vector), with all values as base64url encoded strings
      * @throws CryptException if there is an error in the cryptographic process
      */
     public function encryptAndSign($plaintext, $cek, $additional, $iv);
@@ -63,6 +63,8 @@ interface EncryptionAlgorithm {
      * string
      * @param string $cek the content encryption key as a binary string
      * @param string $additional additional authenticated data as a binary string
+     * @param string $iv the initialisation vector, where required, as a base64url
+     * encoded string
      * @return string the plaintext as a binary string
      * @throws CryptException if there is an error in the cryptographic process, including
      * if the authentication tag does not match

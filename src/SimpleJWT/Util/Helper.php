@@ -49,9 +49,13 @@ class Helper {
     const COMPACT_FORMAT = 'compact';
     const JSON_FORMAT = 'json';
 
-
+    /** @var string $data */
     private $data;
+
+    /** @var string $type */
     private $type;
+
+    /** @var string $format */
     private $format;
 
     /**

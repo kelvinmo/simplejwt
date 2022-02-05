@@ -45,7 +45,7 @@ use SimpleJWT\Crypt\CryptException;
  * encrypted using PBES2 and JWE compact serialization.
  */
 class KeySet {
-    /** @var array the keys in this key set */
+    /** @var array<Key> the keys in this key set */
     protected $keys = [];
 
     /**
@@ -55,6 +55,7 @@ class KeySet {
      * @param string $jwk the JSON web key set to load
      * @param string $password the password, if the key set is password protected
      * @param string $alg the algorithm, if the key set is password protected
+     * @return void
      * @throws KeyException if there is an error in reading a key
      */
     function load($jwk, $password = null, $alg = 'PBES2-HS256+A128KW') {
@@ -109,6 +110,7 @@ class KeySet {
      * key contents) already exists in the key set.
      *
      * @param Key $key the key to add
+     * @return void
      * @throws KeyException if there is an identical key
      */
     function add($key) {
@@ -128,6 +130,7 @@ class KeySet {
      * specified key set.
      *
      * @param KeySet $set the key set containing the keys to add
+     * @return void
      */
     function addAll($set) {
         foreach ($set->keys as $key) {
@@ -142,7 +145,7 @@ class KeySet {
     /**
      * Returns all the keys in the key set as `Key` objects
      *
-     * @return array an array of keys
+     * @return array<Key> an array of keys
      */
     function getKeys() {
         return $this->keys;
@@ -200,7 +203,7 @@ class KeySet {
      * and mandatory-if-present criteria, the key which matches
      * the most mandatory-if-present and optional criteria will be returned.
      *
-     * @param array $criteria the criteria
+     * @param array<string, mixed> $criteria the criteria
      * @return Key|null the found key, or null
      */
     function get($criteria) {
@@ -239,8 +242,8 @@ class KeySet {
      * sorted by decreasing order of mandatory-if-present and optional criteria 
      * matched.
      *
-     * @param array $criteria the criteria
-     * @return array|null an array of keys that matches the criteria, sorted
+     * @param array<string, mixed> $criteria the criteria
+     * @return array<Key>|null an array of keys that matches the criteria, sorted
      * by decreasing order of optional criteria matched, or null
      */
     protected function find($criteria) {
@@ -362,6 +365,7 @@ class KeySet {
      * Removes a key from the key set
      *
      * @param Key $key the key to remove
+     * @return void
      */
     function remove($key) {
         for ($i = 0; $i < count($this->keys); $i++) {

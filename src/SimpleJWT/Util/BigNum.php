@@ -54,7 +54,6 @@ class BigNum {
             case 10:
                 $this->value = gmp_init($str, 10);
                 return;
-                break;
             case 256:
                 $bytes = array_merge(unpack('C*', $str));
 
@@ -66,7 +65,6 @@ class BigNum {
                 }
                 $this->value = $value;
                 return;
-                break;
             default:
                 if (!is_integer($base) || ($base < 2) || ($base > 36))
                     throw new \InvalidArgumentException('$base cannot be less than 2 or greater than 36');
@@ -80,8 +78,6 @@ class BigNum {
                 $this->value = $value;
                 return;
         }
-
-        throw new \RuntimeException();
     }
 
     /**

@@ -157,16 +157,12 @@ class OpenSSLSig extends SHA2 {
         switch ($result) {
             case 1:
                 return true;
-                break;
             case 0:
                 return false;
-                break;
             default:
                 $messages = [];
                 while ($message = openssl_error_string()) $messages[] = $message;
                 throw new CryptException('Cannot verify signature: ' . implode("\n", $messages));
-                return false;
-                break;
         }
     }
 

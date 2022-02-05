@@ -64,7 +64,7 @@ abstract class Algorithm {
      * the object will represent the entire family of algorithms - in which case
      * only the {@link getSupportedAlgs()} function will work.
      *
-     * @param string $alg the algorithm
+     * @param ?string $alg the algorithm
      * @throws \UnexpectedValueException if the `$alg` parameter is not supported
      * by this class
      */

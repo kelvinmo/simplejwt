@@ -175,8 +175,8 @@ class BigNum {
     /**
      * Adds two bignums
      *
-     * @param \GMP $a
-     * @param \GMP $b
+     * @param \GMP|int $a
+     * @param \GMP|int $b
      * @return \GMP a bignum representing a + b
      */
     protected function _add($a, $b) {
@@ -186,8 +186,8 @@ class BigNum {
     /**
      * Multiplies two bignums
      *
-     * @param \GMP $a
-     * @param \GMP $b
+     * @param \GMP|int $a
+     * @param \GMP|int $b
      * @return \GMP a bignum representing a * b
      */
     protected function _mul($a, $b) {
@@ -197,8 +197,8 @@ class BigNum {
     /**
      * Divides two bignums
      *
-     * @param \GMP $a
-     * @param \GMP $b
+     * @param \GMP|int $a
+     * @param \GMP|int $b
      * @return \GMP a bignum representing a / b
      */
     protected function _div($a, $b) {

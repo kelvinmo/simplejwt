@@ -59,7 +59,7 @@ abstract class Key {
      *
      * Subclasses may support additional formats.
      *
-     * @param array $data the underlying key parameters, in JSON web key format
+     * @param array|string $data the underlying key parameters, in JSON web key format
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
@@ -90,7 +90,7 @@ abstract class Key {
     /**
      * Decrypts an encrypted JSON web key
      *
-     * @param array $data the underlying key parameters, in JSON web key format
+     * @param string $data the underlying key parameters, in JSON web key format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      * @return array the decrypted data

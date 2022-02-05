@@ -95,7 +95,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
                 $enc = AlgorithmFactory::create($headers['enc'], Algorithm::ENCRYPTION_ALGORITHM);
                 $size = $enc->getCEKSize();
             } catch (\UnexpectedValueException $e) {
-                throw new CryptException('Unexpected enc algorithm', $e);
+                throw new CryptException('Unexpected enc algorithm', 0, $e);
             }
         } elseif ($this->key_size != null) {
             $size = $this->key_size;

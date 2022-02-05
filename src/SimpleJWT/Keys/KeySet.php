@@ -353,7 +353,7 @@ class KeySet {
         } elseif (is_array($criterion_value) && is_scalar($key_value)) {
             return in_array($key_value, $criterion_value);
         } elseif (is_array($criterion_value) && is_array($key_value)) {
-            return (count($key_value) != count($key_value, $criterion_value));
+            return (count(array_intersect($criterion_value, $key_value)) > 0);
         }
         return false;
     }

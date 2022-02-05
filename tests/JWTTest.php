@@ -204,6 +204,18 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
+    function testSkipValidation() {
+        $set = $this->getPrivateKeySet();
+        $claims = $this->getJWTClaims();
+        $claims['exp'] = 1;
+        $jwt = new JWT(['typ' => 'JWT', 'alg' => 'HS256'], $claims);
+        $token = $jwt->encode($set, null, false);
+
+        $set2 = $this->getPublicKeySet();
+        $jwt2 = JWT::decode($token, $set2, 'HS256', null, ['exp']);
+        $this->assertTrue($jwt2->getClaim('http://example.com/is_root'));
+    }
+
     function testTokenHash() {
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
         $token_hash = JWT::tokenHash($token);

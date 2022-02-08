@@ -55,7 +55,9 @@ class BigNum {
                 $this->value = gmp_init($str, 10);
                 return;
             case 256:
-                $bytes = array_merge(unpack('C*', $str));
+                $arr = unpack('C*', $str);
+                assert($arr !== false);
+                $bytes = array_merge($arr);
 
                 $value = (new BigNum(0))->value;
           
@@ -213,8 +215,7 @@ class BigNum {
      * @return \GMP a bignum representing base ^ exp
      */
     function _pow($base, $exp) {
-        if ((is_resource($exp) && (get_resource_type($exp) == 'GMP integer'))
-            || (is_object($exp) && (get_class($exp) == 'GMP')))
+        if (is_object($exp) && ($exp instanceof \GMP))
             $exp = gmp_intval($exp);
         return gmp_pow($base, $exp);
     }

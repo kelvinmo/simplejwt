@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.6.1
 
 - Changed: JWT::deserialise() no longer takes a `$format` parameter (which
   is already ignored)

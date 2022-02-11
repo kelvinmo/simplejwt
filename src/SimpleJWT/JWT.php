@@ -155,12 +155,12 @@ class JWT {
         // Check time, etc
         $time = time();
         if (isset($claims['nbf']) && !in_array('nbf', $skip_validation)) {
-            if (!is_numeric($claims['nbf'])) throw new InvalidTokenException('nbf claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
+            if (!is_integer($claims['nbf'])) throw new InvalidTokenException('nbf claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
             if ($time < $claims['nbf'] - self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too early due to nbf claim', InvalidTokenException::TOO_EARLY_ERROR, null, $claims['nbf']);
         }
 
         if (isset($claims['exp']) && !in_array('exp', $skip_validation)) {
-            if (!is_numeric($claims['exp'])) throw new InvalidTokenException('exp claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
+            if (!is_integer($claims['exp'])) throw new InvalidTokenException('exp claim is not an integer', InvalidTokenException::TOKEN_PARSE_ERROR);
             if ($time > $claims['exp'] + self::$TIME_ALLOWANCE) throw new InvalidTokenException('Too late due to exp claim', InvalidTokenException::TOO_LATE_ERROR, null, $claims['exp']);
         }
 

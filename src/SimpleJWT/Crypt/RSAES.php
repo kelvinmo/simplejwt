@@ -75,7 +75,7 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
      * Generates a seed for OAEP encoding.  This uses {@link SimpleJWT\Util\Util::random_bytes()}
      * to generate random bytes.
      *
-     * @param int $len the length of the seed required, in octets
+     * @param int<1, max> $len the length of the seed required, in octets
      * @return string the seed
      */
     protected function generateSeed($len) {

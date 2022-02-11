@@ -106,7 +106,7 @@ class Util {
      * This function is retained for compatibility with earlier versions
      * of SimpleJWT.
      *
-     * @param int $num_bytes the number of bytes to generate
+     * @param int<1, max> $num_bytes the number of bytes to generate
      * @return string a string containing random bytes
      */
     static function random_bytes($num_bytes) {

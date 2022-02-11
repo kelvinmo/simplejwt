@@ -332,7 +332,7 @@ class JWE {
      * (This method is separated from the rest of the {@link encrypt()}
      * function to enable testing.)
      * 
-     * @param int $length the length of the content encryption key, in bytes
+     * @param int<1, max> $length the length of the content encryption key, in bytes
      * @return string the generated content encryption key as a binary
      * string
      */

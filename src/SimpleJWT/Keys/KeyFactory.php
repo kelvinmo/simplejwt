@@ -108,6 +108,7 @@ class KeyFactory {
 
         // 2. Decode JSON
         if ($format == 'json') {
+            /* @var string $data */
             $json = json_decode($data, true);
             if (isset($json['ciphertext'])) {
                 $format = 'jwe';

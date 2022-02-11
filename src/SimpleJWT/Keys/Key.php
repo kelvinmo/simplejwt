@@ -64,13 +64,16 @@ abstract class Key {
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
+     * @throws KeyException if the key cannot be created
      */
     public function __construct($data = [], $format = 'php', $password = null, $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
+                if (!is_array($data)) throw new KeyException('Incorrect key data format');
                 $this->data = $data;
                 break;
             case 'json':
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $jwk = json_decode($data, true);
 
                 if (isset($jwk['ciphertext'])) {
@@ -80,6 +83,7 @@ abstract class Key {
                 }
                 break;
             case 'jwe':
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $this->data = self::decrypt($data, $password, $alg);
         }
 

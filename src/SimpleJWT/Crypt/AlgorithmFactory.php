@@ -96,7 +96,9 @@ class AlgorithmFactory {
                     if (!is_subclass_of($cls, $superclass, true)) throw new \UnexpectedValueException('Unexpected use for algorithm: ' . $alg);
                 }
 
-                return new $cls($alg);
+                /** @var Algorithm $obj */
+                $obj = new $cls($alg);
+                return $obj;
             }
         }
         throw new \UnexpectedValueException('Algorithm not supported: ' . $alg);
@@ -120,6 +122,7 @@ class AlgorithmFactory {
         foreach ($classes as $cls) {
             if (!is_subclass_of($cls, $superclass, true)) continue;
 
+            /** @var Algorithm $obj */
             $obj = new $cls(null);
             $results = array_merge($results, $obj->getSupportedAlgs());
         }

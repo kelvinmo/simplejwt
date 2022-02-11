@@ -68,6 +68,7 @@ class SymmetricKey extends Key {
                 parent::__construct($data, $format, $password, $alg);
                 break;
             case 'base64url':
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => $data
@@ -75,6 +76,7 @@ class SymmetricKey extends Key {
                 parent::__construct($jwk);
                 break;
             case 'base64':
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => trim(strtr($data, '+/', '-_'), '=')  // convert base64 to base64url
@@ -82,6 +84,7 @@ class SymmetricKey extends Key {
                 parent::__construct($jwk);
                 break;
             case 'bin':
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => Util::base64url_encode($data)

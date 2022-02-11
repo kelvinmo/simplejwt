@@ -91,6 +91,7 @@ class KeySet {
             return $key->getKeyData();
         }, $this->keys);
         $json = json_encode(['keys' => $result]);
+        assert($json !== false);
         if ($password == null) return $json;
 
         $keys = KeySet::createFromSecret($password, 'bin');
@@ -297,7 +298,9 @@ class KeySet {
         if (count($results) == 0) return null;
         if (count($results) == 1) {
             $kids = array_keys($results);
-            return [$this->getById($kids[0])];
+            $key = $this->getById($kids[0]);
+            assert($key != null);
+            return [$key];
         }
 
         // 4. Optional criteria
@@ -306,7 +309,9 @@ class KeySet {
         if (count($non_mandatory) == 0) {
             $kids = array_keys($results);
             return array_map(function($kid) {
-                return $this->getById($kid);
+                $key = $this->getById($kid);
+                assert($key != null);
+                return $key;
             }, $kids);
         }
 
@@ -323,7 +328,9 @@ class KeySet {
         arsort($results);
         $kids = array_keys($results);
         return array_map(function($kid) {
-            return $this->getById($kid);
+            $key = $this->getById($kid);
+            assert($key != null);
+            return $key;
         }, $kids);
     }
 

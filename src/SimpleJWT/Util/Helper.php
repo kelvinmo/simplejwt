@@ -144,7 +144,9 @@ class Helper {
         // @phpstan-ignore-next-line
         switch ($this->type) {
             case 'JWT':
-                return $this->getObject($keys, $expected_jwt_alg, $jwt_kid);
+                /** @var JWT $jwt */
+                $jwt = $this->getObject($keys, $expected_jwt_alg, $jwt_kid);
+                return $jwt;
             case 'JWE':
                 $jwe = JWE::decrypt($this->data, $keys, $expected_jwe_alg);
                 if ($jwe->getHeader('cty') != 'JWT') {

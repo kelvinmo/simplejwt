@@ -166,6 +166,9 @@ class KeyFactory {
                         return new $cls($data, 'pem');
                     }
                 }
+
+                // TODO - it's probably PKCS#8, which uses BEGIN PRIVATE KEY
+                throw new KeyException('PEM key format not supported');
             }
         }
 

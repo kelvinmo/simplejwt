@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fixed: Compatibility with PHP 8.1 when using ECDH (#58)
+
 ## 0.6.1
 
 - Changed: JWT::deserialise() no longer takes a `$format` parameter (which

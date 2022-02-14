@@ -64,7 +64,7 @@ class KeyFactory {
     /** @var array<string, string> $pem_map */
     static $pem_map = [
         RSAKey::PEM_PRIVATE => 'SimpleJWT\Keys\RSAKey',
-        ECKey::PEM_PRIVATE => 'SimpleJWT\Keys\ECKey'
+        ECKey::PEM_RFC5915_PRIVATE => 'SimpleJWT\Keys\ECKey'
     ];
 
     /** @var array<string, string> $oid_map */
@@ -166,6 +166,9 @@ class KeyFactory {
                         return new $cls($data, 'pem');
                     }
                 }
+
+                // TODO - it's probably PKCS#8, which uses BEGIN PRIVATE KEY
+                throw new KeyException('PEM key format not supported');
             }
         }
 

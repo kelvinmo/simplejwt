@@ -3,7 +3,8 @@ name: CI
 on: [ push, pull_request ]
 
 jobs:
-  tests:
+  phpunit:
+    name: Unit tests (PHP ${{ matrix.php-versions }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,7 +14,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
-    name: Tests on PHP ${{ matrix.php-versions }}
+          - 8.1
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,3 +42,33 @@ jobs:
 
       - name: Run tests
         run: composer test
+
+  phpstan:
+    runs-on: ubuntu-latest
+    name: Static analysis
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: "phpstan-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "phpstan-composer-"
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Perform static analysis
+        run: composer phpstan

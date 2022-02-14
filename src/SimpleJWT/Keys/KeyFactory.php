@@ -64,7 +64,7 @@ class KeyFactory {
     /** @var array<string, string> $pem_map */
     static $pem_map = [
         RSAKey::PEM_PRIVATE => 'SimpleJWT\Keys\RSAKey',
-        ECKey::PEM_PRIVATE => 'SimpleJWT\Keys\ECKey'
+        ECKey::PEM_RFC5915_PRIVATE => 'SimpleJWT\Keys\ECKey'
     ];
 
     /** @var array<string, string> $oid_map */

@@ -46,7 +46,8 @@ class ECKey extends Key {
 
     const KTY = 'EC';
 
-    const PEM_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
+    const PEM_RFC5915_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
+    const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
     const EC_OID = '1.2.840.10045.2.1';
     const P256_OID = '1.2.840.10045.3.1.7';
@@ -149,23 +150,22 @@ class ECKey extends Key {
                     $jwk['crv'] = $curve;
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
-                } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
+                } elseif (preg_match(self::PEM_RFC5915_PRIVATE, $data, $matches)) {
                     /** @var string|bool $der */
                     $der = base64_decode($matches[1]);
-
                     if ($der === FALSE) throw new KeyException('Cannot read PEM key');
 
                     $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
                     $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
 
-                    if (ord($version) != 1) throw new KeyException('Invalid private key version');
+                    if (ord($version) != 1) throw new KeyException('Invalid private key version: ' . ord($version));
 
                     $offset += ASN1::readDER($der, $offset, $d);  // OCTET STRING [d]
 
                     $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[0]
                     $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
                     $curve_oid = ASN1::decodeOID($curve_oid);
-                    $curve = $this->getCurveNameFromOID($curve_oid);
+                    $curve = self::getCurveNameFromOID($curve_oid);
                     if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
@@ -184,6 +184,56 @@ class ECKey extends Key {
                     $jwk['d'] = Util::base64url_encode($d);
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
+                } elseif (preg_match(self::PEM_PKCS8_PRIVATE, $data, $matches)) {
+                    /** @var string|bool $der */
+                    $der = base64_decode($matches[1]);
+                    if ($der === FALSE) throw new KeyException('Cannot read PEM key');
+
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
+
+                    if (ord($version) != 0) throw new KeyException('Invalid private key version: ' . ord($version));
+
+                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
+                    $offset += ASN1::readDER($der, $offset, $key_oid);  // OBJECT IDENTIFIER - id-ecPublicKey
+
+                    if (ASN1::decodeOID($key_oid) != self::EC_OID) throw new KeyException('Invalid key type: ' . ASN1::decodeOID($key_oid));
+
+                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
+                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve = self::getCurveNameFromOID($curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
+
+                    $len = self::$curves[$curve]['len'];
+
+                    $offset += ASN1::readDER($der, $offset, $private_key);  // OCTET STRING [privateKey]
+
+                    // Parse the octet string
+                    $offset = 0;
+                    $offset += ASN1::readDER($private_key, $offset, $data);  // SEQUENCE
+                    $offset += ASN1::readDER($private_key, $offset, $version);  // INTEGER
+
+                    if (ord($version) != 1) throw new KeyException('Invalid private key version: ' . ord($version));
+
+                    $offset += ASN1::readDER($private_key, $offset, $d);  // OCTET STRING [d]
+
+                    $offset += ASN1::readDER($private_key, $offset, $data);  // SEQUENCE[0]
+                    $offset += ASN1::readDER($private_key, $offset, $point);  // BIT STRING - ECPoint
+
+                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
+
+                    if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
+
+                    $x = substr($point, 1, $len / 2);
+                    $y = substr($point, 1 + $len / 2);
+
+                    $jwk['kty'] = self::KTY;
+                    $jwk['crv'] = $curve;
+                    $jwk['d'] = Util::base64url_encode($d);
+                    $jwk['x'] = Util::base64url_encode($x);
+                    $jwk['y'] = Util::base64url_encode($y);
+                } else {
+                    throw new KeyException('Unrecognised key format');
                 }
 
                 parent::__construct($jwk);
@@ -296,7 +346,7 @@ class ECKey extends Key {
         return ['crv', 'kty', 'x', 'y'];
     }
 
-    private function getCurveNameFromOID(string $curve_oid): ?string {
+    private static function getCurveNameFromOID(string $curve_oid): ?string {
         foreach (self::$curves as $crv => $params) {
             if ($params['oid'] == $curve_oid) return $crv;
         }

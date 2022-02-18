@@ -33,8 +33,10 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Encryption;
 
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 
 /**

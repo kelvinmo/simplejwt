@@ -93,7 +93,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         // 1. Get the required key length and alg input into Concat KDF
         if (isset($headers['enc'])) {
             try {
-                /** @var \SimpleJWT\Crypt\EncryptionAlgorithm $enc */
+                /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $enc */
                 $enc = AlgorithmFactory::create($headers['enc'], Algorithm::ENCRYPTION_ALGORITHM);
                 $size = $enc->getCEKSize();
             } catch (\UnexpectedValueException $e) {

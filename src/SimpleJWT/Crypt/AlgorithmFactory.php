@@ -64,14 +64,14 @@ class AlgorithmFactory {
         '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\ECDH_AESKeyWrap',
 
         // Content encryption algorithms
-        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2',
-        '/^A\d+GCM$/' => 'SimpleJWT\Crypt\AESGCM'
+        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\Encryption\AESCBC_HMACSHA2',
+        '/^A\d+GCM$/' => 'SimpleJWT\Crypt\Encryption\AESGCM'
     ];
 
     /** @var array<string, string> $use_map */
     private static $use_map = [
         Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\SignatureAlgorithm',
-        Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\EncryptionAlgorithm',
+        Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\Encryption\EncryptionAlgorithm',
         Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm'
     ];
 

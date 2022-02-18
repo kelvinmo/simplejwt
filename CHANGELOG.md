@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Deprecated: Helper::getObject() and Helper::getJWTObject() have been
+  replaced by Helper::decode() and Helper::decodeFully() respectively,
+  and will be removed in future versions
+
 ## 0.6.2
 
 - Changed: Updated `symfony/console` package version

@@ -33,7 +33,7 @@ jobs:
           restore-keys: "composer-"
 
       - name: Install dependencies
-        run: composer install
+        run: composer update && composer install
 
       - name: Build jwkstool.phar
         run: composer phar

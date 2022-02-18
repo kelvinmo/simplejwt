@@ -64,16 +64,30 @@ jobs:
           input_string: ${{ github.ref }}
           version_extractor_regex: '\/v(.*)$'
 
+      # - name: Get Changelog
+      #   id: changelog
+      #   uses: statamic/changelog-action@v1
+      #   with:
+      #     version: ${{ github.ref }}
+
+      # - name: Create Github release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     artifacts: jwkstool.phar
+      #     body: ${{ steps.changelog.outputs.text }}
+      #     prerelease: ${{ !!steps.semver.outputs.prerelease }}
+
       - name: Get Changelog
         id: changelog
-        uses: statamic/changelog-action@v1
+        uses: ocavue/changelog-parser-action@v1
         with:
-          version: ${{ github.ref }}
+          removeMarkdown: false
 
       - name: Create Github release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: jwkstool.phar
-          body: ${{ steps.changelog.outputs.text }}
+          body: ${{ steps.changelog.outputs.latestBody }}
           prerelease: ${{ !!steps.semver.outputs.prerelease }}

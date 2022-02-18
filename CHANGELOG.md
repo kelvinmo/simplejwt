@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.6.2
 
 - Changed: Updated `symfony/console` package version
 - Fixed: Compatibility with PHP 8.1 when using ECDH (#58)

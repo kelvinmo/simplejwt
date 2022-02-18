@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one
+  for each algorithm type (#60)
+
 ## 0.6.2
 
 - Changed: Updated `symfony/console` package version

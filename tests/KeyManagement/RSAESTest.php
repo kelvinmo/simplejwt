@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\KeySet;

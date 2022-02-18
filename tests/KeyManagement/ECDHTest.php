@@ -1,6 +1,7 @@
 <?php
 
-use SimpleJWT\Crypt\ECDH;
+namespace SimpleJWT\Crypt\KeyManagement;
+
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
@@ -27,7 +28,7 @@ class ECDHTest extends TestCase {
             'y' => 'SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps'
         ], 'php');
 
-        $stub = $this->getMockBuilder('SimpleJWT\Crypt\ECDH')
+        $stub = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\ECDH')
             ->setMethods(['createEphemeralKey'])->setConstructorArgs(['ECDH-ES'])->getMock();
 
         $stub->method('createEphemeralKey')->willReturn($ephemeral_key);

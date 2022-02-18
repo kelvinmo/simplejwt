@@ -33,8 +33,11 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\AlgorithmFactory;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\KeyFactory;
 use SimpleJWT\Util\Util;

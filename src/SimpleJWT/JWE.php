@@ -36,8 +36,8 @@ namespace SimpleJWT;
 
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Crypt\KeyDerivationAlgorithm;
-use SimpleJWT\Crypt\KeyEncryptionAlgorithm;
+use SimpleJWT\Crypt\KeyManagement\KeyDerivationAlgorithm;
+use SimpleJWT\Crypt\KeyManagement\KeyEncryptionAlgorithm;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;

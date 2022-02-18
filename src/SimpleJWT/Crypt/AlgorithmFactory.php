@@ -54,14 +54,14 @@ class AlgorithmFactory {
         '/^HS\d+$/' => 'SimpleJWT\Crypt\Signature\HMAC',
 
         // Key management algorithms (derivation or encryption)
-        '/^dir$/' => 'SimpleJWT\Crypt\DirectEncryption',
-        '/^RSA1_5$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
-        '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
-        '/^ECDH-ES$/' => 'SimpleJWT\Crypt\ECDH',
-        '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\ECDH_AESKeyWrap',
+        '/^dir$/' => 'SimpleJWT\Crypt\KeyManagement\DirectEncryption',
+        '/^RSA1_5$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\AESKeyWrap',
+        '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\PBES2',
+        '/^ECDH-ES$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH',
+        '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH_AESKeyWrap',
 
         // Content encryption algorithms
         '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\Encryption\AESCBC_HMACSHA2',
@@ -72,7 +72,7 @@ class AlgorithmFactory {
     private static $use_map = [
         Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\Signature\SignatureAlgorithm',
         Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\Encryption\EncryptionAlgorithm',
-        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm'
+        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagement\KeyManagementAlgorithm'
     ];
 
     /**

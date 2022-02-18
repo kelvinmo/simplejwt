@@ -33,16 +33,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
+
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\CryptException;
+use SimpleJWT\Util\Util;
+use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\SymmetricKey;
 
 /**
- * Interface for key management algorithms.  These can be *key encryption
- * algorithms*, which takes a previously generated content encrpytion key and
- * encrypts it, or *key derivation algoritms* which generates the content
- * encryption key based on certain shared information.
+ * Implementation of direct encryption.  The key selected from the key set is
+ * the shared content encryption key
  */
-interface KeyManagementAlgorithm {
+class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
+    public function __construct($alg) {
+        parent::__construct($alg);
+    }
 
+    public function getSupportedAlgs() {
+        return ['dir'];
+    }
+
+    public function getKeyCriteria() {
+        return [
+            'kty' => 'oct',
+            '~alg' => $this->getAlg()
+        ];
+    }
+
+    public function deriveKey($keys, &$headers, $kid = null) {
+        /** @var SymmetricKey $key */
+        $key = $this->selectKey($keys, $kid);
+        if ($key == null) {
+            throw new CryptException('Key not found or is invalid');
+        }
+        $headers['kid'] = $key->getKeyId();
+
+        return $key->toBinary();
+    }
 }
-
-?>

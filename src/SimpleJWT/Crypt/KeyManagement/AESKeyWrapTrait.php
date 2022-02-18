@@ -33,7 +33,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;

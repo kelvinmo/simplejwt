@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2020
+ * Copyright (C) Kelvin Mo 2015-2022
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,53 +33,36 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\KeyException;
 
 /**
- * Implementation of the Elliptic Curve Diffie-Hellman 
- * Ephemeral Static algorithm with AES Key Wrap
- * 
- * 
- * 
- * See {@link ECDH} for further information.
- * 
- * @see https://tools.ietf.org/html/rfc7518#section-4.6
+ * Interface for key derivation algorithms.  These are used for the following
+ * JWE key management modes:
+ *
+ * - direct encryption
+ * - direct key agreement
+ * - key agreement with key wrapping (which will also implement {@link KeyEncryptionAlgorithm})
  */
-class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
-    use AESKeyWrapTrait;
-
-    public function __construct($alg) {
-        if ($alg == null) {
-            $this->initAESKW(null);
-            $size = null;
-        } else {
-            list($ecdh_alg, $aeskw_alg) = explode('+', $alg, 2);
-
-            $this->initAESKW($aeskw_alg);
-            $size = $this->getAESKWKeySize();
-        }
-
-        parent::__construct($alg, $size);
-    }
-
-    public function getSupportedAlgs() {
-        if (count(parent::getSupportedAlgs()) == 0) return [];
-
-        $aeskw_algs = $this->getAESKWAlgs();
-        return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
-    }
-
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
-        return $this->wrapKey($cek, $wrapping_key, $headers);
-    }
-
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
-        return $this->unwrapKey($encrypted_key, $wrapping_key, $headers);
-    }
+interface KeyDerivationAlgorithm extends KeyManagementAlgorithm {
+    /**
+     * Derives the content encryption key.
+     *
+     * @param KeySet $keys the key set containing the key
+     * required to derive the CEK
+     * @param array<string, mixed> &$headers the JWE header, which can be modified by
+     * implementing algorithms
+     * @param string $kid the ID of the key to be used. If null the key will
+     * be chosen automatically.
+     * @return string the content encryption key as a binary string
+     * @throws KeyException if there is an error in obtaining the
+     * key(s) required for this operation
+     * @throws CryptException if there is an error in the cryptographic process
+     */
+    public function deriveKey($keys, &$headers, $kid = null);
 }
 
 ?>

@@ -33,10 +33,12 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Util\Util;
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
+use SimpleJWT\Util\Util;
 
 /**
  * Implementation of the RSA Encryption Scheme algorithms, including `RSA1_5` and

@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2022
+ * Copyright (C) Kelvin Mo 2020
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,40 +33,53 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Util\Util;
-use SimpleJWT\Keys\Key;
-use SimpleJWT\Keys\SymmetricKey;
+use SimpleJWT\Keys\KeySet;
 
 /**
- * Implementation of direct encryption.  The key selected from the key set is
- * the shared content encryption key
+ * Implementation of the Elliptic Curve Diffie-Hellman 
+ * Ephemeral Static algorithm with AES Key Wrap
+ * 
+ * 
+ * 
+ * See {@link ECDH} for further information.
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
-class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
+class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
+    use AESKeyWrapTrait;
+
     public function __construct($alg) {
-        parent::__construct($alg);
+        if ($alg == null) {
+            $this->initAESKW(null);
+            $size = null;
+        } else {
+            list($ecdh_alg, $aeskw_alg) = explode('+', $alg, 2);
+
+            $this->initAESKW($aeskw_alg);
+            $size = $this->getAESKWKeySize();
+        }
+
+        parent::__construct($alg, $size);
     }
 
     public function getSupportedAlgs() {
-        return ['dir'];
+        if (count(parent::getSupportedAlgs()) == 0) return [];
+
+        $aeskw_algs = $this->getAESKWAlgs();
+        return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
-    public function getKeyCriteria() {
-        return [
-            'kty' => 'oct',
-            '~alg' => $this->getAlg()
-        ];
+    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->wrapKey($cek, $wrapping_key, $headers);
     }
 
-    public function deriveKey($keys, &$headers, $kid = null) {
-        /** @var SymmetricKey $key */
-        $key = $this->selectKey($keys, $kid);
-        if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
-        }
-        $headers['kid'] = $key->getKeyId();
-
-        return $key->toBinary();
+    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->unwrapKey($encrypted_key, $wrapping_key, $headers);
     }
 }
+
+?>

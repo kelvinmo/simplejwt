@@ -137,7 +137,7 @@ class JWT {
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
-        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($expected_alg);
 
         try {
@@ -228,7 +228,7 @@ class JWT {
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
-            /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+            /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
             $signer = AlgorithmFactory::create($this->headers['alg']);
         } catch (\UnexpectedValueException $e) {
             throw new CryptException($e->getMessage(), 0, $e);
@@ -390,7 +390,7 @@ class JWT {
         $deserialised = self::deserialise($token);
         $alg = $deserialised['signatures'][0]['headers']['alg'];
 
-        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($alg);
         return $signer->shortHash($token);
     }

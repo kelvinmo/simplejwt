@@ -33,32 +33,53 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Util\Util;
+use SimpleJWT\Crypt\Algorithm;
 
 /**
- * Abstract class for SHA2-based signature algorithms.
+ * Implements the `none` signature algorithm.
+ * 
+ * Note that the `none` algorithm should only be used in JWTs which
+ * are cryptographically protected by other means.
+ * 
+ * By default, the `none` algorithm is disabled in SimpleJWT.  Attempts
+ * to decode a JWT with a `none` algorithm will return a
+ * {@link SimpleJWT\InvalidTokenException}.  In order to enable this
+ * algorithm, call {@link AlgorithmFactory::addNoneAlg()} static
+ * method.
+ * 
+ * @link https://datatracker.ietf.org/doc/html/rfc8725.html#section-3.2
+ * @codeCoverageIgnore
  */
-abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
-    /** @var int the length, in bits, of the SHA-2 hash */
-    protected $size;
-
-    /**
-     * Creates an instance of this algorithm.
-     * 
-     * @param ?string $alg the algorithm
-     * @param ?int $size the length, in bits, of the SHA-2 hash
-     */
-    protected function __construct($alg, $size) {
+class None extends Algorithm implements SignatureAlgorithm {
+    public function __construct($alg) {
         parent::__construct($alg);
-        $this->size = $size;
+    }
+
+    public function getKeyCriteria() {
+        return [];
+    }
+
+    public function getSupportedAlgs() {
+        return ['none'];
+    }
+
+    public function sign($data, $keys, $kid = null) {
+        return '';
     }
 
     public function shortHash($data) {
-        $hash = hash('sha' . $this->size, $data, true);
-        $short = substr($hash, 0, $this->size / 16);
-        return Util::base64url_encode($short);
+        return '';
+    }
+
+    public function verify($signature, $data, $keys, $kid = null) {
+        if ($kid != null) return false;
+        return ($signature === '');
+    }
+
+    public function getSigningKey($keys, $kid = null) {
+        return null;
     }
 }
 

@@ -43,12 +43,7 @@ use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
-class JWE {
-    /** @var string COMPACT_FORMAT Compact JWE serialisation format */
-    const COMPACT_FORMAT = Helper::COMPACT_FORMAT;
-    /** @var string JSON_FORMAT JSON JWE serialisation format */
-    const JSON_FORMAT = Helper::JSON_FORMAT;
-
+class JWE extends Token {
     /** @var array<string, mixed> $headers */
     protected $headers = ['typ' => 'JWE'];
 
@@ -62,7 +57,7 @@ class JWE {
      * @param string $plaintext the plaintext to encrypt
      */
     public function __construct($headers, $plaintext) {
-        $this->headers = $headers;
+        parent::__construct($headers);
         $this->plaintext = $plaintext;
     }
 
@@ -201,25 +196,6 @@ class JWE {
         }
 
         return new JWE($headers, $plaintext);
-    }
-
-    /**
-     * Returns the JWE's headers.
-     *
-     * @return array<string, mixed> the headers
-     */
-    public function getHeaders() {
-        return $this->headers;
-    }
-
-    /**
-     * Returns a specified header
-     *
-     * @param string $header the header to return
-     * @return mixed the header value
-     */
-    public function getHeader($header) {
-        return $this->headers[$header];
     }
 
     /**

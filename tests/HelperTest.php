@@ -13,7 +13,7 @@ class HelperTest extends TestCase {
 
         $results = Helper::detect($compact);
         $this->assertEquals('JWT', $results['type']);
-        $this->assertEquals(Helper::COMPACT_FORMAT, $results['format']);
+        $this->assertEquals(Token::COMPACT_FORMAT, $results['format']);
     }
 
     function testJWSJSON() {
@@ -35,7 +35,7 @@ END;
 
         $results = Helper::detect($complete_json);
         $this->assertEquals('JWT', $results['type']);
-        $this->assertEquals(Helper::JSON_FORMAT, $results['format']);
+        $this->assertEquals(Token::JSON_FORMAT, $results['format']);
 
         $flattened_json = <<<END
         {
@@ -51,7 +51,7 @@ END;
 
         $results = Helper::detect($flattened_json);
         $this->assertEquals('JWT', $results['type']);
-        $this->assertEquals(Helper::JSON_FORMAT, $results['format']);
+        $this->assertEquals(Token::JSON_FORMAT, $results['format']);
     }
 
     function testJWECompact() {
@@ -59,7 +59,7 @@ END;
 
         $results = Helper::detect($compact);
         $this->assertEquals('JWE', $results['type']);
-        $this->assertEquals(Helper::COMPACT_FORMAT, $results['format']);
+        $this->assertEquals(Token::COMPACT_FORMAT, $results['format']);
     }
 
     function testJWEJSON() {
@@ -89,7 +89,7 @@ END;
 
         $results = Helper::detect($complete_json);
         $this->assertEquals('JWE', $results['type']);
-        $this->assertEquals(Helper::JSON_FORMAT, $results['format']);
+        $this->assertEquals(Token::JSON_FORMAT, $results['format']);
 
         $flattened_json = <<<END
         {
@@ -112,7 +112,7 @@ END;
 
         $results = Helper::detect($flattened_json);
         $this->assertEquals('JWE', $results['type']);
-        $this->assertEquals(Helper::JSON_FORMAT, $results['format']);
+        $this->assertEquals(Token::JSON_FORMAT, $results['format']);
     }
 
     function testInvalidToken() {

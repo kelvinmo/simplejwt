@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one
   for each algorithm type (#60)
+- Changed: `JWT` and `JWE` now derives from a common parent class `Token`
 
 ## 0.6.2
 

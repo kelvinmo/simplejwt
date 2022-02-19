@@ -123,7 +123,7 @@ class Helper {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use for verification of a JWT. If null, this
      * is automatically retrieved.  For a JWE, this parameter is ignored.
-     * @return JWT|JWE the decoded JWT or JWE
+     * @return Token the decoded JWT or JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      * @deprecated use {@link decode()} instead
      * @codeCoverageIgnore

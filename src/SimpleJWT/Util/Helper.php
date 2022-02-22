@@ -187,7 +187,7 @@ class Helper {
      * @codeCoverageIgnore
      */
     function getJWTObject($keys, $expected_jwe_alg, $expected_jwt_alg, $dummy = null, $jwt_kid = null) {
-        return $this->decodeFully($keys, $expected_jwe_alg, $expected_jwt_alg, $jwt_kid = null);
+        return $this->decodeFully($keys, $expected_jwe_alg, $expected_jwt_alg, $jwt_kid);
     }
 
     /**

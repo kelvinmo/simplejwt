@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.6.3
 
 - Deprecated: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively,

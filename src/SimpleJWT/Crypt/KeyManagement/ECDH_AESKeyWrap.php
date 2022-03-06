@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2022
+ * Copyright (C) Kelvin Mo 2020
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,56 +33,52 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Keys\KeyException;
-use SimpleJWT\Util\Util;
+use SimpleJWT\Keys\KeySet;
 
 /**
- * HMAC-based signature algorithm.
- *
- * This class implements the `HS256`, `HS384` and `HS512` algorithms.
- *
+ * Implementation of the Elliptic Curve Diffie-Hellman 
+ * Ephemeral Static algorithm with AES Key Wrap
+ * 
+ * 
+ * 
+ * See {@link ECDH} for further information.
+ * 
+ * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
-class HMAC extends SHA2 {
+class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
+    use AESKeyWrapTrait;
+
     public function __construct($alg) {
         if ($alg == null) {
-            parent::__construct(null, null);
+            $this->initAESKW(null);
+            $size = null;
         } else {
-            // @phpstan-ignore-next-line
-            parent::__construct($alg, filter_var($alg, FILTER_SANITIZE_NUMBER_INT));
-        }
-    }
+            list($ecdh_alg, $aeskw_alg) = explode('+', $alg, 2);
 
-    public function getKeyCriteria() {
-        return ['kty' => 'oct', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
+            $this->initAESKW($aeskw_alg);
+            $size = $this->getAESKWKeySize();
+        }
+
+        parent::__construct($alg, $size);
     }
 
     public function getSupportedAlgs() {
-        $results = [];
-        $hash_algos = hash_algos();
-        if (in_array('sha256', $hash_algos)) $results[] = 'HS256';
-        if (in_array('sha384', $hash_algos)) $results[] = 'HS384';
-        if (in_array('sha512', $hash_algos)) $results[] = 'HS512';
+        if (count(parent::getSupportedAlgs()) == 0) return [];
 
-        return $results;
+        $aeskw_algs = $this->getAESKWAlgs();
+        return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
-    public function sign($data, $keys, $kid = null) {
-        $key = $this->getSigningKey($keys, $kid);
-        if (($key == null) || !is_a($key, 'SimpleJWT\Keys\SymmetricKey')) {
-            throw new KeyException('Key not found or is invalid');
-        }
-        return Util::base64url_encode(hash_hmac('sha' . $this->size, $data, $key->toBinary(), true));
+    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->wrapKey($cek, $wrapping_key, $headers);
     }
 
-    public function verify($signature, $data, $keys, $kid = null) {
-        $compare = $this->sign($data, $keys, $kid);
-        return Util::secure_compare($signature, $compare);
-    }
-
-    public function getSigningKey($keys, $kid = null) {
-        return $this->selectKey($keys, $kid);
+    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
+        return $this->unwrapKey($encrypted_key, $wrapping_key, $headers);
     }
 }
 

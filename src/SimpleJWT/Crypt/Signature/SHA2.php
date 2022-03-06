@@ -33,40 +33,34 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Signature;
 
+use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Util\Util;
-use SimpleJWT\Keys\Key;
-use SimpleJWT\Keys\SymmetricKey;
 
 /**
- * Implementation of direct encryption.  The key selected from the key set is
- * the shared content encryption key
+ * Abstract class for SHA2-based signature algorithms.
  */
-class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
-    public function __construct($alg) {
+abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
+    /** @var int the length, in bits, of the SHA-2 hash */
+    protected $size;
+
+    /**
+     * Creates an instance of this algorithm.
+     * 
+     * @param ?string $alg the algorithm
+     * @param ?int $size the length, in bits, of the SHA-2 hash
+     */
+    protected function __construct($alg, $size) {
         parent::__construct($alg);
+        $this->size = $size;
     }
 
-    public function getSupportedAlgs() {
-        return ['dir'];
-    }
-
-    public function getKeyCriteria() {
-        return [
-            'kty' => 'oct',
-            '~alg' => $this->getAlg()
-        ];
-    }
-
-    public function deriveKey($keys, &$headers, $kid = null) {
-        /** @var SymmetricKey $key */
-        $key = $this->selectKey($keys, $kid);
-        if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
-        }
-        $headers['kid'] = $key->getKeyId();
-
-        return $key->toBinary();
+    public function shortHash($data) {
+        $hash = hash('sha' . $this->size, $data, true);
+        $short = substr($hash, 0, $this->size / 16);
+        return Util::base64url_encode($short);
     }
 }
+
+?>

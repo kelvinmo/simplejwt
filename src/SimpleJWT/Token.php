@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2022
+ * Copyright (C) Kelvin Mo 2022
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,33 +33,50 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
-
-use SimpleJWT\Util\Util;
+namespace SimpleJWT;
 
 /**
- * Abstract class for SHA2-based signature algorithms.
+ * A JSON Object Signing and Encryption (JOSE) token.
+ * 
+ * A JOSE token can be a JSON web token (JWT) or a JSON web encryption
+ * (JWE).  These are represented by the subclasses {@link JWE} and
+ * {@link JWT} respectively.
  */
-abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
-    /** @var int the length, in bits, of the SHA-2 hash */
-    protected $size;
+abstract class Token {
+    /** @var string COMPACT_FORMAT Compact token serialisation format */
+    const COMPACT_FORMAT = 'compact';
+    /** @var string JSON_FORMAT JSON token serialisation format */
+    const JSON_FORMAT = 'json';
+
+    /** @var array<string, mixed> $headers */
+    protected $headers;
 
     /**
-     * Creates an instance of this algorithm.
-     * 
-     * @param ?string $alg the algorithm
-     * @param ?int $size the length, in bits, of the SHA-2 hash
+     * Creates a new token.
+     *
+     * @param array<string, mixed> $headers the headers
      */
-    protected function __construct($alg, $size) {
-        parent::__construct($alg);
-        $this->size = $size;
+    public function __construct($headers) {
+        $this->headers = $headers;
     }
 
-    public function shortHash($data) {
-        $hash = hash('sha' . $this->size, $data, true);
-        $short = substr($hash, 0, $this->size / 16);
-        return Util::base64url_encode($short);
+    /**
+     * Returns the token's headers.
+     *
+     * @return array<string, mixed> the headers
+     */
+    public function getHeaders() {
+        return $this->headers;
+    }
+
+    /**
+     * Returns a specified header
+     *
+     * @param string $header the header to return
+     * @return mixed the header value
+     */
+    public function getHeader($header) {
+        return $this->headers[$header];
     }
 }
-
 ?>

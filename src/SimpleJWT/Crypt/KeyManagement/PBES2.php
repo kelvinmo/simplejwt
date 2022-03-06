@@ -33,12 +33,14 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Util\Util;
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
+use SimpleJWT\Util\Util;
 
 /**
  * Implements PBES2 key encryption algorithm with AES key wrap.

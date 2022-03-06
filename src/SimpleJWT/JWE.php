@@ -36,19 +36,14 @@ namespace SimpleJWT;
 
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Crypt\KeyDerivationAlgorithm;
-use SimpleJWT\Crypt\KeyEncryptionAlgorithm;
+use SimpleJWT\Crypt\KeyManagement\KeyDerivationAlgorithm;
+use SimpleJWT\Crypt\KeyManagement\KeyEncryptionAlgorithm;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
-class JWE {
-    /** @var string COMPACT_FORMAT Compact JWE serialisation format */
-    const COMPACT_FORMAT = Helper::COMPACT_FORMAT;
-    /** @var string JSON_FORMAT JSON JWE serialisation format */
-    const JSON_FORMAT = Helper::JSON_FORMAT;
-
+class JWE extends Token {
     /** @var array<string, mixed> $headers */
     protected $headers = ['typ' => 'JWE'];
 
@@ -62,7 +57,7 @@ class JWE {
      * @param string $plaintext the plaintext to encrypt
      */
     public function __construct($headers, $plaintext) {
-        $this->headers = $headers;
+        parent::__construct($headers);
         $this->plaintext = $plaintext;
     }
 
@@ -138,7 +133,7 @@ class JWE {
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::DECRYPTION_ERROR);
         $key_enc = AlgorithmFactory::create($headers['alg']);
 
-        /** @var \SimpleJWT\Crypt\EncryptionAlgorithm $content_enc */
+        /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($headers['enc']);
 
         if ($key_enc instanceof KeyDerivationAlgorithm) {
@@ -204,25 +199,6 @@ class JWE {
     }
 
     /**
-     * Returns the JWE's headers.
-     *
-     * @return array<string, mixed> the headers
-     */
-    public function getHeaders() {
-        return $this->headers;
-    }
-
-    /**
-     * Returns a specified header
-     *
-     * @param string $header the header to return
-     * @return mixed the header value
-     */
-    public function getHeader($header) {
-        return $this->headers[$header];
-    }
-
-    /**
      * Returns the JWE's plaintext
      *
      * @return string the plaintext
@@ -250,7 +226,7 @@ class JWE {
 
         $key_enc = AlgorithmFactory::create($this->headers['alg']);
         
-        /** @var \SimpleJWT\Crypt\EncryptionAlgorithm $content_enc */
+        /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($this->headers['enc']);
 
         if ($kid != null) $this->headers['kid'] = $kid;

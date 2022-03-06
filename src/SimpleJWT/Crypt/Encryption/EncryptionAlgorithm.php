@@ -33,7 +33,9 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Encryption;
+
+use SimpleJWT\Crypt\CryptException;
 
 /**
  * Interface for content authenticated encryption algorithms.

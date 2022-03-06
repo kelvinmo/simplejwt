@@ -53,12 +53,7 @@ use SimpleJWT\Util\Util;
  * claims can then be retrieved using the {@link getHeaders()} and {@link getClaims()}
  * functions.
  */
-class JWT {
-    /** @var string COMPACT_FORMAT Compact JWT serialisation format */
-    const COMPACT_FORMAT = Helper::COMPACT_FORMAT;
-    /** @var string JSON_FORMAT JSON JWT serialisation format */
-    const JSON_FORMAT = Helper::JSON_FORMAT;
-
+class JWT extends Token {
     /** @var int $TIME_ALLOWANCE */
     static public $TIME_ALLOWANCE = 300;
 
@@ -78,7 +73,7 @@ class JWT {
      * @param array<string, mixed> $claims the claims
      */
     public function __construct($headers, $claims) {
-        $this->headers = $headers;
+        parent::__construct($headers);
         $this->claims = $claims;
     }
 
@@ -137,7 +132,7 @@ class JWT {
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
-        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($expected_alg);
 
         try {
@@ -165,25 +160,6 @@ class JWT {
         }
 
         return new JWT($headers, $claims);
-    }
-
-    /**
-     * Returns the JWT's headers.
-     *
-     * @return array<string, mixed> the headers
-     */
-    public function getHeaders() {
-        return $this->headers;
-    }
-
-    /**
-     * Returns a specified header
-     *
-     * @param string $header the header to return
-     * @return mixed the header value
-     */
-    public function getHeader($header) {
-        return $this->headers[$header];
     }
 
     /**
@@ -228,7 +204,7 @@ class JWT {
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
-            /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+            /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
             $signer = AlgorithmFactory::create($this->headers['alg']);
         } catch (\UnexpectedValueException $e) {
             throw new CryptException($e->getMessage(), 0, $e);
@@ -390,7 +366,7 @@ class JWT {
         $deserialised = self::deserialise($token);
         $alg = $deserialised['signatures'][0]['headers']['alg'];
 
-        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($alg);
         return $signer->shortHash($token);
     }

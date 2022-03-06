@@ -48,31 +48,31 @@ class AlgorithmFactory {
     /** @var array<string, string> $alg_map */
     static $alg_map = [
         // Signature algorithms
-        '/^ES\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/^ES256K$/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/^RS\d+$/' => 'SimpleJWT\Crypt\OpenSSLSig',
-        '/^HS\d+$/' => 'SimpleJWT\Crypt\HMAC',
+        '/^ES\d+$/' => 'SimpleJWT\Crypt\Signature\OpenSSLSig',
+        '/^ES256K$/' => 'SimpleJWT\Crypt\Signature\OpenSSLSig',
+        '/^RS\d+$/' => 'SimpleJWT\Crypt\Signature\OpenSSLSig',
+        '/^HS\d+$/' => 'SimpleJWT\Crypt\Signature\HMAC',
 
         // Key management algorithms (derivation or encryption)
-        '/^dir$/' => 'SimpleJWT\Crypt\DirectEncryption',
-        '/^RSA1_5$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\RSAES',
-        '/^A\d+KW$/' => 'SimpleJWT\Crypt\AESKeyWrap',
-        '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\PBES2',
-        '/^ECDH-ES$/' => 'SimpleJWT\Crypt\ECDH',
-        '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\ECDH_AESKeyWrap',
+        '/^dir$/' => 'SimpleJWT\Crypt\KeyManagement\DirectEncryption',
+        '/^RSA1_5$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
+        '/^A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\AESKeyWrap',
+        '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\PBES2',
+        '/^ECDH-ES$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH',
+        '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH_AESKeyWrap',
 
         // Content encryption algorithms
-        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\AESCBC_HMACSHA2',
-        '/^A\d+GCM$/' => 'SimpleJWT\Crypt\AESGCM'
+        '/^A\d+CBC-HS\d+$/' => 'SimpleJWT\Crypt\Encryption\AESCBC_HMACSHA2',
+        '/^A\d+GCM$/' => 'SimpleJWT\Crypt\Encryption\AESGCM'
     ];
 
     /** @var array<string, string> $use_map */
     private static $use_map = [
-        Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\SignatureAlgorithm',
-        Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\EncryptionAlgorithm',
-        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagementAlgorithm'
+        Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\Signature\SignatureAlgorithm',
+        Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\Encryption\EncryptionAlgorithm',
+        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagement\KeyManagementAlgorithm'
     ];
 
     /**
@@ -141,7 +141,7 @@ class AlgorithmFactory {
      * @return void
      */
     static public function addNoneAlg() {
-        self::$alg_map['/^none$/'] = 'SimpleJWT\Crypt\None';
+        self::$alg_map['/^none$/'] = 'SimpleJWT\Crypt\Signature\None';
     }
 
     /**

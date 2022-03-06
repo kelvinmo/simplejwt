@@ -37,6 +37,7 @@ namespace SimpleJWT\Util;
 
 use SimpleJWT\JWT;
 use SimpleJWT\JWE;
+use SimpleJWT\Token;
 use SimpleJWT\InvalidTokenException;
 
 /**
@@ -45,10 +46,6 @@ use SimpleJWT\InvalidTokenException;
  * JWTs and JWEs are accepted.
  */
 class Helper {
-
-    const COMPACT_FORMAT = 'compact';
-    const JSON_FORMAT = 'json';
-
     /** @var string $data */
     private $data;
 
@@ -106,7 +103,7 @@ class Helper {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use for verification of a JWT. If null, this
      * is automatically retrieved.  If the token is a JWE, this parameter is ignored.
-     * @return JWT|JWE the decoded JWT or JWE
+     * @return Token the decoded JWT or JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
     function decode($keys, $expected_alg, $kid = null) {
@@ -126,7 +123,7 @@ class Helper {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use for verification of a JWT. If null, this
      * is automatically retrieved.  For a JWE, this parameter is ignored.
-     * @return JWT|JWE the decoded JWT or JWE
+     * @return Token the decoded JWT or JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      * @deprecated use {@link decode()} instead
      * @codeCoverageIgnore
@@ -207,18 +204,18 @@ class Helper {
             $dot_count = substr_count($data, '.');
             if (($dot_count == 1) || ($dot_count == 2)) {
                 $results['type'] = 'JWT';
-                $results['format'] = self::COMPACT_FORMAT;
+                $results['format'] = Token::COMPACT_FORMAT;
             } elseif ($dot_count == 4) {
                 $results['type'] = 'JWE';
-                $results['format'] = self::COMPACT_FORMAT;
+                $results['format'] = Token::COMPACT_FORMAT;
             }
         } else {
             if (isset($obj['signature']) || isset($obj['signatures'])) {
                 $results['type'] = 'JWT';
-                $results['format'] = self::JSON_FORMAT;
+                $results['format'] = Token::JSON_FORMAT;
             } elseif (isset($obj['ciphertext'])) {
                 $results['type'] = 'JWE';
-                $results['format'] = self::JSON_FORMAT;
+                $results['format'] = Token::JSON_FORMAT;
             }
         }
 

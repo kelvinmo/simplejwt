@@ -33,35 +33,54 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Keys\KeySet;
-use SimpleJWT\Keys\KeyException;
+use SimpleJWT\Crypt\Algorithm;
 
 /**
- * Interface for key derivation algorithms.  These are used for the following
- * JWE key management modes:
- *
- * - direct encryption
- * - direct key agreement
- * - key agreement with key wrapping (which will also implement {@link KeyEncryptionAlgorithm})
+ * Implements the `none` signature algorithm.
+ * 
+ * Note that the `none` algorithm should only be used in JWTs which
+ * are cryptographically protected by other means.
+ * 
+ * By default, the `none` algorithm is disabled in SimpleJWT.  Attempts
+ * to decode a JWT with a `none` algorithm will return a
+ * {@link SimpleJWT\InvalidTokenException}.  In order to enable this
+ * algorithm, call {@link AlgorithmFactory::addNoneAlg()} static
+ * method.
+ * 
+ * @link https://datatracker.ietf.org/doc/html/rfc8725.html#section-3.2
+ * @codeCoverageIgnore
  */
-interface KeyDerivationAlgorithm extends KeyManagementAlgorithm {
-    /**
-     * Derives the content encryption key.
-     *
-     * @param KeySet $keys the key set containing the key
-     * required to derive the CEK
-     * @param array<string, mixed> &$headers the JWE header, which can be modified by
-     * implementing algorithms
-     * @param string $kid the ID of the key to be used. If null the key will
-     * be chosen automatically.
-     * @return string the content encryption key as a binary string
-     * @throws KeyException if there is an error in obtaining the
-     * key(s) required for this operation
-     * @throws CryptException if there is an error in the cryptographic process
-     */
-    public function deriveKey($keys, &$headers, $kid = null);
+class None extends Algorithm implements SignatureAlgorithm {
+    public function __construct($alg) {
+        parent::__construct($alg);
+    }
+
+    public function getKeyCriteria() {
+        return [];
+    }
+
+    public function getSupportedAlgs() {
+        return ['none'];
+    }
+
+    public function sign($data, $keys, $kid = null) {
+        return '';
+    }
+
+    public function shortHash($data) {
+        return '';
+    }
+
+    public function verify($signature, $data, $keys, $kid = null) {
+        if ($kid != null) return false;
+        return ($signature === '');
+    }
+
+    public function getSigningKey($keys, $kid = null) {
+        return null;
+    }
 }
 
 ?>

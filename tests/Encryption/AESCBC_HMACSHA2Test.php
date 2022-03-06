@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\Encryption;
 
 use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;

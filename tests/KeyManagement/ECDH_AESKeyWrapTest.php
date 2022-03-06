@@ -1,6 +1,7 @@
 <?php
 
-use SimpleJWT\Crypt\ECDH_AESKeyWrap;
+namespace SimpleJWT\Crypt\KeyManagement;
+
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;

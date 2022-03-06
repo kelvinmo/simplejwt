@@ -33,52 +33,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
+
+use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\CryptException;
+use SimpleJWT\Util\Util;
+use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\SymmetricKey;
 
 /**
- * Implements the `none` signature algorithm.
- * 
- * Note that the `none` algorithm should only be used in JWTs which
- * are cryptographically protected by other means.
- * 
- * By default, the `none` algorithm is disabled in SimpleJWT.  Attempts
- * to decode a JWT with a `none` algorithm will return a
- * {@link SimpleJWT\InvalidTokenException}.  In order to enable this
- * algorithm, call {@link AlgorithmFactory::addNoneAlg()} static
- * method.
- * 
- * @link https://datatracker.ietf.org/doc/html/rfc8725.html#section-3.2
- * @codeCoverageIgnore
+ * Implementation of direct encryption.  The key selected from the key set is
+ * the shared content encryption key
  */
-class None extends Algorithm implements SignatureAlgorithm {
+class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
     public function __construct($alg) {
         parent::__construct($alg);
     }
 
-    public function getKeyCriteria() {
-        return [];
-    }
-
     public function getSupportedAlgs() {
-        return ['none'];
+        return ['dir'];
     }
 
-    public function sign($data, $keys, $kid = null) {
-        return '';
+    public function getKeyCriteria() {
+        return [
+            'kty' => 'oct',
+            '~alg' => $this->getAlg()
+        ];
     }
 
-    public function shortHash($data) {
-        return '';
-    }
+    public function deriveKey($keys, &$headers, $kid = null) {
+        /** @var SymmetricKey $key */
+        $key = $this->selectKey($keys, $kid);
+        if ($key == null) {
+            throw new CryptException('Key not found or is invalid');
+        }
+        $headers['kid'] = $key->getKeyId();
 
-    public function verify($signature, $data, $keys, $kid = null) {
-        if ($kid != null) return false;
-        return ($signature === '');
-    }
-
-    public function getSigningKey($keys, $kid = null) {
-        return null;
+        return $key->toBinary();
     }
 }
-
-?>

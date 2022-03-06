@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleJWT\Crypt;
+namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ class PBES2Test extends TestCase {
         $password = 'Thus from my lips, by yours, my sin is purged.';
         $keys = $this->getKeySet($password);
 
-        $stub = $this->getMockBuilder('SimpleJWT\Crypt\PBES2')
+        $stub = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\PBES2')
             ->setMethods(['generateSaltInput'])->setConstructorArgs(['PBES2-HS256+A128KW'])->getMock();
 
         $stub->method('generateSaltInput')->willReturn(Util::base64url_decode('2WCTcJZ1Rvd_CJuJripQ1w'));

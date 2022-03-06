@@ -139,7 +139,9 @@ class KeyFactory {
         if ($format == 'php') {
             if (($data != null) && isset($data['kty'])) {
                 if (isset(self::$jwk_kty_map[$data['kty']])) {
-                    return new self::$jwk_kty_map[$data['kty']]($data, 'php');
+                    /** @var Key $key */
+                    $key = new self::$jwk_kty_map[$data['kty']]($data, 'php');
+                    return $key;
                 }
             }
         }
@@ -173,12 +175,16 @@ class KeyFactory {
                 
                 $oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
-                    return new self::$oid_map[$oid]($data, 'pem');
+                    /** @var Key $key */
+                    $key = new self::$oid_map[$oid]($data, 'pem');
+                    return $key;
                 }
             } else {
                 foreach (self::$pem_map as $regex => $cls) {
                     if (preg_match($regex, $data)) {
-                        return new $cls($data, 'pem');
+                        /** @var Key $key */
+                        $key = new $cls($data, 'pem');
+                        return $key;
                     }
                 }
 

@@ -2,11 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.6.3
+## Unrelease
 
 - Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one
   for each algorithm type (#60)
 - Changed: `JWT` and `JWE` now derives from a common parent class `Token`
+
+## 0.6.3
+
 - Deprecated: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively,
   and will be removed in future versions

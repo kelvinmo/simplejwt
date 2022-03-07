@@ -46,7 +46,7 @@ namespace SimpleJWT\Util\ASN1;
  * - the *value*, which is stored as a native PHP value (see below)
  * 
  * In addition, the type would indicate whether the value should be
- * encoded using the primitive or constructed method.
+ * encoded using the primitive or constructed method under DER.
  * 
  * The following sets out the native PHP value for each ASN.1 type.
  * 
@@ -78,6 +78,9 @@ class Value {
     /** @var mixed $value */
     protected $value;
 
+    /** @var array<string, mixed> $additional */
+    protected $additional;
+
     /** @var bool $is_constructed */
     protected $is_constructed;
 
@@ -87,13 +90,15 @@ class Value {
     /**
      * @param int $tag
      * @param mixed $value
+     * @param array<string, mixed> $additional
      * @param bool|null $is_constructed
      * @param int $class
      * @throws ASN1Exception
      */
-    function __construct(int $tag, mixed $value, ?bool $is_constructed = null, int $class = 0) {
+    function __construct(int $tag, mixed $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
         $this->tag = $tag;
         $this->value = $value;
+        $this->additional = $additional;
 
         if ($is_constructed == null) {
             $this->is_constructed = in_array($tag, [self::SEQUENCE, self::SET]);
@@ -126,10 +131,18 @@ class Value {
      * Creates a value representing a bit string.
      * 
      * @param string $value
+     * @param int|null $length the length of the bit string, in bits
      * @return Value
      */
-    static public function bitString(string $value): self {
-        return new self(static::BIT_STRING, $value);
+    static public function bitString(string $value, ?int $length = null): self {
+        if ($length == null) {
+            $length = strlen($value) * 8;
+        } elseif ($length > strlen($value) * 8) {
+            throw new ASN1Exception('Specified length of bit string too long');
+        } elseif ($length <= (strlen($value) - 1) * 8) {
+            throw new ASN1Exception('Specified length of bit string too short');
+        }
+        return new self(static::BIT_STRING, $value, [ 'bitstring_length' => $length ]);
     }
 
     /**
@@ -189,6 +202,15 @@ class Value {
      */
     public function getValue(): mixed {
         return $this->value;
+    }
+
+    /**
+     * Returns additional data associated with the value
+     * 
+     * @return array<string, mixed>
+     */
+    public function getAdditionalData(): array {
+        return $this->additional;
     }
 
     /**

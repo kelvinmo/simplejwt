@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Util\ASN1;
 
+use \InvalidArgumentException;
+
 /**
  * An ASN.1 value.
  * 
@@ -56,6 +58,7 @@ namespace SimpleJWT\Util\ASN1;
  * - `NULL`: N/A
  * - `OBJECT IDENTIFIER`: `string`
  * - `SEQUENCE`: an array of `Value` objects
+ * - explicitly tagged value: a `Value` object
  */
 class Value {
     const UNIVERSAL_CLASS = 0x00;
@@ -93,7 +96,7 @@ class Value {
      * @param array<string, mixed> $additional
      * @param bool|null $is_constructed
      * @param int $class
-     * @throws ASN1Exception
+     * @throws InvalidArgumentException
      */
     function __construct(int $tag, mixed $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
         $this->tag = $tag;
@@ -101,13 +104,19 @@ class Value {
         $this->additional = $additional;
 
         if ($is_constructed == null) {
-            $this->is_constructed = in_array($tag, [self::SEQUENCE, self::SET]);
+            if ($class == self::UNIVERSAL_CLASS) {
+                $this->is_constructed = in_array($tag, [self::SEQUENCE, self::SET]);
+            } elseif (is_array($value) || ($value instanceof Value)) {
+                $this->is_constructed = true;
+            } else {
+                throw new InvalidArgumentException('is_constructed must be specified if not universal class');
+            }
         }
 
         if (in_array($class, [self::UNIVERSAL_CLASS, self::APPLICATION_CLASS, self::CONTEXT_CLASS, self::PRIVATE_CLASS])) {
             $this->class = $class;
         } else {
-            throw new ASN1Exception('Invalid class value');
+            throw new InvalidArgumentException('Invalid class value');
         }
     }
 
@@ -138,9 +147,9 @@ class Value {
         if ($length == null) {
             $length = strlen($value) * 8;
         } elseif ($length > strlen($value) * 8) {
-            throw new ASN1Exception('Specified length of bit string too long');
+            throw new InvalidArgumentException('Specified length of bit string too long');
         } elseif ($length <= (strlen($value) - 1) * 8) {
-            throw new ASN1Exception('Specified length of bit string too short');
+            throw new InvalidArgumentException('Specified length of bit string too short');
         }
         return new self(static::BIT_STRING, $value, [ 'bitstring_length' => $length ]);
     }
@@ -172,7 +181,7 @@ class Value {
      */
     static public function oid(string $value): self {
         if (!preg_match('/^([0-2])((\.0)|(\.[1-9][0-9]*))*$/', $value)) {
-            throw new ASN1Exception('Not an OID');
+            throw new InvalidArgumentException('Not an OID');
         }
         return new self(static::OID, $value);
     }
@@ -185,9 +194,21 @@ class Value {
      */
     static public function sequence(array $value): self {
         if (!is_array($value)) {
-            throw new ASN1Exception('Not a sequence');
+            throw new InvalidArgumentException('Not a sequence');
         }
         return new self(static::SEQUENCE, $value);
+    }
+
+    /**
+     * Creates an explicit tagged value.
+     * 
+     * @param int $tag the tag
+     * @param Value $value the underlying value
+     * @param int $class the class
+     * @return Value
+     */
+    static public function explicit(int $tag, Value $value, int $class = self::CONTEXT_CLASS): self {
+        return new self($tag, $value, [], true, $class);
     }
 
     /**
@@ -225,6 +246,48 @@ class Value {
      */
     public function getClass(): int {
         return $this->class;
+    }
+
+    /**
+     * Returns the value of a child of a SEQUENCE or SET at a specified index.
+     * 
+     * @param int $index
+     * @return Value|null
+     * @throws InvalidArgumentException
+     */
+    public function getChildAt(int $index): ?Value {
+        if (($class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
+            throw new InvalidArgumentException('Not a SEQUENCE or SET');
+        }
+        if (!is_array($this->value)) {
+            throw new InvalidArgumentException('No contents in SEQUENCE or SET');
+        }
+        if (!isset($this->value[$index])) {
+            return null;
+        }
+        return $this->value[$index];
+    }
+
+    /**
+     * Returns the value of a child of a SEQUENCE or SET at a specified index.
+     * 
+     * @param int $tag
+     * @return Value|null
+     * @throws InvalidArgumentException
+     */
+    public function getChildWithTag(int $tag): ?Value {
+        if (($class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
+            throw new InvalidArgumentException('Not a SEQUENCE or SET');
+        }
+        if (!is_array($this->value)) {
+            throw new InvalidArgumentException('No contents in SEQUENCE or SET');
+        }
+        foreach ($this->value as $child) {
+            if (($child->getClass() == self::CONTEXT_CLASS) && ($child->getTag() == $tag)) {
+                return $child;
+            }
+        }
+        return null;
     }
 }
 

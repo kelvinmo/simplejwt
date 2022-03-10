@@ -71,9 +71,18 @@ class Value {
     const OCTET_STRING = 0x04;
     const NULL_TYPE = 0x05;
     const OID = 0x06;
-
     const SEQUENCE = 0x10;
     const SET = 0x11;
+
+    static $universal_types = [
+        self::INTEGER_TYPE => 'INTEGER',
+        self::BIT_STRING => 'BIT STRING',
+        self::OCTET_STRING => 'OCTET STRING',
+        self::NULL_TYPE => 'NULL',
+        self::OID => 'OBJECT IDENTIFIER',
+        self::SEQUENCE => 'SEQUENCE',
+        self::SET => 'SET',
+    ];
 
     /** @var int $tag */
     protected $tag;
@@ -111,6 +120,8 @@ class Value {
             } else {
                 throw new InvalidArgumentException('is_constructed must be specified if not universal class');
             }
+        } else {
+            $this->is_constructed = $is_constructed;
         }
 
         if (in_array($class, [self::UNIVERSAL_CLASS, self::APPLICATION_CLASS, self::CONTEXT_CLASS, self::PRIVATE_CLASS])) {
@@ -288,6 +299,40 @@ class Value {
             }
         }
         return null;
+    }
+
+    public function __toString(): string {
+        if ($this->class == self::UNIVERSAL_CLASS) {
+            $result = self::$universal_types[$this->tag];
+        } elseif ($this->class == self::CONTEXT_CLASS) {
+            $result = sprintf('[%d]', $this->tag);
+        } else {
+            $result = sprintf('<0x%02x (class 0x%02x)>', $this->class);
+        }
+
+        if ($this->is_constructed) {
+            $result .= " {\n";
+            if (is_array($this->value)) {
+                $result .= implode("\n", array_map(function ($child) { return '  ' . $child->__toString(); }, $this->value));
+            } else {
+                $result .= $this->value->__toString() . "\n";
+            }
+            $result .= "}";
+        } elseif ($this->class == self::UNIVERSAL_CLASS) {
+            $result .= ' ';
+            if (is_numeric($this->value)) {
+                $result .= $this->value;
+            } elseif ($this->value instanceof \GMP) {
+                $result .= gmp_strval($this->value);
+            } elseif (is_string($this->value)) {
+                if (ctype_print($this->value)) {
+                    $result .= $this->value;
+                } else {
+                    $result .= '(base64) ' . base64_encode($this->value);
+                }
+            }
+        }
+        return $result;
     }
 }
 

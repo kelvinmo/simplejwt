@@ -232,8 +232,10 @@ class Value {
 
     /**
      * Returns the PHP-native value
+     * 
+     * @return mixed
      */
-    public function getValue(): mixed {
+    public function getValue() {
         return $this->value;
     }
 

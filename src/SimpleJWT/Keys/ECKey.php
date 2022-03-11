@@ -35,7 +35,8 @@
 
 namespace SimpleJWT\Keys;
 
-use SimpleJWT\Util\ASN1;
+use SimpleJWT\Util\ASN1\DER;
+use SimpleJWT\Util\ASN1\Value;
 use SimpleJWT\Util\BigNum;
 use SimpleJWT\Util\Util;
 
@@ -47,7 +48,6 @@ class ECKey extends Key {
     const KTY = 'EC';
 
     const PEM_RFC5915_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
-    const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
     const EC_OID = '1.2.840.10045.2.1';
     const P256_OID = '1.2.840.10045.3.1.7';
@@ -117,28 +117,25 @@ class ECKey extends Key {
             case 'pem':
                 $offset = 0;
                 $jwk = [];
+                $der = new DER();
 
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
-                    /** @var string|bool $der */
-                    $der = base64_decode($matches[1]);
+                    /** @var string|bool $binary */
+                    $binary = base64_decode($matches[1]);
+                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    if ($der === FALSE) throw new KeyException('Cannot read PEM key');
+                    $seq = $der->decode($binary);
 
-                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
-                    $offset += ASN1::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
-
-                    $algorithm = ASN1::decodeOID($algorithm);
+                    $algorithm = $seq->getChildAt(0)->getChildAt(0)->getValue();
                     if ($algorithm != self::EC_OID) throw new KeyException('Not EC key');
 
-                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
-                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve_oid = $seq->getChildAt(0)->getChildAt(1)->getValue();
                     $curve = $this->getCurveNameFromOID($curve_oid);
                     if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
-                    $offset += ASN1::readDER($der, $offset, $point);  // BIT STRING - ECPoint
+                    $point = $seq->getChildAt(1)->getValue();
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect public key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid public key');  // W
@@ -151,27 +148,24 @@ class ECKey extends Key {
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
                 } elseif (preg_match(self::PEM_RFC5915_PRIVATE, $data, $matches)) {
-                    /** @var string|bool $der */
-                    $der = base64_decode($matches[1]);
-                    if ($der === FALSE) throw new KeyException('Cannot read PEM key');
+                    /** @var string|bool $binary */
+                    $binary = base64_decode($matches[1]);
+                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
-                    $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
+                    $seq = $der->decode($binary);
 
-                    if (ord($version) != 1) throw new KeyException('Invalid private key version: ' . ord($version));
+                    $version = $seq->getChildAt(0)->getValue();
+                    if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
 
-                    $offset += ASN1::readDER($der, $offset, $d);  // OCTET STRING [d]
+                    $d = $seq->getChildAt(1)->getValue();
 
-                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[0]
-                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
-                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve_oid = $seq->getChildWithTag(0)->getValue();
                     $curve = self::getCurveNameFromOID($curve_oid);
                     if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
-                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE[1]
-                    $offset += ASN1::readDER($der, $offset, $point);  // BIT STRING - ECPoint
+                    $point = $seq->getChildWithTag(1)->getValue();
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
@@ -184,42 +178,34 @@ class ECKey extends Key {
                     $jwk['d'] = Util::base64url_encode($d);
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
-                } elseif (preg_match(self::PEM_PKCS8_PRIVATE, $data, $matches)) {
-                    /** @var string|bool $der */
-                    $der = base64_decode($matches[1]);
-                    if ($der === FALSE) throw new KeyException('Cannot read PEM key');
+                } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
+                    /** @var string|bool $binary */
+                    $binary = base64_decode($matches[1]);
+                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
-                    $offset += ASN1::readDER($der, $offset, $version);  // INTEGER
+                    $seq = $der->decode($binary);
 
-                    if (ord($version) != 0) throw new KeyException('Invalid private key version: ' . ord($version));
+                    $version = $seq->getChildAt(0)->getValue();
+                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                    
+                    $key_oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
+                    if ($key_oid != self::EC_OID) throw new KeyException('Invalid key type: ' . $key_oid);
 
-                    $offset += ASN1::readDER($der, $offset, $data);  // SEQUENCE
-                    $offset += ASN1::readDER($der, $offset, $key_oid);  // OBJECT IDENTIFIER - id-ecPublicKey
-
-                    if (ASN1::decodeOID($key_oid) != self::EC_OID) throw new KeyException('Invalid key type: ' . ASN1::decodeOID($key_oid));
-
-                    $offset += ASN1::readDER($der, $offset, $curve_oid);  // OBJECT IDENTIFIER - parameters
-                    $curve_oid = ASN1::decodeOID($curve_oid);
+                    $curve_oid = $seq->getChildAt(1)->getChildAt(1)->getValue();
                     $curve = self::getCurveNameFromOID($curve_oid);
                     if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
                     $len = self::$curves[$curve]['len'];
 
-                    $offset += ASN1::readDER($der, $offset, $private_key);  // OCTET STRING [privateKey]
+                    $private_octet_string = $seq->getChildAt(2)->getValue();
+                    $private_seq = $der->decode($private_octet_string);
 
-                    // Parse the octet string
-                    $offset = 0;
-                    $offset += ASN1::readDER($private_key, $offset, $data);  // SEQUENCE
-                    $offset += ASN1::readDER($private_key, $offset, $version);  // INTEGER
+                    $version = $private_seq->getChildAt(0)->getValue();
+                    if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
 
-                    if (ord($version) != 1) throw new KeyException('Invalid private key version: ' . ord($version));
+                    $d = $private_seq->getChildAt(1)->getValue();
 
-                    $offset += ASN1::readDER($private_key, $offset, $d);  // OCTET STRING [d]
-
-                    $offset += ASN1::readDER($private_key, $offset, $data);  // SEQUENCE[0]
-                    $offset += ASN1::readDER($private_key, $offset, $point);  // BIT STRING - ECPoint
-
+                    $point = $private_seq->getChildWithTag(1)->getValue();
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
@@ -305,29 +291,31 @@ class ECKey extends Key {
     }
 
     public function toPEM() {
+        $der = new DER();
         $oid = self::$curves[$this->data['crv']]['oid'];
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
 
         if ($this->isPublic()) {
-            $der = ASN1::encodeDER(ASN1::SEQUENCE,
-                ASN1::encodeDER(ASN1::SEQUENCE,
-                    ASN1::encodeDER(ASN1::OID, ASN1::encodeOID(self::EC_OID))
-                    . ASN1::encodeDER(ASN1::OID, ASN1::encodeOID($oid)),
-                    false
-                ) .
-                ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])),
-            false);
+            $seq = Value::sequence([
+                Value::sequence([
+                    Value::oid(self::EC_OID),
+                    Value::oid($oid)
+                ]),
+                Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y']))
+            ]);
+            $binary = $der->encode($seq);
 
-            return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($der) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
+            return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($binary) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
-            $der = ASN1::encodeDER(ASN1::SEQUENCE,
-                ASN1::encodeDER(ASN1::INTEGER_TYPE, chr(0x01))
-                . ASN1::encodeDER(ASN1::OCTET_STRING, Util::base64url_decode($this->data['d']))
-                . ASN1::encodeDER(0x00, ASN1::encodeDER(ASN1::OID, ASN1::encodeOID($oid)), false, ASN1::CONTEXT_CLASS)
-                . ASN1::encodeDER(0x01, ASN1::encodeDER(ASN1::BIT_STRING, chr(0x00) . chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])), false, ASN1::CONTEXT_CLASS),
-            false);
+            $seq = Value::sequence([
+                Value::integer(1),
+                Value::octetString(Util::base64url_decode($this->data['d'])),
+                Value::explicit(0, Value::oid($oid)),
+                Value::explicit(1, Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])))
+            ]);
+            $binary = $der->encode($seq);
 
-            return wordwrap("-----BEGIN EC PRIVATE KEY-----\n" . base64_encode($der) . "\n-----END EC PRIVATE KEY-----\n", 64, "\n", true);
+            return wordwrap("-----BEGIN EC PRIVATE KEY-----\n" . base64_encode($binary) . "\n-----END EC PRIVATE KEY-----\n", 64, "\n", true);
         }
     }
 

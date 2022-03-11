@@ -38,7 +38,8 @@ namespace SimpleJWT\Crypt\Signature;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeyException;
-use SimpleJWT\Util\ASN1;
+use SimpleJWT\Util\ASN1\DER;
+use SimpleJWT\Util\ASN1\Value;
 use SimpleJWT\Util\Util;
 
 /**
@@ -108,16 +109,10 @@ class OpenSSLSig extends SHA2 {
 
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
             // OpenSSL returns ECDSA signatures as an ASN.1 DER SEQUENCE
-            $offset = 0;
-            $offset += ASN1::readDER($binary, $offset, $value);  // SEQUENCE
-            $offset += ASN1::readDER($binary, $offset, $r);  // INTEGER
-            $offset += ASN1::readDER($binary, $offset, $s);  // INTEGER
-
-            // DER integers are big-endian in two's complement form. We need to
-            // convert these to unsigned integers.  But the r and s values are always
-            // positive, so it is just a matter of stripping out the leading null
-            $r = ltrim($r, "\x00");
-            $s = ltrim($s, "\x00");
+            $der = new DER();
+            $seq = $der->decode($binary);
+            $r = $seq->getChildAt(0)->getValueAsUIntOctets();
+            $s = $seq->getChildAt(1)->getValueAsUIntOctets();
 
             // Now pad out r and s so that they are $key->getSize() bits long
             $r = str_pad($r, $key->getSize() / 8, "\x00", STR_PAD_LEFT);
@@ -141,18 +136,9 @@ class OpenSSLSig extends SHA2 {
             // For ECDSA signatures, OpenSSL expects a ASN.1 DER SEQUENCE
             list($r, $s) = str_split($binary, (int) (strlen($binary) / 2));
 
-            // Trim leading zeros
-            $r = ltrim($r, "\x00");
-            $s = ltrim($s, "\x00");
-
-            // Convert r and s from unsigned big-endian integers to signed two's complement
-            if (ord($r[0]) > 0x7f) $r = "\x00" . $r;
-            if (ord($s[0]) > 0x7f) $s = "\x00" . $s;
-
-            $binary = ASN1::encodeDER(ASN1::SEQUENCE,
-                ASN1::encodeDER(ASN1::INTEGER_TYPE, $r) .
-                ASN1::encodeDER(ASN1::INTEGER_TYPE, $s),
-            false);
+            $der = new DER();
+            $seq = Value::sequence([Value::integer($r), Value::integer($s)]);
+            $binary = $der->encode($seq);
         }
 
         $result = openssl_verify($data, $binary, $key->toPEM(), 'SHA' . $this->size);

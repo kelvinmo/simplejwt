@@ -24,8 +24,6 @@ class KeyFactoryTest extends TestCase {
         $key_data = $key->getKeyData();
         $this->assertTrue($key->isPublic());
         $this->assertEquals("p8wHcPeYsIbQBwFg-mUXIFjZI-b1gQJuNoGboa3ub7KMVjmob9c4mOqc8j2u9cMS6PLnqGMIiM2H1HVDZSwZs6kS7Kq942uNBsut2cHy-PZd5Jq3cWIoQZwnhrjg_OfwbJugYeGe0Orub8J42qyT8HuhLX65Q6iSSf_3bo1Rr2M", $key_data['n']);
-
-        var_dump($key->toPEM());
     }
 
 
@@ -65,7 +63,6 @@ class KeyFactoryTest extends TestCase {
         $this->assertTrue($key->isPublic());
         $this->assertEquals("QGVPYUfFqCwBeaapsTbrtQZFU5h0EXBO8iEzH3pUz-c", $key_data['x']);
         $this->assertEquals("3BZVYSHcdZMkWtnnenhAiCXdWJyVGEMKMECIdzVD11U", $key_data['y']);
-
     }
 
     public function testSymmetric() {

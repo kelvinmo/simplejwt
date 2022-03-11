@@ -93,7 +93,7 @@ class RSAKey extends Key {
                     $jwk['n'] = Util::base64url_encode($public_seq->getChildAt(0)->getValueAsUIntOctets());
                     $jwk['e'] = Util::base64url_encode($public_seq->getChildAt(1)->getValueAsUIntOctets());
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
-                    /** @var string|bool $der */
+                    /** @var string|bool $binary */
                     $binary = base64_decode($matches[1]);
                     if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
 

@@ -37,6 +37,7 @@ namespace SimpleJWT\Keys;
 
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
+use SimpleJWT\Util\ASN1\DER;
 use SimpleJWT\Util\ASN1;
 
 /**
@@ -145,18 +146,32 @@ class KeyFactory {
 
         // 4. PEM
         if ($format == 'pem') {
+            $der = new DER();
+
             if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
-                /** @var string|bool $der */
-                $der = base64_decode($matches[1]);
-                if ($der === FALSE) throw new KeyException('Cannot read PEM key');
+                /** @var string|bool $binary */
+                $binary = base64_decode($matches[1]);
+                if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+
+                $seq = $der->decode($binary);
 
                 $offset = 0;
 
-                $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
-                $offset += ASN1::readDER($der, $offset, $value);  // SEQUENCE
-                $offset += ASN1::readDER($der, $offset, $algorithm);  // OBJECT IDENTIFIER - AlgorithmIdentifier
+                $oid = $seq->getChildAt(0)->getChildAt(0)->getValue();
+                if (isset(self::$oid_map[$oid])) {
+                    return new self::$oid_map[$oid]($data, 'pem');
+                }
+            } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
+                /** @var string|bool $binary */
+                $binary = base64_decode($matches[1]);
+                if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
 
-                $oid = ASN1::decodeOID($algorithm);
+                $seq = $der->decode($binary);
+
+                $version = $seq->getChildAt(0)->getValue();
+                if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                
+                $oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
                     return new self::$oid_map[$oid]($data, 'pem');
                 }
@@ -167,7 +182,6 @@ class KeyFactory {
                     }
                 }
 
-                // TODO - it's probably PKCS#8, which uses BEGIN PRIVATE KEY
                 throw new KeyException('PEM key format not supported');
             }
         }

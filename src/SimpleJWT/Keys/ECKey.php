@@ -48,7 +48,6 @@ class ECKey extends Key {
     const KTY = 'EC';
 
     const PEM_RFC5915_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
-    const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
     const EC_OID = '1.2.840.10045.2.1';
     const P256_OID = '1.2.840.10045.3.1.7';
@@ -179,7 +178,7 @@ class ECKey extends Key {
                     $jwk['d'] = Util::base64url_encode($d);
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
-                } elseif (preg_match(self::PEM_PKCS8_PRIVATE, $data, $matches)) {
+                } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
                     /** @var string|bool $binary */
                     $binary = base64_decode($matches[1]);
                     if ($binary === FALSE) throw new KeyException('Cannot read PEM key');

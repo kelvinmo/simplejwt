@@ -250,6 +250,7 @@ class Value {
         if (!$is_bigint) $int = gmp_init($int);
         $result = gmp_export($int);
 
+        if (strlen($result) == 0) return "\0";
         return $result;
     }
 
@@ -333,12 +334,12 @@ class Value {
         if ($this->is_constructed) {
             $result .= " {\n";
             if (is_array($this->value)) {
-                $result .= implode("\n", array_map(function ($child) { return '  ' . $child->__toString(); }, $this->value));
+                $result .= implode("\n", array_map(function ($child) { return '  ' . $child->__toString(); }, $this->value)) . "\n";
             } else {
                 $result .= $this->value->__toString() . "\n";
             }
             $result .= "}";
-        } elseif ($this->class == self::UNIVERSAL_CLASS) {
+        } elseif (($this->class == self::UNIVERSAL_CLASS) && ($this->tag != self::NULL_TYPE)) {
             $result .= ' ';
             if (is_numeric($this->value)) {
                 $result .= $this->value;

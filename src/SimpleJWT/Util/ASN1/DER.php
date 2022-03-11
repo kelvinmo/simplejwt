@@ -91,7 +91,7 @@ class DER {
                 $len = ($len << 8) | ord($data[$pos++]);
             }
         }
-        if ($pos >= $size || $len > $size - $pos) throw new ASN1Exception('Data too short');
+        //if ($pos >= $size || $len > $size - $pos) throw new ASN1Exception('Data too short');  //TODO - if $len = 0
 
         // Contents
         $contents = substr($data, $pos, $len);
@@ -276,6 +276,7 @@ class DER {
         if (!$is_bigint) $int = gmp_init($int);
         $data = gmp_export($int);
 
+        if (strlen($data) == 0) return "\0";
         if (ord($data) > 127) return "\0" . $data;
         return $data;
     }

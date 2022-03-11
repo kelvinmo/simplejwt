@@ -237,6 +237,22 @@ class Value {
         return $this->value;
     }
 
+    public function getValueAsUIntOctets(): string {
+        $is_bigint = ($this->value instanceof \GMP);
+        if (!is_integer($this->value) && !$is_bigint) {
+            throw new InvalidArgumentException('Not an integer');
+        }
+        
+        $int = $this->value;
+        $is_negative = ($is_bigint) ? (gmp_sign($int) < 0): ($int < 0);
+        if ($is_negative) throw new InvalidArgumentException('Not a positive number');
+
+        if (!$is_bigint) $int = gmp_init($int);
+        $result = gmp_export($int);
+
+        return $result;
+    }
+
     /**
      * Returns additional data associated with the value
      * 

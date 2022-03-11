@@ -108,7 +108,7 @@ class Value {
      * @param int $class
      * @throws InvalidArgumentException
      */
-    function __construct(int $tag, mixed $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
+    function __construct(int $tag, $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
         $this->tag = $tag;
         $this->value = $value;
         $this->additional = $additional;

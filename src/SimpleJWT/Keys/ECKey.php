@@ -205,7 +205,7 @@ class ECKey extends Key {
 
                     $d = $private_seq->getChildAt(1)->getValue();
 
-                    $point = $seq->getChildWithTag(1)->getValue();
+                    $point = $private_seq->getChildWithTag(1)->getValue();
                     if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
 
                     if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W

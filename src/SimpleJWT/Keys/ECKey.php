@@ -201,7 +201,7 @@ class ECKey extends Key {
                     $private_seq = $der->decode($private_octet_string);
 
                     $version = $private_seq->getChildAt(0)->getValue();
-                    if (ord($version) != 1) throw new KeyException('Invalid private key version: ' . ord($version));
+                    if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
 
                     $d = $private_seq->getChildAt(1)->getValue();
 

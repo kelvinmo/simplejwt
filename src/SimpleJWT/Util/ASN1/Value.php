@@ -74,6 +74,7 @@ class Value {
     const SEQUENCE = 0x10;
     const SET = 0x11;
 
+    /** @var array<int, string> $universal_types */
     static $universal_types = [
         self::INTEGER_TYPE => 'INTEGER',
         self::BIT_STRING => 'BIT STRING',
@@ -267,7 +268,7 @@ class Value {
      * @throws InvalidArgumentException
      */
     public function getChildAt(int $index): ?Value {
-        if (($class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
+        if (($this->class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
             throw new InvalidArgumentException('Not a SEQUENCE or SET');
         }
         if (!is_array($this->value)) {
@@ -280,14 +281,15 @@ class Value {
     }
 
     /**
-     * Returns the value of a child of a SEQUENCE or SET at a specified index.
+     * Returns the underlying value of a child of a SEQUENCE or SET with a
+     * specified context-specific tag.
      * 
      * @param int $tag
      * @return Value|null
      * @throws InvalidArgumentException
      */
     public function getChildWithTag(int $tag): ?Value {
-        if (($class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
+        if (($this->class != self::UNIVERSAL_CLASS) || !in_array($this->tag, [self::SEQUENCE, self::SET])) {
             throw new InvalidArgumentException('Not a SEQUENCE or SET');
         }
         if (!is_array($this->value)) {
@@ -295,7 +297,9 @@ class Value {
         }
         foreach ($this->value as $child) {
             if (($child->getClass() == self::CONTEXT_CLASS) && ($child->getTag() == $tag)) {
-                return $child;
+                /** @var Value $child_value */
+                $child_value = $child->getValue();
+                return $child_value;
             }
         }
         return null;
@@ -307,7 +311,7 @@ class Value {
         } elseif ($this->class == self::CONTEXT_CLASS) {
             $result = sprintf('[%d]', $this->tag);
         } else {
-            $result = sprintf('<0x%02x (class 0x%02x)>', $this->class);
+            $result = sprintf('<0x%02x (class 0x%02x)>', $this->tag, $this->class);
         }
 
         if ($this->is_constructed) {

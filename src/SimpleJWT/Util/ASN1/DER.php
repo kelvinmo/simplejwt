@@ -91,7 +91,7 @@ class DER {
                 $len = ($len << 8) | ord($data[$pos++]);
             }
         }
-        //if ($pos >= $size || $len > $size - $pos) throw new ASN1Exception('Data too short');  //TODO - if $len = 0
+        if (($len > 0) && ($pos >= $size || $len > $size - $pos)) throw new ASN1Exception('Data too short');
 
         // Contents
         $contents = substr($data, $pos, $len);

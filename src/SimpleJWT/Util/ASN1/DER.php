@@ -60,12 +60,16 @@ class DER {
 
     /**
      * Reads a DER stream and decodes the next object at a specified position.
+     * 
+     * The position is specified in the `$pos` parameter.  This variable is
+     * updated to the position of the next object upon a successful read.
      *
      * @param string $data the data stream
      * @param int &$pos the position of the data stream containing the object
      * to decode
      * @return Value|null the decoded value, or null if the end of the
      * stream has been reached
+     * @throws ASN1Exception if an error occurred
      */
     protected function decodeNext(string $data, int &$pos): ?Value {
         $value = '';
@@ -237,8 +241,10 @@ class DER {
 
 
     /**
-     * @param string $data
-     * @return int|\GMP
+     * Decodes a DER-encoded integer
+     * 
+     * @param string $data the DER encoded data
+     * @return int|\GMP the decoded integer
      */
     static function decodeInteger($data) {
         static $int_min;
@@ -264,8 +270,11 @@ class DER {
     }
 
     /**
-     * @param int|\GMP $int
-     * @return string
+     * Encodes an integer into its DER form.  Currently only positive numbers
+     * are supported
+     * 
+     * @param int|\GMP $int the integer to encode
+     * @return string the encoded integer
      */
     static function encodeInteger($int) {
         $is_bigint = ($int instanceof \GMP);
@@ -282,8 +291,11 @@ class DER {
     }
 
     /**
-     * @param string $data
-     * @return array<string, mixed>
+     * Decodes a bit string
+     * 
+     * @param string $data the DER encoded data
+     * @return array<string, mixed> an array containing the keys `value` (with the
+     * value) and `bitstring_length` with the length of the bit string in bits
      */
     static function decodeBitString($data) {
         $unused_bits = ord($data[0]);
@@ -298,9 +310,11 @@ class DER {
     }
 
     /**
-     * @param string $data
-     * @param int $length
-     * @return string
+     * Encodes a bit string into its DER form
+     * 
+     * @param string $data the data to encode
+     * @param int $length the length of the data, in bits
+     * @return string the encoded bit string
      */
     static function encodeBitString($data, $length) {
         if (($length % 8) == 0) {

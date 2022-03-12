@@ -101,11 +101,13 @@ class Value {
     protected $class;
 
     /**
-     * @param int $tag
-     * @param mixed $value
-     * @param array<string, mixed> $additional
-     * @param bool|null $is_constructed
-     * @param int $class
+     * Creates an ASN.1 value
+     * 
+     * @param int $tag the tag number (i.e. excluding the class and constructed bit masks)
+     * @param mixed $value the native PHP value
+     * @param array<string, mixed> $additional type-dependent additional data
+     * @param bool|null $is_constructed whether the type is a constructed type
+     * @param int $class the class number
      * @throws InvalidArgumentException
      */
     function __construct(int $tag, $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
@@ -324,6 +326,9 @@ class Value {
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __toString(): string {
         if ($this->class == self::UNIVERSAL_CLASS) {
             $result = self::$universal_types[$this->tag];

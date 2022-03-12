@@ -327,27 +327,31 @@ class Value {
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a formatted string representation of the value
+     * 
+     * @param int $indent
+     * @return string
      */
-    public function __toString(): string {
+    protected function prettyPrint(int $indent = 0): string {
+        $result = str_pad('', $indent);
         if ($this->class == self::UNIVERSAL_CLASS) {
-            $result = self::$universal_types[$this->tag];
+            $result .= self::$universal_types[$this->tag];
         } elseif ($this->class == self::CONTEXT_CLASS) {
-            $result = sprintf('[%d]', $this->tag);
+            $result .= sprintf('[%d]', $this->tag);
         } else {
-            $result = sprintf('<0x%02x (class 0x%02x)>', $this->tag, $this->class);
+            $result .= sprintf('<0x%02x (class 0x%02x)>', $this->tag, $this->class);
         }
+        $result .= ' ';
 
         if ($this->is_constructed) {
-            $result .= " {\n";
             if (is_array($this->value)) {
-                $result .= implode("\n", array_map(function ($child) { return '  ' . $child->__toString(); }, $this->value)) . "\n";
+                $result .= "{\n";
+                $result .= implode("\n", array_map(function ($child) use ($indent) { return $child->prettyPrint($indent + 2); }, $this->value)) . "\n";
+                $result .= str_pad('', $indent) . "}";
             } else {
-                $result .= $this->value->__toString() . "\n";
+                $result .= $this->value->prettyPrint();
             }
-            $result .= "}";
         } elseif (($this->class == self::UNIVERSAL_CLASS) && ($this->tag != self::NULL_TYPE)) {
-            $result .= ' ';
             if (is_numeric($this->value)) {
                 $result .= $this->value;
             } elseif ($this->value instanceof \GMP) {
@@ -361,6 +365,13 @@ class Value {
             }
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string {
+        return $this->prettyPrint();
     }
 }
 

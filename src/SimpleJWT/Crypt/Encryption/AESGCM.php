@@ -89,6 +89,11 @@ class AESGCM extends Algorithm implements EncryptionAlgorithm {
         }
 
         $e = openssl_encrypt($plaintext, $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional, 16);
+        if ($e == false) {
+            $messages = [];
+            while ($message = openssl_error_string()) $messages[] = $message;
+            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages));
+        }
 
         return [
             'ciphertext' => Util::base64url_encode($e),

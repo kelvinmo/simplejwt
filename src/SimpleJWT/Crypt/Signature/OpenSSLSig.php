@@ -87,7 +87,9 @@ class OpenSSLSig extends SHA2 {
         if (defined('OPENSSL_KEYTYPE_EC')) {
             foreach ($hashes as $size) $results[] = 'ES' . $size;
 
-            if (function_exists('openssl_get_curve_names') && in_array('secp256k1', openssl_get_curve_names()) && in_array('SHA256', $hash_algos))
+            $curves = openssl_get_curve_names();
+            if ($curves == false) throw new \UnexpectedValueException('Cannot get openssl supported curves');
+            if (function_exists('openssl_get_curve_names') && in_array('secp256k1', $curves) && in_array('SHA256', $hash_algos))
                 $results[] = 'ES256K';
         }
 

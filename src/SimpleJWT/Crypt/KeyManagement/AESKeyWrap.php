@@ -107,6 +107,12 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
             for ($i = 0; $i < $n; $i++) {
                 $t = $n * $j + ($i + 1);
                 $B = openssl_encrypt($A . $R[$i], $cipher, $key->toBinary(), OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+                if ($B == false) {
+                    $messages = [];
+                    while ($message = openssl_error_string()) $messages[] = $message;
+                    throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages));
+                }
+
                 $A = $this->msb($B) ^ Util::packInt64($t);
                 $R[$i] = $this->lsb($B);
             }
@@ -132,6 +138,11 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
             for ($i = $n - 1; $i >= 0; $i--) {
                 $t = $n * $j + ($i + 1);
                 $B = openssl_decrypt(($A ^ Util::packInt64($t)) . $R[$i], $cipher, $key->toBinary(), OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+                if ($B == false) {
+                    $messages = [];
+                    while ($message = openssl_error_string()) $messages[] = $message;
+                    throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages));
+                }
                 $A = $this->msb($B);
                 $R[$i] = $this->lsb($B);
             }

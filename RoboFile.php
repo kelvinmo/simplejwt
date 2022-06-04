@@ -69,7 +69,7 @@ class RoboFile extends \Robo\Tasks {
         $current_year = strftime("%Y");
 
         $finder = new Finder();
-        $finder->in(['src', 'bin'])->name('*.php')->append(['COPYING.txt']);
+        $finder->in(['src', 'bin'])->name('*.php')->append(['LICENSE.txt']);
 
         foreach($finder as $file) {
             $this->taskReplaceInFile($file)

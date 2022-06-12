@@ -117,22 +117,6 @@ class Helper {
     }
 
     /**
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption or
-     * verification keys
-     * @param string $expected_alg the expected value of the `alg` parameter, which
-     * should be agreed between the parties out-of-band
-     * @param string $kid the ID of the key to use for verification of a JWT. If null, this
-     * is automatically retrieved.  For a JWE, this parameter is ignored.
-     * @return Token the decoded JWT or JWE
-     * @throws InvalidTokenException if the token is invalid for any reason
-     * @deprecated use {@link decode()} instead
-     * @codeCoverageIgnore
-     */
-    function getObject($keys, $expected_alg, $kid = null) {
-        return $this->decode($keys, $expected_alg, $kid);
-    }
-
-    /**
      * Decrypts and verifies a nested JWT.
      *
      * If the supplied token is a JWT, this function calls {@link decode()}
@@ -166,25 +150,6 @@ class Helper {
                 }
                 return JWT::decode($jwe->getPlaintext(), $keys, $expected_jwt_alg, $jwt_kid);
         }
-    }
-
-    /**
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption
-     * and verification keys
-     * @param string $expected_jwe_alg the expected value of the `alg` parameter for the
-     * JWE, which should be agreed between the parties out-of-band
-     * @param string $expected_jwt_alg the expected value of the `alg` parameter for the
-     * underlying JWT, which should be agreed between the parties out-of-band
-     * @param string $dummy parameter ignored - to be removed
-     * @param string $jwt_kid the ID of the key to use for verification. If null, this
-     * is automatically retrieved
-     * @return JWT the decoded JWT
-     * @throws InvalidTokenException if the token is invalid for any reason
-     * @deprecated use {@link decodeFully()} instead
-     * @codeCoverageIgnore
-     */
-    function getJWTObject($keys, $expected_jwe_alg, $expected_jwt_alg, $dummy = null, $jwt_kid = null) {
-        return $this->decodeFully($keys, $expected_jwe_alg, $expected_jwt_alg, $jwt_kid);
     }
 
     /**

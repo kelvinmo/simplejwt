@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - Changed: Util::base64url_decode() will now throw
   `\UnexpectedValueException` instead of returning false if the input
   cannot be decoded
+- Removed: Helper::getObject() and Helper::getJWTObject() have been
+  replaced by Helper::decode() and Helper::decodeFully() respectively
 
 ## 0.6.3
 

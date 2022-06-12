@@ -171,7 +171,10 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         if (!isset(ECKey::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
         $openssl_curve_name = ECKey::$curves[$crv]['openssl'];
 
-        if (!in_array($openssl_curve_name, openssl_get_curve_names()))
+        $curves = openssl_get_curve_names();
+        if ($curves == false) throw new CryptException('Cannot get openssl supported curves');
+
+        if (!in_array($openssl_curve_name, $curves))
             throw new CryptException('Unable to create ephemeral key: unsupported curve');
 
         // Note openssl.cnf needs to be correctly configured for this to work.

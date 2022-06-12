@@ -186,6 +186,7 @@ class JWE extends Token {
                 switch ($headers['zip']) {
                     case 'DEF':
                         $plaintext = gzinflate($plaintext);
+                        if ($plaintext == false) throw new InvalidTokenException('Cannot decompress plaintext', InvalidTokenException::TOKEN_PARSE_ERROR);
                         break;
                     default:
                         throw new InvalidTokenException('Unsupported zip header:' . $headers['zip'], InvalidTokenException::UNSUPPORTED_ERROR);
@@ -250,7 +251,11 @@ class JWE extends Token {
             }
         }
 
-        if (!isset($cek)) $cek = $this->generateCEK($content_enc->getCEKSize() / 8);
+        if (!isset($cek)) {
+            /** @var int<1, max> $cek_size */
+            $cek_size = (int) ($content_enc->getCEKSize() / 8);
+            $cek = $this->generateCEK($cek_size);
+        }
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
             $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
@@ -262,6 +267,7 @@ class JWE extends Token {
             switch ($this->headers['zip']) {
                 case 'DEF':
                     $plaintext = gzdeflate($this->plaintext);
+                    if ($plaintext == false) throw new \InvalidArgumentException('Cannot compress plaintext');
                     break;
                 default:
                     throw new \InvalidArgumentException('Unsupported zip header:' . $this->headers['zip']);
@@ -270,10 +276,12 @@ class JWE extends Token {
             $plaintext = $this->plaintext;
         }
 
-        $protected = Util::base64url_encode(json_encode($this->headers));
+        $protected = Util::base64url_encode((string) json_encode($this->headers));
         
         if ($content_enc->getIVSize() > 0) {
-            $iv = $this->generateIV($content_enc->getIVSize() / 8);
+            /** @var int<0, max> $iv_size */
+            $iv_size = (int) ($content_enc->getIVSize() / 8);
+            $iv = $this->generateIV($iv_size);
         } else {
             $iv = '';
         }
@@ -296,7 +304,7 @@ class JWE extends Token {
                 if ($encrypted_key) $obj['encrypted_key'] = $encrypted_key;
                 if ($iv) $obj['iv'] = $iv;
 
-                return json_encode($obj);
+                return (string) json_encode($obj);
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
@@ -322,11 +330,12 @@ class JWE extends Token {
      * (This method is separated from the rest of the {@link encrypt()}
      * function to enable testing.)
      * 
-     * @param int $length the length of the initialisation vector, in bytes
+     * @param int<0, max> $length the length of the initialisation vector, in bytes
      * @return string the generated initialisation vector as a base64url
      * encoded string
      */
     protected function generateIV($length) {
+        if ($length <= 0) return '';
         return Util::base64url_encode(Util::random_bytes($length));
     }
 }

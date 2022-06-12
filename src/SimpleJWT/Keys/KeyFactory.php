@@ -109,7 +109,7 @@ class KeyFactory {
 
         // 2. Decode JSON
         if ($format == 'json') {
-            /* @var string $data */
+            /** @var string $data */
             $json = json_decode($data, true);
             if (isset($json['ciphertext'])) {
                 $format = 'jwe';
@@ -139,7 +139,9 @@ class KeyFactory {
         if ($format == 'php') {
             if (($data != null) && isset($data['kty'])) {
                 if (isset(self::$jwk_kty_map[$data['kty']])) {
-                    return new self::$jwk_kty_map[$data['kty']]($data, 'php');
+                    /** @var Key $key */
+                    $key = new self::$jwk_kty_map[$data['kty']]($data, 'php');
+                    return $key;
                 }
             }
         }
@@ -149,9 +151,9 @@ class KeyFactory {
             $der = new DER();
 
             if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
-                /** @var string|bool $binary */
+                /** @var string $binary */
                 $binary = base64_decode($matches[1]);
-                if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+                if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
                 $seq = $der->decode($binary);
 
@@ -159,12 +161,14 @@ class KeyFactory {
 
                 $oid = $seq->getChildAt(0)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
-                    return new self::$oid_map[$oid]($data, 'pem');
+                    /** @var Key $key */
+                    $key = new self::$oid_map[$oid]($data, 'pem');
+                    return $key;
                 }
             } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
-                /** @var string|bool $binary */
+                /** @var string $binary */
                 $binary = base64_decode($matches[1]);
-                if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+                if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
                 $seq = $der->decode($binary);
 
@@ -173,12 +177,16 @@ class KeyFactory {
                 
                 $oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
-                    return new self::$oid_map[$oid]($data, 'pem');
+                    /** @var Key $key */
+                    $key = new self::$oid_map[$oid]($data, 'pem');
+                    return $key;
                 }
             } else {
                 foreach (self::$pem_map as $regex => $cls) {
                     if (preg_match($regex, $data)) {
-                        return new $cls($data, 'pem');
+                        /** @var Key $key */
+                        $key = new $cls($data, 'pem');
+                        return $key;
                     }
                 }
 

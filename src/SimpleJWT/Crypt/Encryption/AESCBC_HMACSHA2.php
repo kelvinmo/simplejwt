@@ -87,10 +87,18 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
             if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
         }
 
-        list($mac_key, $enc_key) = str_split($cek, (int) (strlen($cek) / 2));
+        $split = (int) (strlen($cek) / 2);
+        if ($split < 1) throw new CryptException('Incorrect key length');
+        list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
 
         $e = openssl_encrypt($plaintext, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
+        if ($e == false) {
+            $messages = [];
+            while ($message = openssl_error_string()) $messages[] = $message;
+            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages));
+        }
+
         $m = hash_hmac($params['hash'], $additional . $iv . $e . $al, $mac_key, true);
         $t = substr($m, 0, $params['tag']);
 
@@ -110,7 +118,10 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
         $iv = Util::base64url_decode($iv);
         if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
 
-        list($mac_key, $enc_key) = str_split($cek, (int) (strlen($cek) / 2));
+        $split = (int) (strlen($cek) / 2);
+        if ($split < 1) throw new CryptException('Incorrect key length');
+        list($mac_key, $enc_key) = str_split($cek, $split);
+        list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
 
         $e = Util::base64url_decode($ciphertext);
@@ -120,6 +131,11 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
         if (!Util::secure_compare(Util::base64url_decode($tag), $t)) throw new CryptException('Authentication tag does not match');
         
         $plaintext = openssl_decrypt($e, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
+        if ($plaintext == false) {
+            $messages = [];
+            while ($message = openssl_error_string()) $messages[] = $message;
+            throw new CryptException('Cannot decrypt ciphertext: ' . implode("\n", $messages));
+        }
 
         return $plaintext;
     }

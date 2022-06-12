@@ -241,6 +241,12 @@ class Value {
         return $this->value;
     }
 
+    /**
+     * Encodes the unsigned value as a big-endian octet sequence.
+     * 
+     * @return string the octet sequence
+     * @throws InvalidArgumentException if the value is not an integer
+     */
     public function getValueAsUIntOctets(): string {
         $is_bigint = ($this->value instanceof \GMP);
         if (!is_integer($this->value) && !$is_bigint) {

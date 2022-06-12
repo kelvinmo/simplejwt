@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Util;
 
+use \UnexpectedValueException;
+
 /**
  * Miscellaneous utility functions.
  */
@@ -57,11 +59,16 @@ class Util {
      * Decodes data encoded with Base 64 Encoding with URL and Filename Safe Alphabet.
      *
      * @param string $data the encoded data
-     * @return string|bool the original data or FALSE on failure. The returned data may be binary.
+     * @return string the original data. The returned data may be binary.
      * @link http://tools.ietf.org/html/rfc4648#section-5
+     * @throws UnexpectedValueException if an error occurs in the decoding process
      */
     static public function base64url_decode($data) {
-        return base64_decode(strtr($data, '-_', '+/'));
+        $decoded = base64_decode(strtr($data, '-_', '+/'));
+        if ($decoded == false) {
+            throw new UnexpectedValueException('Invalid base64url string');
+        }
+        return $decoded;
     }
 
     /**

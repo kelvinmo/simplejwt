@@ -87,7 +87,7 @@ class JWT extends Token {
      * should be agreed between the parties out-of-band
      * @param string $kid the ID of the key to use to verify the signature if this is not
      * specified in the JWT header. If null, this is automatically determine
-     * @param bool|array<string> $skip_validation an array of headers or claims that
+     * @param false|array<string> $skip_validation an array of headers or claims that
      * should be ignored as part of the validation process (e.g. if expired tokens
      * are to be accepted), or false if all validations are to be performed.
      * @return JWT the decoded JWT
@@ -188,7 +188,7 @@ class JWT extends Token {
      * JWT
      * @param string $kid the ID of the key to use to sign. If null, this
      * is automatically retrieved
-     * @param bool|array<string> $auto_complete an array of headers or claims that
+     * @param false|array<string> $auto_complete an array of headers or claims that
      * should be automatically completed, or false if no auto-completion is
      * to be performed
      * @param string $alg if not null, override the `alg` header
@@ -211,8 +211,8 @@ class JWT extends Token {
         }
         $key = $signer->getSigningKey($keys, $kid);
         if (($key != null) && in_array('kid', $auto_complete)) $this->headers['kid'] = $key->getKeyId();
-        $protected = Util::base64url_encode(json_encode($this->headers));
-        $payload = Util::base64url_encode(json_encode($this->claims));
+        $protected = Util::base64url_encode((string) json_encode($this->headers));
+        $payload = Util::base64url_encode((string) json_encode($this->claims));
         $signing_input = $protected . '.' . $payload;
         $signature = $signer->sign($signing_input, $keys, $kid);
 
@@ -220,7 +220,7 @@ class JWT extends Token {
             case self::COMPACT_FORMAT:
                 return $signing_input . '.' . $signature;
             case self::JSON_FORMAT:
-                return json_encode([
+                return (string) json_encode([
                     'protected' => $protected,
                     'payload' => $payload,
                     'signature' => $signature

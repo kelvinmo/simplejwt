@@ -115,14 +115,15 @@ class ECKey extends Key {
                 parent::__construct($data, $format, $password, $alg);
                 break;
             case 'pem':
+                /** @var string $data */
                 $offset = 0;
                 $jwk = [];
                 $der = new DER();
 
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
-                    /** @var string|bool $binary */
+                    /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
                     $seq = $der->decode($binary);
 
@@ -148,9 +149,9 @@ class ECKey extends Key {
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
                 } elseif (preg_match(self::PEM_RFC5915_PRIVATE, $data, $matches)) {
-                    /** @var string|bool $binary */
+                    /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
                     $seq = $der->decode($binary);
 
@@ -179,9 +180,9 @@ class ECKey extends Key {
                     $jwk['x'] = Util::base64url_encode($x);
                     $jwk['y'] = Util::base64url_encode($y);
                 } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
-                    /** @var string|bool $binary */
+                    /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary === FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
                     $seq = $der->decode($binary);
 

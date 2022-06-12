@@ -234,9 +234,11 @@ abstract class Key {
      * @param string $format the serialisation format for the JWE (ignored if the
      * key is a public key)
      * @return string the key set
+     * @throws KeyException if the key cannot be converted
      */
     public function toJWK($password = null, $format = JWE::COMPACT_FORMAT) {
         $json = json_encode($this->data);
+        if ($json == false) throw new KeyException('Cannot encode key');
         if (($password == null) || $this->isPublic()) return $json;
 
         $keys = KeySet::createFromSecret($password, 'bin');
@@ -287,7 +289,9 @@ abstract class Key {
         $signing = [];
         foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
         ksort($signing);
-        return Util::base64url_encode(hash('sha256', json_encode($signing), true));
+        $hash_input = json_encode($signing);
+        if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
+        return Util::base64url_encode(hash('sha256', $hash_input, true));
     }
 }
 

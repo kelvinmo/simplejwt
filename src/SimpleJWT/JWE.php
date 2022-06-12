@@ -251,7 +251,11 @@ class JWE extends Token {
             }
         }
 
-        if (!isset($cek)) $cek = $this->generateCEK((int) ($content_enc->getCEKSize() / 8));
+        if (!isset($cek)) {
+            /** @var int<1, max> $cek_size */
+            $cek_size = (int) ($content_enc->getCEKSize() / 8);
+            $cek = $this->generateCEK($cek_size);
+        }
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
             $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
@@ -300,7 +304,7 @@ class JWE extends Token {
                 if ($encrypted_key) $obj['encrypted_key'] = $encrypted_key;
                 if ($iv) $obj['iv'] = $iv;
 
-                return json_encode($obj);
+                return (string) json_encode($obj);
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
@@ -326,7 +330,7 @@ class JWE extends Token {
      * (This method is separated from the rest of the {@link encrypt()}
      * function to enable testing.)
      * 
-     * @param int $length the length of the initialisation vector, in bytes
+     * @param int<0, max> $length the length of the initialisation vector, in bytes
      * @return string the generated initialisation vector as a base64url
      * encoded string
      */

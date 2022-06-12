@@ -87,7 +87,9 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
             if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
         }
 
-        list($mac_key, $enc_key) = str_split($cek, (int) (strlen($cek) / 2));
+        $split = (int) (strlen($cek) / 2);
+        if ($split < 1) throw new CryptException('Incorrect key length');
+        list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
 
         $e = openssl_encrypt($plaintext, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
@@ -116,7 +118,10 @@ class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
         $iv = Util::base64url_decode($iv);
         if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
 
-        list($mac_key, $enc_key) = str_split($cek, (int) (strlen($cek) / 2));
+        $split = (int) (strlen($cek) / 2);
+        if ($split < 1) throw new CryptException('Incorrect key length');
+        list($mac_key, $enc_key) = str_split($cek, $split);
+        list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
 
         $e = Util::base64url_decode($ciphertext);

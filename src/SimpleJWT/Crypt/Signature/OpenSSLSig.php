@@ -136,7 +136,9 @@ class OpenSSLSig extends SHA2 {
 
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
             // For ECDSA signatures, OpenSSL expects a ASN.1 DER SEQUENCE
-            list($r, $s) = str_split($binary, (int) (strlen($binary) / 2));
+            $split = (int) (strlen($binary) / 2);
+            if ($split < 1) return false;
+            list($r, $s) = str_split($binary, $split);
 
             $der = new DER();
             $seq = Value::sequence([Value::integer($r), Value::integer($s)]);

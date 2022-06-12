@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
   for each algorithm type (#60)
 - Changed: `JWT` and `JWE` now derives from a common parent class `Token`
 - Changed: Improved ASN.1 processing code (#68)
+- Changed: Util::base64url_decode() will now throw
+  `\UnexpectedValueException` instead of returning false if the input
+  cannot be decoded
 
 ## 0.6.3
 

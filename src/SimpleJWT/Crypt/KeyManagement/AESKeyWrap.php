@@ -162,7 +162,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
      * @return string the most significant half
      */
     protected function msb($x) {
-        return substr($x, 0, strlen($x) / 2);
+        return substr($x, 0, (int) (strlen($x) / 2));
     }
 
     /**
@@ -172,7 +172,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
      * @return string the least significant half
      */
     protected function lsb($x) {
-        return substr($x, strlen($x) / 2);
+        return substr($x, (int) (strlen($x) / 2));
     }
 
 }

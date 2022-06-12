@@ -250,7 +250,7 @@ class JWE extends Token {
             }
         }
 
-        if (!isset($cek)) $cek = $this->generateCEK($content_enc->getCEKSize() / 8);
+        if (!isset($cek)) $cek = $this->generateCEK((int) ($content_enc->getCEKSize() / 8));
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
             $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
@@ -273,7 +273,7 @@ class JWE extends Token {
         $protected = Util::base64url_encode(json_encode($this->headers));
         
         if ($content_enc->getIVSize() > 0) {
-            $iv = $this->generateIV($content_enc->getIVSize() / 8);
+            $iv = $this->generateIV((int) ($content_enc->getIVSize() / 8));
         } else {
             $iv = '';
         }
@@ -327,6 +327,7 @@ class JWE extends Token {
      * encoded string
      */
     protected function generateIV($length) {
+        if ($length <= 0) return '';
         return Util::base64url_encode(Util::random_bytes($length));
     }
 }

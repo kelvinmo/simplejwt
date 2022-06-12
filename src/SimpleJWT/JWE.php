@@ -186,6 +186,7 @@ class JWE extends Token {
                 switch ($headers['zip']) {
                     case 'DEF':
                         $plaintext = gzinflate($plaintext);
+                        if ($plaintext == false) throw new InvalidTokenException('Cannot decompress plaintext', InvalidTokenException::TOKEN_PARSE_ERROR);
                         break;
                     default:
                         throw new InvalidTokenException('Unsupported zip header:' . $headers['zip'], InvalidTokenException::UNSUPPORTED_ERROR);
@@ -262,6 +263,7 @@ class JWE extends Token {
             switch ($this->headers['zip']) {
                 case 'DEF':
                     $plaintext = gzdeflate($this->plaintext);
+                    if ($plaintext == false) throw new \InvalidArgumentException('Cannot compress plaintext');
                     break;
                 default:
                     throw new \InvalidArgumentException('Unsupported zip header:' . $this->headers['zip']);
@@ -270,10 +272,12 @@ class JWE extends Token {
             $plaintext = $this->plaintext;
         }
 
-        $protected = Util::base64url_encode(json_encode($this->headers));
+        $protected = Util::base64url_encode((string) json_encode($this->headers));
         
         if ($content_enc->getIVSize() > 0) {
-            $iv = $this->generateIV((int) ($content_enc->getIVSize() / 8));
+            /** @var int<0, max> $iv_size */
+            $iv_size = (int) ($content_enc->getIVSize() / 8);
+            $iv = $this->generateIV($iv_size);
         } else {
             $iv = '';
         }

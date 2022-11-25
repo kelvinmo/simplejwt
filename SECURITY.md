@@ -26,8 +26,8 @@ Security patches will be provided for the following:
 If you discover a vulnerability in SimpleJWT, keep it confidential. 
 *Do not disclose the vulnerability to anyone before the advisory is issued.*
 
-Provide details of the vulnerability direct to kmo-at-users.sourceforge.net.
-**Do not use the GitHub issue system.**
+Provide details of the vulnerability at the [GitHub Security Advisories]
+page.  For further information, please see the [GitHub documentation].
 
 At a minimum, your report should include:
 
@@ -61,3 +61,5 @@ pull request.
 
 
 [Semantic Versioning Specification]: https://semver.org/
+[GitHub Security Advisories]: https://github.com/kelvinmo/simplejwt/security/advisories
+[GitHub documentation]: https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability

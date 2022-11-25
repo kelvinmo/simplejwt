@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.7.0
 
 - Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one
   for each algorithm type (#60)

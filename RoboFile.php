@@ -66,7 +66,7 @@ class RoboFile extends \Robo\Tasks {
     }
 
     public function update_copyright() {
-        $current_year = strftime("%Y");
+        $current_year = date('Y', time());
 
         $finder = new Finder();
         $finder->in(['src', 'bin'])->name('*.php')->append(['LICENSE.txt']);

@@ -17,8 +17,12 @@ class PBES2Test extends TestCase {
         $password = 'Thus from my lips, by yours, my sin is purged.';
         $keys = $this->getKeySet($password);
 
-        $stub = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\PBES2')
-            ->setMethods(['generateSaltInput'])->setConstructorArgs(['PBES2-HS256+A128KW'])->getMock();
+        $builder = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\PBES2');
+        if (method_exists($builder, 'setMethods')) {
+            $stub = $builder->setMethods(['generateSaltInput'])->setConstructorArgs(['PBES2-HS256+A128KW'])->getMock();
+        } else {
+            $stub = $builder->onlyMethods(['generateSaltInput'])->setConstructorArgs(['PBES2-HS256+A128KW'])->getMock();
+        }
 
         $stub->method('generateSaltInput')->willReturn(Util::base64url_decode('2WCTcJZ1Rvd_CJuJripQ1w'));
         $stub->setIterations(4096);

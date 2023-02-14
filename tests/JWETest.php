@@ -84,11 +84,17 @@ class JWETest extends TestCase {
         $plaintext = 'Live long and prosper.';
         $public_set = $this->getPublicKeySet();
 
-        $stub = $this->getMockBuilder('SimpleJWT\JWE')
-            ->setConstructorArgs([["alg" => "RSA1_5","enc" => "A128CBC-HS256"], $plaintext])
+        $builder = $this->getMockBuilder('SimpleJWT\JWE');
+        if (method_exists($builder, 'setMethods')) {
+            $stub = $builder->setConstructorArgs([["alg" => "RSA1_5","enc" => "A128CBC-HS256"], $plaintext])
             ->setMethods(['generateCEK'])
             ->setMethods(['generateIV'])
             ->getMock();
+        } else {
+            $stub = $builder->setConstructorArgs([["alg" => "RSA1_5","enc" => "A128CBC-HS256"], $plaintext])
+            ->onlyMethods(['generateCEK', 'generateIV'])
+            ->getMock();
+        }
         $stub->method('generateCEK')->willReturn(base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLEA8I+cLM8='));
         $stub->method('generateIV')->willReturn('AxY8DCtDaGlsbGljb3RoZQ');
 
@@ -116,11 +122,17 @@ class JWETest extends TestCase {
         $plaintext = 'Live long and prosper.';
         $public_set = $this->getPublicKeySet();
 
-        $stub = $this->getMockBuilder('SimpleJWT\JWE')
-            ->setConstructorArgs([["alg" => "A128KW","enc" => "A128CBC-HS256"], $plaintext])
+        $builder = $this->getMockBuilder('SimpleJWT\JWE');
+        if (method_exists($builder, 'setMethods')) {
+            $stub = $builder->setConstructorArgs([["alg" => "A128KW","enc" => "A128CBC-HS256"], $plaintext])
             ->setMethods(['generateCEK'])
             ->setMethods(['generateIV'])
             ->getMock();
+        } else {
+            $stub = $builder->setConstructorArgs([["alg" => "A128KW","enc" => "A128CBC-HS256"], $plaintext])
+            ->onlyMethods(['generateCEK', 'generateIV'])
+            ->getMock();
+        }
         $stub->method('generateCEK')->willReturn(base64_decode('BNMfxVSd/P4LZJ36P6pqzmt81C1vawnbyLEA8I+cLM8='));
         $stub->method('generateIV')->willReturn('AxY8DCtDaGlsbGljb3RoZQ');
 
@@ -169,10 +181,16 @@ class JWETest extends TestCase {
         $plaintext = 'Live long and prosper.';
         $public_set = $this->getDirectKeySet();
 
-        $stub = $this->getMockBuilder('SimpleJWT\JWE')
-            ->setConstructorArgs([["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK"], $plaintext])
+        $builder = $this->getMockBuilder('SimpleJWT\JWE');
+        if (method_exists($builder, 'setMethods')) {
+            $stub = $builder->setConstructorArgs([["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK"], $plaintext])
             ->setMethods(['generateIV'])
             ->getMock();
+        } else {
+            $stub = $builder->setConstructorArgs([["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK"], $plaintext])
+            ->onlyMethods(['generateIV'])
+            ->getMock();
+        }
 
         $stub->method('generateIV')->willReturn('h7LOWyYIlzq4BJV5V1vxhg');
         

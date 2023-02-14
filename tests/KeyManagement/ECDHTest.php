@@ -28,8 +28,13 @@ class ECDHTest extends TestCase {
             'y' => 'SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps'
         ], 'php');
 
-        $stub = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\ECDH')
-            ->setMethods(['createEphemeralKey'])->setConstructorArgs(['ECDH-ES'])->getMock();
+        $builder = $this->getMockBuilder('SimpleJWT\Crypt\KeyManagement\ECDH');
+
+        if (method_exists($builder, 'setMethods')) {
+            $stub = $builder->setMethods(['createEphemeralKey'])->setConstructorArgs(['ECDH-ES'])->getMock();
+        } else {
+            $stub = $builder->onlyMethods(['createEphemeralKey'])->setConstructorArgs(['ECDH-ES'])->getMock();
+        }   
 
         $stub->method('createEphemeralKey')->willReturn($ephemeral_key);
 

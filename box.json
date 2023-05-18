@@ -1,0 +1,12 @@
+{
+    "main": "bin/jwkstool.php",
+    "stub": "build/jwkstool_pharstub.php",
+    "output": "bin/jwkstool.phar",
+    "chmod": "0755",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json"
+    ],
+    "compression": "GZ",
+    "exclude-dev-files": true
+}

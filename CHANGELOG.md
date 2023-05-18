@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Removed: Helper::getObject() and Helper::getJWTObject() have been
+  replaced by Helper::decode() and Helper::decodeFully() respectively
+
 ## 0.7.0
 
 - Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one

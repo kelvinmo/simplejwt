@@ -16,7 +16,7 @@
         "phpunit/phpunit": "^7.0 || ^9.3 || ^10.0",
         "consolidation/robo": "^3.0 || ^4.0",
         "phpstan/phpstan": "^1.3.0",
-        "humbug/box": "^4.3"
+        "bamarni/composer-bin-plugin": "^1.8"
     },
     "license": "BSD-3-Clause",
     "authors": [
@@ -30,10 +30,22 @@
         "psr-4": { "SimpleJWT\\": "src/SimpleJWT" }
     },
     "scripts": {
-        "phar": [ "@composer install", "robo phar" ],
+        "phar": [ "@composer install", "@composer bin build install", "robo phar" ],
         "test": [ "@composer install", "phpunit" ],
         "coverage": [ "@composer install", "phpdbg -qrr vendor/bin/phpunit --coverage-text" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ]
+    },
+    "config": {
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true
+        }
+    },
+    "extra": {
+        "bamarni-bin": {
+            "bin-links": false,
+            "target-directory": "vendor-bin",
+            "forward-command": false
+        }
     }
 }

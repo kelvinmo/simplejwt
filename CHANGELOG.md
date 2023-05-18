@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Removed: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively
+- Removed: Support for PHP 7.1
 
 ## 0.7.0
 

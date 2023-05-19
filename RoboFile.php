@@ -29,9 +29,11 @@ class RoboFile extends \Robo\Tasks {
         // (a) Copy files to temp directory
         $prepare_collection->taskMirrorDir([
             'src' => "$temp/src",
-            'bin' => "$temp/bin"
+            'bin' => "$temp/bin",
+            'build' => "$temp/build"
         ]);
         $prepare_collection->taskFilesystemStack()->copy('composer.json', "$temp/composer.json");
+        $prepare_collection->taskFilesystemStack()->copy('box.json', "$temp/box.json");
 
         // (b) composer install
         $prepare_collection->taskComposerInstall()->dir($temp)->noDev();
@@ -42,24 +44,11 @@ class RoboFile extends \Robo\Tasks {
             return $result;
         }
 
-        // 4. Prepare phar task
-        $phar_task = $main_collection->taskPackPhar($phar_file)
-            ->compress('bzip2')
-            ->stub('build/jwkstool_pharstub.php');
+        // 4. Run box to create phar
+        $box_command = str_replace('/', DIRECTORY_SEPARATOR, 'vendor-bin/build/vendor/bin/box');
 
-        // 5. Add files
-        $finder = new Finder();
-        $finder->in($temp)->name('*.php');
-        foreach($finder as $file) {
-            $phar_task->addFile($file->getRelativePathname(), $file->getRealPath());
-        }
-        $finder->in($temp)->name('*.cnf');
-        foreach($finder as $file) {
-            $phar_task->addFile($file->getRelativePathname(), $file->getRealPath());
-        }
-        
-        // 6. chmod
-        $main_collection->taskFilesystemStack()->chmod($phar_file, 0755);
+        $main_collection->taskExec($box_command)->arg('compile')->arg('-c')->arg("$temp/box.json");
+        $main_collection->taskFilesystemStack()->copy("$temp/bin/jwkstool.phar", 'bin/jwkstool.phar', true);
 
         // 7. Run everything
         return $main_collection->run();

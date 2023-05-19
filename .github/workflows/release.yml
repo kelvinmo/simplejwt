@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           extensions: bz2, Phar
           ini-values: phar.readonly=0
           tools: composer
@@ -34,6 +34,9 @@ jobs:
 
       - name: Install dependencies
         run: composer update && composer install
+
+      - name: Install dependencies for build
+        run: composer bin build update && composer bin build install
 
       - name: Build jwkstool.phar
         run: composer phar

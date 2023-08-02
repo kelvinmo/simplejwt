@@ -36,7 +36,7 @@
 namespace SimpleJWT\Keys;
 
 use SimpleJWT\Util\ASN1\DER;
-use SimpleJWT\Util\ASN1\Value;
+use SimpleJWT\Util\ASN1\Value as ASN1Value;
 use SimpleJWT\Util\Util;
 
 /**
@@ -145,33 +145,33 @@ class RSAKey extends Key {
         $der = new DER();
 
         if ($this->isPublic()) {
-            $public_seq = Value::sequence([
-                Value::integer(Util::base64url_decode($this->data['n'])),
-                Value::integer(Util::base64url_decode($this->data['e']))
+            $public_seq = ASN1Value::sequence([
+                ASN1Value::integer(Util::base64url_decode($this->data['n'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['e']))
             ]);
             $public_bitstring = $der->encode($public_seq);
 
-            $seq = Value::sequence([
-                Value::sequence([
-                    Value::oid(self::OID),
-                    Value::null()
+            $seq = ASN1Value::sequence([
+                ASN1Value::sequence([
+                    ASN1Value::oid(self::OID),
+                    ASN1Value::null()
                 ]),
-                Value::bitString($public_bitstring)
+                ASN1Value::bitString($public_bitstring)
             ]);
             $binary = $der->encode($seq);
 
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($binary) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
-            $seq = Value::sequence([
-                Value::integer(0),
-                Value::integer(Util::base64url_decode($this->data['n'])),
-                Value::integer(Util::base64url_decode($this->data['e'])),
-                Value::integer(Util::base64url_decode($this->data['d'])),
-                Value::integer(Util::base64url_decode($this->data['p'])),
-                Value::integer(Util::base64url_decode($this->data['q'])),
-                Value::integer(Util::base64url_decode($this->data['dp'])),
-                Value::integer(Util::base64url_decode($this->data['dq'])),
-                Value::integer(Util::base64url_decode($this->data['qi']))
+            $seq = ASN1Value::sequence([
+                ASN1Value::integer(0),
+                ASN1Value::integer(Util::base64url_decode($this->data['n'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['e'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['d'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['p'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['q'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['dp'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['dq'])),
+                ASN1Value::integer(Util::base64url_decode($this->data['qi']))
             ]);
             $binary = $der->encode($seq);
 

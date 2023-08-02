@@ -39,7 +39,7 @@ use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\ASN1\DER;
-use SimpleJWT\Util\ASN1\Value;
+use SimpleJWT\Util\ASN1\Value as ASN1Value;
 use SimpleJWT\Util\Util;
 
 /**
@@ -141,7 +141,7 @@ class OpenSSLSig extends SHA2 {
             list($r, $s) = str_split($binary, $split);
 
             $der = new DER();
-            $seq = Value::sequence([Value::integer($r), Value::integer($s)]);
+            $seq = ASN1Value::sequence([ASN1Value::integer($r), ASN1Value::integer($s)]);
             $binary = $der->encode($seq);
         }
 

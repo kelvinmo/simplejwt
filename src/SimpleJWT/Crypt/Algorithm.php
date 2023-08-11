@@ -87,9 +87,13 @@ abstract class Algorithm {
     /**
      * Get `alg` or `enc` values supported by this class.
      *
-     * Implementations should test the host system's configuration
+     * Implementations should test the host system's configuration to determine
+     * an algorithm is supported.  For example, if an algorithm requires a
+     * particular PHP extension is installed, then this method should test
+     * the presence of this extension before including the algorithm in the
+     * return value.
      *
-     * @return array<string> supported algorithms
+     * @return array<string> an array of supported algorithms
      */
     abstract public function getSupportedAlgs();
 

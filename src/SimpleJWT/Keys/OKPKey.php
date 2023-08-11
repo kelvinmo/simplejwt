@@ -103,17 +103,19 @@ class OKPKey extends Key {
         if ($this->isPublic()) {
             return Util::base64url_decode($this->data['x']);
         } else {
+            $d = Util::base64url_decode($this->data['d']);
+            $x = Util::base64url_decode($this->data['x']);
+            if ((strlen($d) == 0) || strlen($x) == 0) {
+                throw new KeyException('Invalid key data');
+            }
+            
             switch ($this->data['crv']) {
                 case 'Ed25519':
-                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey(
-                        Util::base64url_decode($this->data['d']),
-                        Util::base64url_decode($this->data['x'])
-                    );
+                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey($d, $x);
                 case 'X25519':
-                    return sodium_crypto_box_keypair_from_secretkey_and_publickey(
-                        Util::base64url_decode($this->data['d']),
-                        Util::base64url_decode($this->data['x'])
-                    );
+                    return sodium_crypto_box_keypair_from_secretkey_and_publickey($d, $x);
+                default:
+                    throw new KeyException('Cannot convert to Sodium format');
             }
         }
     }

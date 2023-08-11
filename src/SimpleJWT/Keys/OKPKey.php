@@ -94,6 +94,31 @@ class OKPKey extends Key {
     }
 
     /**
+     * Returns the key in the format used by libsodium
+     *
+     * @return string the key in Sodium format
+     * @throws KeyException if the key cannot be converted
+     */
+    public function toSodium() {
+        if ($this->isPublic()) {
+            return Util::base64url_decode($this->data['x']);
+        } else {
+            switch ($this->data['crv']) {
+                case 'Ed25519':
+                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey(
+                        Util::base64url_decode($this->data['d']),
+                        Util::base64url_decode($this->data['x'])
+                    );
+                case 'X25519':
+                    return sodium_crypto_box_keypair_from_secretkey_and_publickey(
+                        Util::base64url_decode($this->data['d']),
+                        Util::base64url_decode($this->data['x'])
+                    );
+            }
+        }
+    }
+
+    /**
      * Gets the subtype for the key.  The subtype is specified in
      * the `crv` parameter.
      * 

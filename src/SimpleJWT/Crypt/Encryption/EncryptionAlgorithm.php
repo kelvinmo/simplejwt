@@ -35,12 +35,13 @@
 
 namespace SimpleJWT\Crypt\Encryption;
 
+use SimpleJWT\Crypt\AlgorithmInterface;
 use SimpleJWT\Crypt\CryptException;
 
 /**
  * Interface for content authenticated encryption algorithms.
  */
-interface EncryptionAlgorithm {
+interface EncryptionAlgorithm extends AlgorithmInterface {
     /**
      * Encrypts plaintext and provides an authentication value.
      *

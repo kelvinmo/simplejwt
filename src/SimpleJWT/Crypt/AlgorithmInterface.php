@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,18 +33,43 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt\KeyManagement;
+namespace SimpleJWT\Crypt;
 
-use SimpleJWT\Crypt\AlgorithmInterface;
+use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeySet;
 
 /**
- * Interface for key management algorithms.  These can be *key encryption
- * algorithms*, which takes a previously generated content encrpytion key and
- * encrypts it, or *key derivation algoritms* which generates the content
- * encryption key based on certain shared information.
+ * Interface for a cryptographic algorithm.
+ *
+ * Algorithms will ordinarily implement one or more of the subinterfaces
+ * of this interface: {@link SignatureAlgorithm},
+ * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm}.
  */
-interface KeyManagementAlgorithm extends AlgorithmInterface {
+interface AlgorithmInterface {
 
+    const SIGNATURE_ALGORITHM = 'sig';
+    const ENCRYPTION_ALGORITHM = 'enc';
+    const KEY_ALGORITHM = 'key';
+
+    /**
+     * Returns the name of the algorithm.
+     *
+     * @return string|null the algorithm
+     */
+    public function getAlg();
+
+    /**
+     * Get `alg` or `enc` values supported by this class.
+     *
+     * Implementations should test the host system's configuration to determine
+     * an algorithm is supported.  For example, if an algorithm requires a
+     * particular PHP extension is installed, then this method should test
+     * the presence of this extension before including the algorithm in the
+     * return value.
+     *
+     * @return array<string> an array of supported algorithms
+     */
+    public function getSupportedAlgs();
 }
 
 ?>

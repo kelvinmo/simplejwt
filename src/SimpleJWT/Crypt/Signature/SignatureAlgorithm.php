@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Crypt\Signature;
 
+use SimpleJWT\Crypt\AlgorithmInterface;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
@@ -43,7 +44,7 @@ use SimpleJWT\Keys\KeyException;
 /**
  * Interface for signature algorithms.
  */
-interface SignatureAlgorithm {
+interface SignatureAlgorithm extends AlgorithmInterface {
     /**
      * Signs a payload.
      *

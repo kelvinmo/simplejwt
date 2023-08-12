@@ -35,8 +35,8 @@
 
 namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Crypt\Algorithm;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Crypt\BaseAlgorithm;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\OKPKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Util;
@@ -44,7 +44,7 @@ use SimpleJWT\Util\Util;
 /**
  * Abstract class for SHA2-based signature algorithms.
  */
-class EdDSA extends Algorithm implements SignatureAlgorithm {
+class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     public function __construct($alg) {
         parent::__construct($alg);
     }
@@ -74,7 +74,7 @@ class EdDSA extends Algorithm implements SignatureAlgorithm {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true, '~use' => 'sig']);
+        $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof OKPKey)) {
             throw new KeyException('Key not found or is invalid');
         }
@@ -89,7 +89,7 @@ class EdDSA extends Algorithm implements SignatureAlgorithm {
 
 
     public function getSigningKey($keys, $kid = null) {
-        return $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => false]);
+        return $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
     }
 
     public function shortHash($data) {

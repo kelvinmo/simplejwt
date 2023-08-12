@@ -35,9 +35,10 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\PEMInterface;
 use SimpleJWT\Util\Util;
 
 /**
@@ -48,7 +49,7 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-4.3
  * @see https://tools.ietf.org/html/rfc3447
  */
-class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
+class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'RSA1_5' => ['openssl_padding' => OPENSSL_PKCS1_PADDING],
@@ -85,8 +86,8 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true]);
-        if (($key == null) || !$key->isPublic()) {
+        $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true]);
+        if (($key == null) || !$key->isPublic() || !($key instanceof PEMInterface)) {
             throw new CryptException('Key not found or is invalid');
         }
 
@@ -109,8 +110,8 @@ class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => false]);
-        if (($key == null) || $key->isPublic()) {
+        $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
+        if (($key == null) || $key->isPublic() || !($key instanceof PEMInterface)) {
             throw new CryptException('Key not found or is invalid');
         }
 

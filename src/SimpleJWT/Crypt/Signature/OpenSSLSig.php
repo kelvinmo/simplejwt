@@ -36,7 +36,8 @@
 namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\PEMInterface;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\ASN1\DER;
 use SimpleJWT\Util\ASN1\Value;
@@ -98,7 +99,7 @@ class OpenSSLSig extends SHA2 {
 
     public function sign($data, $keys, $kid = null) {
         $key = $this->getSigningKey($keys, $kid);
-        if ($key == null) {
+        if (($key == null) || !($key instanceof PEMInterface)) {
             throw new KeyException('Key not found or is invalid');
         }
 
@@ -127,8 +128,8 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function verify($signature, $data, $keys, $kid = null) {
-        $key = $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => true, '~use' => 'sig']);
-        if ($key == null) {
+        $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
+        if (($key == null) || !($key instanceof PEMInterface)) {
             throw new KeyException('Key not found or is invalid');
         }
 
@@ -160,7 +161,7 @@ class OpenSSLSig extends SHA2 {
     }
 
     public function getSigningKey($keys, $kid = null) {
-        return $this->selectKey($keys, $kid, [Key::PUBLIC_PROPERTY => false]);
+        return $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
     }
 }
 

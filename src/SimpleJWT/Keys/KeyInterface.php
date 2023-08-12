@@ -39,6 +39,53 @@ namespace SimpleJWT\Keys;
  * Interface for cryptographic keys
  */
 interface KeyInterface {
+    const SIZE_PROPERTY = '#size';
+    const PUBLIC_PROPERTY = '#public';
+
+    /**
+     * Returns the key ID
+     *
+     * @return string the key ID
+     */
+    public function getKeyId();
+
+    /**
+     * Returns the type of the key
+     *
+     * @return string the type
+     */
+    public function getKeyType();
+
+    /**
+     * Returns the allowed usage for the key
+     *
+     * @return string the allowed usage
+     */
+    public function getUse();
+
+    /**
+     * Returns the allowed operations for the key
+     *
+     * @return array<string> the allowed operations
+     */
+    public function getOperations();
+
+    /**
+     * Returns the size of the key, in bits.  The definition of "size"
+     * is dependent on the key algorithm.
+     *
+     * @return int the size of the key in bits
+     */
+    public function getSize();
+
+    /**
+     * Returns the underlying parameters for the key.  The parameters should
+     * be consistent with the way they are specified as a JWK.
+     *
+     * @return array<string, mixed> the parameters
+     */
+    public function getKeyData();
+
     /**
      * Determines whether the key is a public key.
      *
@@ -55,6 +102,18 @@ interface KeyInterface {
      * @return Key|null the public key, or null if the public key does not exist (e.g. is a symmetric key)
      */
     public function getPublicKey();
+
+    /**
+     * Obtains a thumbnail for the key.  The thumbnail is derived from the
+     * keys to the JSON web key object as returned by the {@link getThumbnailMembers()}
+     * function.
+     *
+     * For asymmetric keys, the public and private keys should have the same
+     * thumbnail.
+     *
+     * @return string the thumbnail
+     */
+    public function getThumbnail();
 }
 
 ?>

@@ -42,7 +42,7 @@ use SimpleJWT\Util\Util;
 /**
  * A class representing a public or private key in an RSA key pair.
  */
-class RSAKey extends Key {
+class RSAKey extends Key implements PEMInterface {
 
     const KTY = 'RSA';
 

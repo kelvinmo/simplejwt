@@ -45,7 +45,7 @@ use SimpleJWT\Crypt\CryptException;
  * encrypted using PBES2 and JWE compact serialization.
  */
 class KeySet {
-    /** @var array<Key> the keys in this key set */
+    /** @var array<KeyInterface> the keys in this key set */
     protected $keys = [];
 
     /**
@@ -110,7 +110,7 @@ class KeySet {
      * This function checks whether an identical key (whether by key ID or by
      * key contents) already exists in the key set.
      *
-     * @param Key $key the key to add
+     * @param KeyInterface $key the key to add
      * @return void
      * @throws KeyException if there is an identical key
      */
@@ -118,7 +118,7 @@ class KeySet {
         $thumbnail = $key->getThumbnail();
         foreach ($this->keys as $existing_key) {
             if ($existing_key->getThumbnail() == $thumbnail) throw new KeyException('Key already exists');
-            if ($existing_key->getKeyID() == $key->getKeyID()) throw new KeyException('Key already exists');
+            if ($existing_key->getKeyId() == $key->getKeyId()) throw new KeyException('Key already exists');
         }
 
         $this->keys[] = $key;
@@ -146,7 +146,7 @@ class KeySet {
     /**
      * Returns all the keys in the key set as `Key` objects
      *
-     * @return array<Key> an array of keys
+     * @return array<KeyInterface> an array of keys
      */
     function getKeys() {
         return $this->keys;
@@ -160,7 +160,7 @@ class KeySet {
      *
      * @param string $kid the key ID
      * @param bool $fuzzy whether fuzzy search is to be used
-     * @return Key|null the found key, or null
+     * @return KeyInterface|null the found key, or null
      */
     function getById($kid, $fuzzy = false) {
         $fuzzy_keys = [];
@@ -187,8 +187,8 @@ class KeySet {
      * There are also a number of special properties that can be used to match
      * keys:
      * 
-     * - {@link Key::SIZE_PROPERTY}, which specifies the length of the key in bits
-     * - {@link Key::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
+     * - {@link KeyInterface::SIZE_PROPERTY}, which specifies the length of the key in bits
+     * - {@link KeyInterface::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
      *   key
      *
      * A criterion can be mandatory, mandatory-if-present (indicated using a `@`
@@ -205,7 +205,7 @@ class KeySet {
      * the most mandatory-if-present and optional criteria will be returned.
      *
      * @param array<string, mixed> $criteria the criteria
-     * @return Key|null the found key, or null
+     * @return KeyInterface|null the found key, or null
      */
     function get($criteria) {
         $keys = $this->find($criteria);
@@ -244,7 +244,7 @@ class KeySet {
      * matched.
      *
      * @param array<string, mixed> $criteria the criteria
-     * @return array<Key>|null an array of keys that matches the criteria, sorted
+     * @return array<KeyInterface>|null an array of keys that matches the criteria, sorted
      * by decreasing order of optional criteria matched, or null
      */
     protected function find($criteria) {
@@ -269,8 +269,8 @@ class KeySet {
         // 2. Mandatory and mandatory-if-present criteria
         foreach ($this->keys as $key) {
             $key_data = $key->getKeyData();
-            $key_data[Key::SIZE_PROPERTY] = $key->getSize();
-            $key_data[Key::PUBLIC_PROPERTY] = $key->isPublic();
+            $key_data[KeyInterface::SIZE_PROPERTY] = $key->getSize();
+            $key_data[KeyInterface::PUBLIC_PROPERTY] = $key->isPublic();
             $kid = $key->getKeyId();
 
             $found = true;
@@ -371,7 +371,7 @@ class KeySet {
     /**
      * Removes a key from the key set
      *
-     * @param Key $key the key to remove
+     * @param KeyInterface $key the key to remove
      * @return void
      */
     function remove($key) {

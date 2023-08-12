@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\Encryption;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 
@@ -44,7 +44,7 @@ use SimpleJWT\Util\Util;
  *
  * @see https://tools.ietf.org/html/rfc7518#section-5.2
  */
-class AESCBC_HMACSHA2 extends Algorithm implements EncryptionAlgorithm {
+class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
     /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'A128CBC-HS256' => ['cipher' => 'AES-128-CBC', 'hash' => 'sha256', 'key' => 32, 'tag' => 16],

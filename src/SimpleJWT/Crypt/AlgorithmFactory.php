@@ -71,9 +71,9 @@ class AlgorithmFactory {
 
     /** @var array<string, string> $use_map */
     private static $use_map = [
-        Algorithm::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\Signature\SignatureAlgorithm',
-        Algorithm::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\Encryption\EncryptionAlgorithm',
-        Algorithm::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagement\KeyManagementAlgorithm'
+        AlgorithmInterface::SIGNATURE_ALGORITHM => 'SimpleJWT\Crypt\Signature\SignatureAlgorithm',
+        AlgorithmInterface::ENCRYPTION_ALGORITHM => 'SimpleJWT\Crypt\Encryption\EncryptionAlgorithm',
+        AlgorithmInterface::KEY_ALGORITHM => 'SimpleJWT\Crypt\KeyManagement\KeyManagementAlgorithm'
     ];
 
     /**
@@ -84,7 +84,7 @@ class AlgorithmFactory {
      * @throws \UnexpectedValueException if the algorithm cannot be created
      * (e.g. if it a required library is not present) or is not of the expected
      * use
-     * @return Algorithm the algorithm
+     * @return AlgorithmInterface the algorithm
      */
     static public function create($alg, $use = null) {
         if (($use != null) && !isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');
@@ -97,8 +97,10 @@ class AlgorithmFactory {
                     if (!is_subclass_of($cls, $superclass, true)) throw new \UnexpectedValueException('Unexpected use for algorithm: ' . $alg);
                 }
 
-                /** @var Algorithm $obj */
                 $obj = new $cls($alg);
+                if (!($obj instanceof AlgorithmInterface)) {
+                    throw new \UnexpectedValueException('Class does not implement AlgorithmInterface: ' . $cls);
+                }
                 return $obj;
             }
         }
@@ -123,8 +125,10 @@ class AlgorithmFactory {
         foreach ($classes as $cls) {
             if (!is_subclass_of($cls, $superclass, true)) continue;
 
-            /** @var Algorithm $obj */
             $obj = new $cls(null);
+            if (!($obj instanceof AlgorithmInterface)) {
+                throw new \UnexpectedValueException('Class does not implement AlgorithmInterface: ' . $cls);
+            }
             $results = array_merge($results, $obj->getSupportedAlgs());
         }
 

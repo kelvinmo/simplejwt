@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 
 /**
  * Implements the `none` signature algorithm.
@@ -52,7 +52,7 @@ use SimpleJWT\Crypt\Algorithm;
  * @link https://datatracker.ietf.org/doc/html/rfc8725.html#section-3.2
  * @codeCoverageIgnore
  */
-class None extends Algorithm implements SignatureAlgorithm {
+class None extends BaseAlgorithm implements SignatureAlgorithm {
     public function __construct($alg) {
         parent::__construct($alg);
     }

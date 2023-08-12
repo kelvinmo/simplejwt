@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- Added: Support for `Ed25519` signatures and `X25519` key derviation
+  algorithms
 - Changed: Use `box` to package the `jwkstool` utility
 - Removed: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively

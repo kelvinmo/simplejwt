@@ -148,8 +148,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
 
             // (b) Create an ephemeral key pair with the same curve as the recipient's public
             //     key, then set the epk header
-            $crv = $key->getCurve();
-            $ephemeral_private_key = $key::createEphemeralKey($crv);
+            $ephemeral_private_key = $key->createEphemeralKey();
             $ephemeral_public_key = $ephemeral_private_key->getPublicKey();
             $headers['epk'] = $ephemeral_public_key->getKeyData();
 

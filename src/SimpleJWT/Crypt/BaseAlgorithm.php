@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt;
 
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\KeySet;
 
 /**
@@ -97,7 +97,7 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      * @param KeySet $keys the key set from which the key will
      * be selected
      * @param array<string, mixed>|string $args the criteria
-     * @return Key|null the found key, or null
+     * @return KeyInterface|null the found key, or null
      */
     protected function selectKey($keys, ...$args) {
         $criteria = $this->getKeyCriteria();

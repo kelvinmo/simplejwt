@@ -38,7 +38,7 @@ namespace SimpleJWT\Crypt\KeyManagement;
 use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\SymmetricKey;
 
 /**
@@ -80,7 +80,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         $size = self::$alg_params[$alg]['key'] * 8;
         return [
             'kty' => 'oct',
-            Key::SIZE_PROPERTY => $size,
+            KeyInterface::SIZE_PROPERTY => $size,
             '~alg' => $this->getAlg(),
             '@use' => 'enc',
             '@key_ops' => ['wrapKey', 'unwrapKey']

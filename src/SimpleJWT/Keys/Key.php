@@ -46,9 +46,6 @@ abstract class Key implements KeyInterface {
     const PEM_PUBLIC = '/-----BEGIN PUBLIC KEY-----([^-:]+)-----END PUBLIC KEY-----/';
     const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
-    const SIZE_PROPERTY = '#size';
-    const PUBLIC_PROPERTY = '#public';
-
     /** @var array<string, mixed> $data */
     protected $data;
 
@@ -116,9 +113,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Returns the key ID
-     *
-     * @return string the key ID
+     * {@inheritdoc}
      */
     public function getKeyId() {
         return $this->data['kid'];
@@ -135,18 +130,14 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Returns the type of the key
-     *
-     * @return string the type
+     * {@inheritdoc}
      */
     public function getKeyType() {
         return $this->data['kty'];
     }
 
     /**
-     * Returns the allowed usage for the key
-     *
-     * @return string the allowed usage
+     * {@inheritdoc}
      */
     public function getUse() {
         return (isset($this->data['use'])) ? $this->data['use'] : null;
@@ -165,9 +156,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Returns the allowed operations for the key
-     *
-     * @return array<string> the allowed operations
+     * {@inheritdoc}
      */
     public function getOperations() {
         return (isset($this->data['key_ops'])) ? $this->data['key_ops'] : null;
@@ -188,17 +177,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Returns the size of the key, in bits.  The definition of "size"
-     * is dependent on the key algorithm.
-     *
-     * @return int the size of the key in bits
-     */
-    abstract public function getSize();
-
-    /**
-     * Returns the underlying parameters for the key
-     *
-     * @return array<string, mixed> the parameters
+     * {@inheritdoc}
      */
     public function getKeyData() {
         return $this->data;
@@ -235,14 +214,6 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Returns the key in PEM (base64 encoded DER) format
-     *
-     * @return string the key in PEM format
-     * @throws KeyException if the key cannot be converted
-     */
-    abstract public function toPEM();
-
-    /**
      * Obtains the members from the underlying JSON web key object to be used
      * to calculate the key's thumbnail.
      * 
@@ -258,14 +229,7 @@ abstract class Key implements KeyInterface {
     abstract protected function getThumbnailMembers();
 
     /**
-     * Obtains a thumbnail for the key.  The thumbnail is derived from the
-     * keys to the JSON web key object as returned by the {@link getThumbnailMembers()}
-     * function.
-     *
-     * For asymmetric keys, the public and private keys should have the same
-     * thumbnail.
-     *
-     * @return string the thumbnail
+     * {@inheritdoc}
      */
     public function getThumbnail() {
         $members = $this->getThumbnailMembers();

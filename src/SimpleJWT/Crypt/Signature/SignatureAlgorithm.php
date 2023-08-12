@@ -37,7 +37,7 @@ namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\AlgorithmInterface;
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\KeyException;
 
@@ -83,7 +83,7 @@ interface SignatureAlgorithm extends AlgorithmInterface {
      * to be used to sign the payload
      * @param string $kid the ID of the key to be used. If null the key will
      * be chosen automatically.
-     * @return Key|null the signing key, or null if there is no appropriate
+     * @return KeyInterface|null the signing key, or null if there is no appropriate
      * key in $keys
      */
     public function getSigningKey($keys, $kid = null);

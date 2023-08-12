@@ -114,13 +114,6 @@ class SymmetricKey extends Key {
     }
 
     /**
-     * @codeCoverageIgnore
-     */
-    public function toPEM() {
-        throw new KeyException('Unsupported key format');
-    }
-
-    /**
      * Returns the symmetric key in binary representation
      *
      * @return string the key

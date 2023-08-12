@@ -97,10 +97,6 @@ class OKPKey extends Key implements ECDHKeyInterface {
         ], 'php');
     }
 
-    public function toPEM() {
-        throw new KeyException('PEM format is not supported for OKP keys');
-    }
-
     /**
      * Returns the key in the format used by libsodium
      *

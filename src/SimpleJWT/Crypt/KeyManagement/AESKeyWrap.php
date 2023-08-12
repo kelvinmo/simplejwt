@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
@@ -47,7 +47,7 @@ use SimpleJWT\Keys\SymmetricKey;
  * @see https://tools.ietf.org/html/rfc7518#section-4.4
  * @see https://tools.ietf.org/html/rfc3394
  */
-class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
+class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
 
     const RFC3394_IV = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
 

@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
@@ -45,7 +45,7 @@ use SimpleJWT\Keys\SymmetricKey;
  * Implementation of direct encryption.  The key selected from the key set is
  * the shared content encryption key
  */
-class DirectEncryption extends Algorithm implements KeyDerivationAlgorithm {
+class DirectEncryption extends BaseAlgorithm implements KeyDerivationAlgorithm {
     public function __construct($alg) {
         parent::__construct($alg);
     }

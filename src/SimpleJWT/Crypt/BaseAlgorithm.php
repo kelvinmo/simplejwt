@@ -50,11 +50,7 @@ use SimpleJWT\Keys\KeySet;
  * Algorithms will ordinarily implement one or more of {@link SignatureAlgorithm},
  * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm} interfaces.
  */
-abstract class Algorithm {
-
-    const SIGNATURE_ALGORITHM = 'sig';
-    const ENCRYPTION_ALGORITHM = 'enc';
-    const KEY_ALGORITHM = 'key';
+abstract class BaseAlgorithm {
 
     /** @var string|null $alg */
     private $alg;

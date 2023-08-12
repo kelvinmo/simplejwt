@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\OKPKey;
 use SimpleJWT\Keys\KeyException;
@@ -44,7 +44,7 @@ use SimpleJWT\Util\Util;
 /**
  * Abstract class for SHA2-based signature algorithms.
  */
-class EdDSA extends Algorithm implements SignatureAlgorithm {
+class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     public function __construct($alg) {
         parent::__construct($alg);
     }

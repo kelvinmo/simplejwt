@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Util\Util;
@@ -48,7 +48,7 @@ use SimpleJWT\Util\Util;
  * @see https://tools.ietf.org/html/rfc7518#section-4.3
  * @see https://tools.ietf.org/html/rfc3447
  */
-class RSAES extends Algorithm implements KeyEncryptionAlgorithm {
+class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'RSA1_5' => ['openssl_padding' => OPENSSL_PKCS1_PADDING],

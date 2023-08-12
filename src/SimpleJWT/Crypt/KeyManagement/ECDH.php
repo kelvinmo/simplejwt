@@ -35,7 +35,8 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\AlgorithmInterface;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\ECDHKeyInterface;
@@ -48,7 +49,7 @@ use SimpleJWT\Util\Util;
  * 
  * @see https://tools.ietf.org/html/rfc7518#section-4.6
  */
-class ECDH extends Algorithm implements KeyDerivationAlgorithm {
+class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
     /** @var int $key_size */
     private $key_size;
 
@@ -97,7 +98,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         if (isset($headers['enc'])) {
             try {
                 /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $enc */
-                $enc = AlgorithmFactory::create($headers['enc'], Algorithm::ENCRYPTION_ALGORITHM);
+                $enc = AlgorithmFactory::create($headers['enc'], AlgorithmInterface::ENCRYPTION_ALGORITHM);
                 $size = $enc->getCEKSize();
             } catch (\UnexpectedValueException $e) {
                 throw new CryptException('Unexpected enc algorithm', 0, $e);

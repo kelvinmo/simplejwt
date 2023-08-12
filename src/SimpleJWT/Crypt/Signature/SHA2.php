@@ -35,13 +35,13 @@
 
 namespace SimpleJWT\Crypt\Signature;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Util\Util;
 
 /**
  * Abstract class for SHA2-based signature algorithms.
  */
-abstract class SHA2 extends Algorithm implements SignatureAlgorithm {
+abstract class SHA2 extends BaseAlgorithm implements SignatureAlgorithm {
     /** @var int the length, in bits, of the SHA-2 hash */
     protected $size;
 

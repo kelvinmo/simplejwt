@@ -8,7 +8,7 @@ use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;
 
 class ECKeyMock extends ECKey {
-    public static function createEphemeralKey(string $crv): ECKey {
+    public static function createEphemeralKey(string $crv): ECDHKeyInterface {
         // From Appendix C of RFC 7518
         return new ECKey([
             'kty' => 'EC',

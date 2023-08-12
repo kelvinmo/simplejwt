@@ -67,12 +67,11 @@ interface ECDHKeyInterface extends KeyInterface {
     public function deriveAgreementKey(ECDHKeyInterface $public_key): string;
 
     /**
-     * Creates an ephemeral keypair using the specified curve
+     * Creates an ephemeral keypair using the same curve as this key
      * 
-     * @param string $crv the name of the curve
      * @return ECDHKeyInterface the ephemeral keypair
      */
-    public static function createEphemeralKey(string $crv): ECDHKeyInterface;
+    public function createEphemeralKey(): ECDHKeyInterface;
 }
 
 ?>

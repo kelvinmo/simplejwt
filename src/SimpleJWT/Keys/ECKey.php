@@ -330,7 +330,9 @@ class ECKey extends Key implements ECDHKeyInterface {
     /**
      * {@inheritdoc}
      */
-    public static function createEphemeralKey(string $crv): ECDHKeyInterface {
+    public function createEphemeralKey(): ECDHKeyInterface {
+        $crv = $this->getCurve();
+        
         if (!isset(self::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
         $openssl_curve_name = self::$curves[$crv]['openssl'];
 

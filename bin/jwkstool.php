@@ -101,7 +101,7 @@ abstract class SelectKeyCommand extends Command {
     protected function selectKey(InputInterface $input, OutputInterface $output) {
         if ($input->getArgument('kid')) {
             if ($input->getOption('use') || $input->getOption('op')) {
-                $output->writeln('Warning: key id specified, ignoring --use and --op');
+                $output->writeln('<comment>Warning: key id specified, ignoring --use and --op</comment>');
             }
             $key = $this->set->getById($input->getArgument('kid'), true);
 
@@ -114,7 +114,7 @@ abstract class SelectKeyCommand extends Command {
 
         if ($key != null) return $key;
 
-        $output->writeln('Key not found');
+        $output->writeln('<error>Key not found</error>');
         return null;
     }
 }
@@ -136,7 +136,7 @@ class AddCommand extends Command {
 
         $key_file = $input->getArgument('key_file');
         if (!file_exists($key_file)) {
-            $output->writeln('File not found: ' . $key_file);
+            $output->writeln('<error>File not found: ' . $key_file . '</error>');
             return 1;
         }
 
@@ -147,7 +147,7 @@ class AddCommand extends Command {
             if ($input->getOption('create')) {
                 $set = new KeySet();
             } else {
-                $output->writeln('File not found: ' . $jwks_file);
+                $output->writeln('<error>File not found: ' . $jwks_file . '</error>');
                 return 1;
             }
         }
@@ -155,11 +155,11 @@ class AddCommand extends Command {
         try {
             $key = KeyFactory::create(file_get_contents($key_file), $input->getOption('format'));
         } catch (KeyException $e) {
-            $output->writeln($e->getMessage());
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
             return 2;
         }
         if ($key == null) {
-            $output->writeln('Key format or type not recognised');
+            $output->writeln('<error>Key format or type not recognised</error>');
             return 2;
         }
 
@@ -191,7 +191,7 @@ class ListKeysCommand extends Command {
         $jwks_file = $input->getArgument('jwks_file');
 
         if (!file_exists($jwks_file)) {
-            $output->writeln('File not found: ' . $jwks_file);
+            $output->writeln('<error>File not found: ' . $jwks_file . '</error>');
             return 1;
         }
 
@@ -235,7 +235,7 @@ class RemoveCommand extends SelectKeyCommand {
 
         $jwks_file = $input->getArgument('jwks_file');
         if (!file_exists($jwks_file)) {
-            $output->writeln('File not found: ' . $jwks_file);
+            $output->writeln('<error>File not found: ' . $jwks_file . '</error>');
             return 1;
         }
 
@@ -265,7 +265,7 @@ class ExportCommand extends SelectKeyCommand {
 
         $jwks_file = $input->getArgument('jwks_file');
         if (!file_exists($jwks_file)) {
-            $output->writeln('File not found: ' . $jwks_file);
+            $output->writeln('<error>File not found: ' . $jwks_file . '</error>');
             return 1;
         }
 
@@ -275,7 +275,7 @@ class ExportCommand extends SelectKeyCommand {
         if ($key) {
             switch ($input->getOption('format')) {
                 case 'json':
-                    $export = $key->toJSON();
+                    $export = json_encode($key->getKeyData());
                     break;
                 case 'pem':
                     try {
@@ -285,7 +285,7 @@ class ExportCommand extends SelectKeyCommand {
                     }
                     break;
                 default:
-                    $output->writeln('Invalid format: ' . $input->getOption('format'));
+                    $output->writeln('<error>Invalid format: ' . $input->getOption('format') . '</error>');
             }
 
             if ($input->getOption('output')) {

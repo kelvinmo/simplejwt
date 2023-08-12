@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - Added: Support for `Ed25519` signatures and `X25519` key derviation
   algorithms
 - Changed: Use `box` to package the `jwkstool` utility
+- Changed: Refactored `Algorithm` (now renamed to `BaseAlgorithm`)
+  and `Key` to extract interfaces (into `AlgorithmInterface` and 
+  `KeyInterface` respectively)
 - Removed: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively
 - Removed: Support for PHP 7.1

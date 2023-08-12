@@ -65,7 +65,7 @@ class EdDSA extends Algorithm implements SignatureAlgorithm {
         if (($key == null) || !($key instanceof OKPKey)) {
             throw new KeyException('Key not found or is invalid');
         }
-        /** @var non-empty-string $secret_key */
+        /** @var non-empty-string $key_pair */
         $key_pair = $key->toSodium();
         $secret_key = sodium_crypto_sign_secretkey($key_pair);
 

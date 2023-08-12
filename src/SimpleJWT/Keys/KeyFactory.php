@@ -59,6 +59,7 @@ class KeyFactory {
     static $jwk_kty_map = [
         RSAKey::KTY => 'SimpleJWT\Keys\RSAKey',
         ECKey::KTY => 'SimpleJWT\Keys\ECKey',
+        OKPKey::KTY => 'SimpleJWT\Keys\OKPKey',
         SymmetricKey::KTY => 'SimpleJWT\Keys\SymmetricKey'
     ];
 

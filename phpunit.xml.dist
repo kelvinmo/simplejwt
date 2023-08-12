@@ -1,20 +1,19 @@
-<phpunit
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
-    bootstrap="tests/bootstrap.php"
->
-    <testsuites>
-        <testsuite name="SimpleJWT test suite">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-    <coverage ignoreDeprecatedCodeUnits="true">
-        <include>
-            <directory suffix=".php">src/</directory>
-        </include>
-        <report>
-            <html outputDirectory="tests/coverage"/>
-            <clover outputFile="tests/coverage/clover.xml"/>
-        </report>
-    </coverage>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" bootstrap="tests/bootstrap.php">
+  <testsuites>
+    <testsuite name="SimpleJWT test suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <coverage ignoreDeprecatedCodeUnits="true">
+    <report>
+      <html outputDirectory="tests/coverage"/>
+      <clover outputFile="tests/coverage/clover.xml"/>
+    </report>
+  </coverage>
+  <source>
+    <include>
+      <directory suffix=".php">src/</directory>
+    </include>
+  </source>
 </phpunit>

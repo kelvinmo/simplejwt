@@ -42,7 +42,7 @@ use SimpleJWT\Util\Util;
 /**
  * Represents a key.
  */
-abstract class Key {
+abstract class Key implements KeyInterface {
     const PEM_PUBLIC = '/-----BEGIN PUBLIC KEY-----([^-:]+)-----END PUBLIC KEY-----/';
     const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
@@ -194,23 +194,6 @@ abstract class Key {
      * @return int the size of the key in bits
      */
     abstract public function getSize();
-
-    /**
-     * Determines wshether the key is a public key.
-     *
-     * A key is public if, and only if, it is an asymmetric key, and the key
-     * does not contain any private parameters.
-     *
-     * @return bool true if the key is public
-     */
-    abstract public function isPublic();
-
-    /**
-     * Returns the public key.
-     *
-     * @return Key|null the public key, or null if the public key does not exist (e.g. is a symmetric key)
-     */
-    abstract public function getPublicKey();
 
     /**
      * Returns the underlying parameters for the key

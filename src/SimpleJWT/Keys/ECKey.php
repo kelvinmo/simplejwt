@@ -43,7 +43,7 @@ use SimpleJWT\Util\Util;
 /**
  * A class representing a public or private key in an elliptic curve key pair.
  */
-class ECKey extends Key {
+class ECKey extends Key implements ECDHKeyInterface {
 
     const KTY = 'EC';
 
@@ -274,7 +274,7 @@ class ECKey extends Key {
      * @return bool true if the EC key is on the same curve
      * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
      */
-    public function isOnSameCurve($public_key) {
+    public function isOnSameCurve($public_key): bool {
         if (!($public_key instanceof ECKey)) return false;
         if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
 
@@ -321,13 +321,64 @@ class ECKey extends Key {
     }
 
     /**
-     * Gets the elliptic curve for the key.  The elliptic curve is specified in
-     * the `crv` parameter.
-     * 
-     * @return string the elliptic curve
+     * {@inheritdoc}
      */
-    public function getCurve() {
+    public function getCurve(): string {
         return $this->data['crv'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createEphemeralKey(): ECDHKeyInterface {
+        $crv = $this->getCurve();
+        
+        if (!isset(self::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
+        $openssl_curve_name = self::$curves[$crv]['openssl'];
+
+        $curves = openssl_get_curve_names();
+        if ($curves == false) throw new KeyException('Cannot get openssl supported curves');
+
+        if (!in_array($openssl_curve_name, $curves))
+            throw new KeyException('Unable to create ephemeral key: unsupported curve');
+
+        // Note openssl.cnf needs to be correctly configured for this to work.
+        // See https://www.php.net/manual/en/openssl.installation.php for the
+        // appropriate location of this configuration file
+        $pkey = openssl_pkey_new([
+            'curve_name' => $openssl_curve_name,
+            'private_key_type' => OPENSSL_KEYTYPE_EC,
+            'config' => dirname(__FILE__) . '/openssl.cnf'
+        ]);
+        if ($pkey === false) throw new KeyException('Unable to create ephemeral key (is openssl.cnf missing?)');
+        
+        // Note openssl.cnf needs to be correctly configured for this to work.
+        // See https://www.php.net/manual/en/openssl.installation.php for the
+        // appropriate location of this configuration file
+        $result = openssl_pkey_export($pkey, $pem, null, [ 'config' => dirname(__FILE__) . '/openssl.cnf' ]);
+        if ($result === false) throw new KeyException('Unable to create ephemeral key');
+
+        return new ECKey($pem, 'pem');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deriveAgreementKey(ECDHKeyInterface $public_key): string {
+        assert(function_exists('openssl_pkey_derive'));
+
+        if (!($public_key instanceof ECKey)) throw new KeyException('Key type does not match');
+        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key');
+
+        $public_key_res = openssl_pkey_get_public($public_key->toPEM());
+        if ($public_key_res === false) throw new KeyException('Public key load error: ' . openssl_error_string());
+
+        $private_key_res = openssl_pkey_get_private($this->toPEM());
+        if ($private_key_res === false) throw new KeyException('Private key load error: ' . openssl_error_string());
+
+        $result = openssl_pkey_derive($public_key_res, $private_key_res);
+        if ($result === false) throw new KeyException('Key agreement error: ' . openssl_error_string());
+        return $result;
     }
 
     protected function getThumbnailMembers() {

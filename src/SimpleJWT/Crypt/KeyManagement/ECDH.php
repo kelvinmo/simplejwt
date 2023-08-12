@@ -38,7 +38,7 @@ namespace SimpleJWT\Crypt\KeyManagement;
 use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
-use SimpleJWT\Keys\ECKey;
+use SimpleJWT\Keys\ECDHKeyInterface;
 use SimpleJWT\Keys\KeyFactory;
 use SimpleJWT\Util\Util;
 
@@ -83,11 +83,11 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
     }
 
     public function getKeyCriteria() {
-        return ['kty' => 'EC', '@use' => 'enc', '@key_ops' => 'deriveKey'];
+        return ['kty' => ['EC', 'OKP'], '@use' => 'enc', '@key_ops' => 'deriveKey'];
     }
 
     public function deriveKey($keys, &$headers, $kid = null) {
-        /** @var ECKey $key */
+        /** @var ECDHKeyInterface $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
@@ -122,8 +122,8 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         if (isset($headers['epk'])) {
             // (a) Load the ephemeral public key
             $ephemeral_public_key = KeyFactory::create($headers['epk'], 'php');
-            if (!($ephemeral_public_key instanceof ECKey)) {
-                throw new CryptException("Invalid epk: not an EC key");
+            if (!($ephemeral_public_key instanceof ECDHKeyInterface)) {
+                throw new CryptException("Invalid epk: not an ECDH compatible key");
             }
 
             // (b) Check that $key is a private key
@@ -148,8 +148,7 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
 
             // (b) Create an ephemeral key pair with the same curve as the recipient's public
             //     key, then set the epk header
-            $crv = $key->getCurve();
-            $ephemeral_private_key = $this->createEphemeralKey($crv);
+            $ephemeral_private_key = $key->createEphemeralKey();
             $ephemeral_public_key = $ephemeral_private_key->getPublicKey();
             $headers['epk'] = $ephemeral_public_key->getKeyData();
 
@@ -159,55 +158,12 @@ class ECDH extends Algorithm implements KeyDerivationAlgorithm {
         }
 
         // 3. Calculate agreement key (Z)
-        $Z = $this->deriveAgreementKey($dh_public_key, $dh_private_key);
+        $Z = $dh_private_key->deriveAgreementKey($dh_public_key);
         
         // 4. Derive key from Concat KDF
         $apu = (isset($headers['apu'])) ? $headers['apu'] : '';
         $apv = (isset($headers['apv'])) ? $headers['apv'] : '';
         return $this->concatKDF($Z, $alg, $size, $apu, $apv);
-    }
-
-    protected function createEphemeralKey(string $crv): ECKey {
-        if (!isset(ECKey::$curves[$crv])) throw new \InvalidArgumentException('Curve not found');
-        $openssl_curve_name = ECKey::$curves[$crv]['openssl'];
-
-        $curves = openssl_get_curve_names();
-        if ($curves == false) throw new CryptException('Cannot get openssl supported curves');
-
-        if (!in_array($openssl_curve_name, $curves))
-            throw new CryptException('Unable to create ephemeral key: unsupported curve');
-
-        // Note openssl.cnf needs to be correctly configured for this to work.
-        // See https://www.php.net/manual/en/openssl.installation.php for the
-        // appropriate location of this configuration file
-        $pkey = openssl_pkey_new([
-            'curve_name' => $openssl_curve_name,
-            'private_key_type' => OPENSSL_KEYTYPE_EC,
-            'config' => dirname(__FILE__) . '/openssl.cnf'
-        ]);
-        if ($pkey === false) throw new CryptException('Unable to create ephemeral key (is openssl.cnf missing?)');
-        
-        // Note openssl.cnf needs to be correctly configured for this to work.
-        // See https://www.php.net/manual/en/openssl.installation.php for the
-        // appropriate location of this configuration file
-        $result = openssl_pkey_export($pkey, $pem, null, [ 'config' => dirname(__FILE__) . '/openssl.cnf' ]);
-        if ($result === false) throw new CryptException('Unable to create ephemeral key');
-
-        return new ECKey($pem, 'pem');
-    }
-
-    private function deriveAgreementKey(ECKey $public_key, ECKey $private_key): string {
-        assert(function_exists('openssl_pkey_derive'));
-
-        $public_key_res = openssl_pkey_get_public($public_key->toPEM());
-        if ($public_key_res === false) throw new CryptException('Public key load error: ' . openssl_error_string());
-
-        $private_key_res = openssl_pkey_get_private($private_key->toPEM());
-        if ($private_key_res === false) throw new CryptException('Private key load error: ' . openssl_error_string());
-
-        $result = openssl_pkey_derive($public_key_res, $private_key_res);
-        if ($result === false) throw new CryptException('Key agreement error: ' . openssl_error_string());
-        return $result;
     }
 
     private function concatKDF(string $Z, string $alg, int $size, string $apu = '', string $apv = ''): string {

@@ -81,7 +81,7 @@ class OKPKey extends Key {
     }
 
     public function getPublicKey() {
-        return new ECKey([
+        return new OKPKey([
             'kid' => $this->data['kid'],
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
@@ -111,7 +111,7 @@ class OKPKey extends Key {
             
             switch ($this->data['crv']) {
                 case 'Ed25519':
-                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey($d, $x);
+                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey($d . $x, $x);
                 case 'X25519':
                     return sodium_crypto_box_keypair_from_secretkey_and_publickey($d, $x);
                 default:

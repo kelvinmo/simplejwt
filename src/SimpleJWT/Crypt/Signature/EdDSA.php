@@ -66,7 +66,8 @@ class EdDSA extends Algorithm implements SignatureAlgorithm {
             throw new KeyException('Key not found or is invalid');
         }
         /** @var non-empty-string $secret_key */
-        $secret_key = $key->toSodium();
+        $key_pair = $key->toSodium();
+        $secret_key = sodium_crypto_sign_secretkey($key_pair);
 
         $binary = sodium_crypto_sign_detached($data, $secret_key);
         return Util::base64url_encode($binary);

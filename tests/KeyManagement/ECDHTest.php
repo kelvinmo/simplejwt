@@ -3,6 +3,7 @@
 namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Keys\ECKey;
+use SimpleJWT\Keys\ECDHKeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
 use PHPUnit\Framework\TestCase;

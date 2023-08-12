@@ -170,6 +170,7 @@ class JWE extends Token {
             try {
                 if (!isset($kid)) $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
                 $cek = $key_enc->decryptKey($encrypted_key, $keys, $headers, $kid);
+                if (isset($agreed_symmetric_key)) $keys->remove($agreed_symmetric_key);
             } catch (KeyException $e) {
                 throw new InvalidTokenException($e->getMessage(), InvalidTokenException::DECRYPTION_ERROR, $e);
             } catch (CryptException $e) {
@@ -259,6 +260,7 @@ class JWE extends Token {
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
             $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
+            if (isset($agreed_symmetric_key)) $keys->remove($agreed_symmetric_key);
         } else {
             $encrypted_key = '';
         }

@@ -3,6 +3,7 @@
 namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Keys\ECKey;
+use SimpleJWT\Keys\OKPKey;
 use SimpleJWT\Keys\ECDHKeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
@@ -32,10 +33,20 @@ class ECKeyMock extends ECKey {
 }
 
 class ECDHTest extends TestCase {
-    protected function isAlgAvailable() {
+    protected function isECAlgAvailable() {
         $ecdh = new ECDH(null);
         if (!in_array('ECDH-ES', $ecdh->getSupportedAlgs())) {
             $this->markTestSkipped('Alg not available: ECDH-ES');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    protected function isX25519AlgAvailable() {
+        if (!$this->isECAlgAvailable()) return false;
+        if (!function_exists('sodium_crypto_scalarmult')) {
+            $this->markTestSkipped('Alg not available: X25519');
             return false;
         } else {
             return true;
@@ -68,7 +79,7 @@ class ECDHTest extends TestCase {
     }
 
     public function testProduceECDH() {
-        if (!$this->isAlgAvailable()) return;
+        if (!$this->isECAlgAvailable()) return;
 
         $ecdh = new ECDH('ECDH-ES');
         $keys = $this->getPublicKeySet();
@@ -89,7 +100,7 @@ class ECDHTest extends TestCase {
     }
 
     public function testConsumeECDH() {
-        if (!$this->isAlgAvailable()) return;
+        if (!$this->isECAlgAvailable()) return;
 
         $ecdh = new ECDH('ECDH-ES');
         $keys = $this->getPrivateKeySet();
@@ -110,6 +121,26 @@ class ECDHTest extends TestCase {
         $this->assertEquals('VqqN6vgjbSBcIijNcacQGg', Util::base64url_encode($result));
     }
 
+    public function testX25519() {
+        if (!$this->isX25519AlgAvailable()) return;
+
+        // Vectors are from Appendix A.6 of RFC 8037
+        $public_key = new OKPKey([
+            'kty' => 'OKP',
+            'crv' => 'X25519',
+            'x' => '3p7bfXt9wbTTW2HC7OQ1Nz-DQ8hbeGdNrfx-FG-IK08'
+        ], 'php');
+
+        $ephemeral_key = new OKPKey([
+            'kty' => 'OKP',
+            'crv' => 'X25519',
+            'd' => 'dwdtCnMYpX08FsFyUbJmRd9ML4frwJkqsXf7pR25LCo',
+            'x' => 'hSDwCYkwp1R0i33ctD73Wg2_Og0mOBr066SpjqqbTmo'
+        ], 'php');
+
+        $Z = $ephemeral_key->deriveAgreementKey($public_key);
+        $this->assertEquals('Sl2dW6TOLeFyjjv0gDUPJeB-IclH0Z4zdvCbPB4WF0I', Util::base64url_encode($Z));
+    }
 }
 
 ?>

@@ -15,6 +15,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
     * HMAC family (HS256, HS384, HS512)
     * RSA family (RS256, RS384, RS512)
     * ECDSA family (ES256, ES384, ES512)
+    * EdDSA
 - Key management algorithms
     * Key agreement or direct encryption
     * RSAES-PKCS1-v1_5 (RSA1_5)
@@ -24,14 +25,15 @@ SimpleJWT is a simple JSON web token library written in PHP.
     * Elliptic Curve Diffie-Hellman (ECDH-ES) - requires PHP 7.3 or later
 - Content encryption algorithms
     * AES_CBC_HMAC_SHA2 family (A128CBC-HS256, A192CBC-HS384, A256CBC-HS512)
-    * AES GCM family (A128GCM, A192GCM, A256GCM) - requires PHP 7.1 or later
+    * AES GCM family (A128GCM, A192GCM, A256GCM)
 
 ## Requirements
 
-- PHP 7.1.0 or later
+- PHP 7.2 or later
 - `gmp` extension
 - `hash` extension
 - `openssl` extension
+- `sodium` extension for EdDSA support
 
 ## Installation
 

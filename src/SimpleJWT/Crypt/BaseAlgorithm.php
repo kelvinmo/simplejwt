@@ -50,7 +50,7 @@ use SimpleJWT\Keys\KeySet;
  * Algorithms will ordinarily implement one or more of {@link SignatureAlgorithm},
  * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm} interfaces.
  */
-abstract class BaseAlgorithm {
+abstract class BaseAlgorithm implements AlgorithmInterface {
 
     /** @var string|null $alg */
     private $alg;
@@ -79,19 +79,6 @@ abstract class BaseAlgorithm {
     public function getAlg() {
         return $this->alg;
     }
-
-    /**
-     * Get `alg` or `enc` values supported by this class.
-     *
-     * Implementations should test the host system's configuration to determine
-     * an algorithm is supported.  For example, if an algorithm requires a
-     * particular PHP extension is installed, then this method should test
-     * the presence of this extension before including the algorithm in the
-     * return value.
-     *
-     * @return array<string> an array of supported algorithms
-     */
-    abstract public function getSupportedAlgs();
 
     /**
      * Select the key from the key set that can be used by this algorithm.

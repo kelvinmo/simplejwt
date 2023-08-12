@@ -41,7 +41,7 @@ use SimpleJWT\Util\ASN1\DER;
 use SimpleJWT\Util\ASN1;
 
 /**
- * A factory object for creating `Key` objects.
+ * A factory object for creating `KeyInterface` objects.
  *
  * This class acts as a central registry to detect the type of a key.  The
  * registry contains three components:
@@ -89,7 +89,7 @@ class KeyFactory {
      * @param string $format the format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
-     * @return Key the key object
+     * @return KeyInterface the key object
      * @throws KeyException if an error occurs in reading the data
      */
     static public function create($data, $format = null, $password = null, $alg = 'PBES2-HS256+A128KW') {
@@ -140,7 +140,7 @@ class KeyFactory {
         if ($format == 'php') {
             if (($data != null) && isset($data['kty'])) {
                 if (isset(self::$jwk_kty_map[$data['kty']])) {
-                    /** @var Key $key */
+                    /** @var KeyInterface $key */
                     $key = new self::$jwk_kty_map[$data['kty']]($data, 'php');
                     return $key;
                 }
@@ -162,7 +162,7 @@ class KeyFactory {
 
                 $oid = $seq->getChildAt(0)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
-                    /** @var Key $key */
+                    /** @var KeyInterface $key */
                     $key = new self::$oid_map[$oid]($data, 'pem');
                     return $key;
                 }
@@ -178,14 +178,14 @@ class KeyFactory {
                 
                 $oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
-                    /** @var Key $key */
+                    /** @var KeyInterface $key */
                     $key = new self::$oid_map[$oid]($data, 'pem');
                     return $key;
                 }
             } else {
                 foreach (self::$pem_map as $regex => $cls) {
                     if (preg_match($regex, $data)) {
-                        /** @var Key $key */
+                        /** @var KeyInterface $key */
                         $key = new $cls($data, 'pem');
                         return $key;
                     }

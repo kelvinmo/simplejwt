@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
@@ -81,7 +81,7 @@ trait AESKeyWrapTrait {
      */
     protected function getAESKWKeySize() {
         $criteria = $this->aeskw->getKeyCriteria();
-        return $criteria[Key::SIZE_PROPERTY];
+        return $criteria[KeyInterface::SIZE_PROPERTY];
     }
 
     /**

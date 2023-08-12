@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\Key;
 use SimpleJWT\Keys\KeySet;
@@ -47,7 +47,7 @@ use SimpleJWT\Util\Util;
  *
  * @see https://tools.ietf.org/html/rfc7518#section-4.8
  */
-class PBES2 extends Algorithm implements KeyEncryptionAlgorithm {
+class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     use AESKeyWrapTrait;
 
     /** @var array<string, mixed> $alg_params */

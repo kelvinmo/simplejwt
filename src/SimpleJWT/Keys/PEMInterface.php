@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,34 +33,20 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt\Signature;
-
-use SimpleJWT\Crypt\BaseAlgorithm;
-use SimpleJWT\Util\Util;
+namespace SimpleJWT\Keys;
 
 /**
- * Abstract class for SHA2-based signature algorithms.
+ * Interface for keys that can be exported to PEM (base64 encoded DER)
+ * format
  */
-abstract class SHA2 extends BaseAlgorithm implements SignatureAlgorithm {
-    /** @var int the length, in bits, of the SHA-2 hash */
-    protected $size;
-
+interface PEMInterface {
     /**
-     * Creates an instance of this algorithm.
-     * 
-     * @param ?string $alg the algorithm
-     * @param ?int $size the length, in bits, of the SHA-2 hash
+     * Returns the key in PEM (base64 encoded DER) format
+     *
+     * @return string the key in PEM format
+     * @throws KeyException if the key cannot be converted
      */
-    protected function __construct($alg, $size) {
-        parent::__construct($alg);
-        $this->size = $size;
-    }
-
-    public function shortHash($data) {
-        $hash = hash('sha' . $this->size, $data, true);
-        $short = substr($hash, 0, $this->size / 16);
-        return Util::base64url_encode($short);
-    }
+    public function toPEM();
 }
 
 ?>

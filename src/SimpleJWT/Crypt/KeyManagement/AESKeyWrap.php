@@ -35,10 +35,10 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\SymmetricKey;
 
 /**
@@ -47,7 +47,7 @@ use SimpleJWT\Keys\SymmetricKey;
  * @see https://tools.ietf.org/html/rfc7518#section-4.4
  * @see https://tools.ietf.org/html/rfc3394
  */
-class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
+class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
 
     const RFC3394_IV = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
 
@@ -80,7 +80,7 @@ class AESKeyWrap extends Algorithm implements KeyEncryptionAlgorithm {
         $size = self::$alg_params[$alg]['key'] * 8;
         return [
             'kty' => 'oct',
-            Key::SIZE_PROPERTY => $size,
+            KeyInterface::SIZE_PROPERTY => $size,
             '~alg' => $this->getAlg(),
             '@use' => 'enc',
             '@key_ops' => ['wrapKey', 'unwrapKey']

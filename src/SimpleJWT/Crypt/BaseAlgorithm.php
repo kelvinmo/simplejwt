@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt;
 
-use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\KeySet;
 
 /**
@@ -50,11 +50,7 @@ use SimpleJWT\Keys\KeySet;
  * Algorithms will ordinarily implement one or more of {@link SignatureAlgorithm},
  * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm} interfaces.
  */
-abstract class Algorithm {
-
-    const SIGNATURE_ALGORITHM = 'sig';
-    const ENCRYPTION_ALGORITHM = 'enc';
-    const KEY_ALGORITHM = 'key';
+abstract class BaseAlgorithm implements AlgorithmInterface {
 
     /** @var string|null $alg */
     private $alg;
@@ -85,19 +81,6 @@ abstract class Algorithm {
     }
 
     /**
-     * Get `alg` or `enc` values supported by this class.
-     *
-     * Implementations should test the host system's configuration to determine
-     * an algorithm is supported.  For example, if an algorithm requires a
-     * particular PHP extension is installed, then this method should test
-     * the presence of this extension before including the algorithm in the
-     * return value.
-     *
-     * @return array<string> an array of supported algorithms
-     */
-    abstract public function getSupportedAlgs();
-
-    /**
      * Select the key from the key set that can be used by this algorithm.
      *
      * The criteria specified in this function is combined with the default
@@ -114,7 +97,7 @@ abstract class Algorithm {
      * @param KeySet $keys the key set from which the key will
      * be selected
      * @param array<string, mixed>|string $args the criteria
-     * @return Key|null the found key, or null
+     * @return KeyInterface|null the found key, or null
      */
     protected function selectKey($keys, ...$args) {
         $criteria = $this->getKeyCriteria();

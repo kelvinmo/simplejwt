@@ -35,13 +35,15 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
+use SimpleJWT\Crypt\AlgorithmInterface;
+
 /**
  * Interface for key management algorithms.  These can be *key encryption
  * algorithms*, which takes a previously generated content encrpytion key and
  * encrypts it, or *key derivation algoritms* which generates the content
  * encryption key based on certain shared information.
  */
-interface KeyManagementAlgorithm {
+interface KeyManagementAlgorithm extends AlgorithmInterface {
 
 }
 

@@ -35,7 +35,7 @@
 
 namespace SimpleJWT\Crypt\Encryption;
 
-use SimpleJWT\Crypt\Algorithm;
+use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 
@@ -44,7 +44,7 @@ use SimpleJWT\Util\Util;
  *
  * @see https://tools.ietf.org/html/rfc7518#section-5.3
  */
-class AESGCM extends Algorithm implements EncryptionAlgorithm {
+class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
         'A128GCM' => ['cipher' => 'aes-128-gcm', 'key' => 16],

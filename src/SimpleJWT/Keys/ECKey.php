@@ -43,7 +43,7 @@ use SimpleJWT\Util\Util;
 /**
  * A class representing a public or private key in an elliptic curve key pair.
  */
-class ECKey extends Key implements ECDHKeyInterface {
+class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
 
     const KTY = 'EC';
 

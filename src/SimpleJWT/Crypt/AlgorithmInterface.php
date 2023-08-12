@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,34 +33,43 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Crypt\Signature;
+namespace SimpleJWT\Crypt;
 
-use SimpleJWT\Crypt\BaseAlgorithm;
-use SimpleJWT\Util\Util;
+use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeySet;
 
 /**
- * Abstract class for SHA2-based signature algorithms.
+ * Interface for a cryptographic algorithm.
+ *
+ * Algorithms will ordinarily implement one or more of the subinterfaces
+ * of this interface: {@link SignatureAlgorithm},
+ * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm}.
  */
-abstract class SHA2 extends BaseAlgorithm implements SignatureAlgorithm {
-    /** @var int the length, in bits, of the SHA-2 hash */
-    protected $size;
+interface AlgorithmInterface {
+
+    const SIGNATURE_ALGORITHM = 'sig';
+    const ENCRYPTION_ALGORITHM = 'enc';
+    const KEY_ALGORITHM = 'key';
 
     /**
-     * Creates an instance of this algorithm.
-     * 
-     * @param ?string $alg the algorithm
-     * @param ?int $size the length, in bits, of the SHA-2 hash
+     * Returns the name of the algorithm.
+     *
+     * @return string|null the algorithm
      */
-    protected function __construct($alg, $size) {
-        parent::__construct($alg);
-        $this->size = $size;
-    }
+    public function getAlg();
 
-    public function shortHash($data) {
-        $hash = hash('sha' . $this->size, $data, true);
-        $short = substr($hash, 0, $this->size / 16);
-        return Util::base64url_encode($short);
-    }
+    /**
+     * Get `alg` or `enc` values supported by this class.
+     *
+     * Implementations should test the host system's configuration to determine
+     * an algorithm is supported.  For example, if an algorithm requires a
+     * particular PHP extension is installed, then this method should test
+     * the presence of this extension before including the algorithm in the
+     * return value.
+     *
+     * @return array<string> an array of supported algorithms
+     */
+    public function getSupportedAlgs();
 }
 
 ?>

@@ -41,7 +41,7 @@ use SimpleJWT\Util\Util;
  * A class representing a public or private key in an octet key pair.
  * Currently this support Edwards curves (Ed25519) adn ECDH X25519
  */
-class OKPKey extends Key {
+class OKPKey extends Key implements ECDHKeyInterface {
     const KTY = 'OKP';
 
     /**
@@ -78,6 +78,14 @@ class OKPKey extends Key {
 
     public function isPublic() {
         return !isset($this->data['d']);
+    }
+
+    public function isOnSameCurve($public_key): bool {
+        if (!($public_key instanceof OKPKey)) return false;
+        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
+        if (!Util::secure_compare($this->data['crv'], 'X25519')) return false;
+
+        return true;
     }
 
     public function getPublicKey() {
@@ -126,8 +134,44 @@ class OKPKey extends Key {
      * 
      * @return string the subtype
      */
-    public function getCurve() {
+    public function getCurve(): string {
         return $this->data['crv'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createEphemeralKey(): ECDHKeyInterface {
+        $crv = $this->getCurve();
+        if ($crv != 'X25519') throw new \InvalidArgumentException('Curve not found');
+
+        $key = sodium_crypto_box_keypair();
+        $d = sodium_crypto_box_secretkey($key);
+        $x = sodium_crypto_box_publickey($key);
+
+        return new OKPKey([
+            'kty' => 'OKP',
+            'crv' => 'X25519',
+            'd' => Util::base64url_encode($d),
+            'x' => Util::base64url_encode($x)
+        ], 'php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deriveAgreementKey(ECDHKeyInterface $public_key): string {
+        assert(function_exists('sodium_crypto_scalarmult'));
+
+        if (!($public_key instanceof OKPKey)) throw new KeyException('Key type does not match');
+        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key');
+
+        $public_key = Util::base64url_decode($public_key->data['x']);
+        $secret_key = Util::base64url_decode($this->data['d']);
+
+        $result = sodium_crypto_scalarmult($secret_key, $public_key);
+        if (strlen($result) != 32) throw new KeyException('Key agreement error');
+        return $result;
     }
 
     protected function getThumbnailMembers() {

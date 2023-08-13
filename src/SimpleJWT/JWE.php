@@ -38,6 +38,7 @@ use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Crypt\KeyManagement\KeyDerivationAlgorithm;
 use SimpleJWT\Crypt\KeyManagement\KeyEncryptionAlgorithm;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
@@ -136,6 +137,8 @@ class JWE extends Token {
         /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($headers['enc']);
 
+        $key_decryption_keys = $keys;
+
         if ($key_enc instanceof KeyDerivationAlgorithm) {
             try {
                 $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
@@ -155,7 +158,9 @@ class JWE extends Token {
                 ], 'php');
                 $kid = $agreed_symmetric_key->getThumbnail();
                 $agreed_symmetric_key->setKeyId($kid);
-                $keys->add($agreed_symmetric_key);
+
+                $key_decryption_keys = new KeySet();
+                $key_decryption_keys->add($agreed_symmetric_key);
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;
@@ -169,8 +174,7 @@ class JWE extends Token {
         if (!isset($cek) && ($key_enc instanceof KeyEncryptionAlgorithm)) {
             try {
                 if (!isset($kid)) $kid = (isset($headers['kid'])) ? $headers['kid'] : null;
-                $cek = $key_enc->decryptKey($encrypted_key, $keys, $headers, $kid);
-                if (isset($agreed_symmetric_key)) $keys->remove($agreed_symmetric_key);
+                $cek = $key_enc->decryptKey($encrypted_key, $key_decryption_keys, $headers, $kid);
             } catch (KeyException $e) {
                 throw new InvalidTokenException($e->getMessage(), InvalidTokenException::DECRYPTION_ERROR, $e);
             } catch (CryptException $e) {
@@ -231,6 +235,8 @@ class JWE extends Token {
         /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($this->headers['enc']);
 
+        $key_encryption_keys = $keys;
+
         if ($kid != null) $this->headers['kid'] = $kid;
 
         if ($key_enc instanceof KeyDerivationAlgorithm) {
@@ -245,7 +251,9 @@ class JWE extends Token {
                 ], 'php');
                 $kid = $agreed_symmetric_key->getThumbnail();
                 $agreed_symmetric_key->setKeyId($kid);
-                $keys->add($agreed_symmetric_key);
+
+                $key_encryption_keys = new KeySet();
+                $key_encryption_keys->add($agreed_symmetric_key);
             } else {
                 // Direct key agreement or direct encryption
                 $cek = $agreed_key;
@@ -259,8 +267,7 @@ class JWE extends Token {
         }
 
         if ($key_enc instanceof KeyEncryptionAlgorithm) {
-            $encrypted_key = $key_enc->encryptKey($cek, $keys, $this->headers, $kid);
-            if (isset($agreed_symmetric_key)) $keys->remove($agreed_symmetric_key);
+            $encrypted_key = $key_enc->encryptKey($cek, $key_encryption_keys, $this->headers, $kid);
         } else {
             $encrypted_key = '';
         }

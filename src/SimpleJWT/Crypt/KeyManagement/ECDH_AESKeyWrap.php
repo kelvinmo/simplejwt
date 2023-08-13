@@ -35,7 +35,9 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\SymmetricKey;
 
 /**
  * Implementation of the Elliptic Curve Diffie-Hellman 
@@ -71,14 +73,43 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
         return array_map(function ($alg) { return 'ECDH-ES+' . $alg; }, $aeskw_algs);
     }
 
+    /**
+     * Returns the criteria for selecting the symmetric wrapping key.
+     * Note that this is different from the criteria for the key used
+     * to derive the wrapping key.
+     *
+     * @return array<string, mixed> the key selection criteria
+     */
+    protected function getWrappingKeyCriteria() {
+        return [
+            'kty' => 'oct',
+            '~alg' => $this->getAlg(),
+            '@use' => 'enc'
+        ];
+    }
+
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
-        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
-        return $this->wrapKey($cek, $wrapping_key, $headers);
+        $criteria = $this->getWrappingKeyCriteria();
+        if ($kid != null) $criteria['kid'] = $kid;
+
+        $wrapping_key = $this->selectKey($keys, $criteria);
+        if (($wrapping_key == null) || !($wrapping_key instanceof SymmetricKey)) {
+            throw new CryptException('Wrapping key not found');
+        }
+
+        return $this->wrapKey($cek, $wrapping_key->toBinary(), $headers);
     }
 
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
-        $wrapping_key = $this->deriveKey($keys, $headers, $kid);
-        return $this->unwrapKey($encrypted_key, $wrapping_key, $headers);
+        $criteria = $this->getWrappingKeyCriteria();
+        if ($kid != null) $criteria['kid'] = $kid;
+
+        $wrapping_key = $this->selectKey($keys, $criteria);
+        if (($wrapping_key == null) || !($wrapping_key instanceof SymmetricKey)) {
+            throw new CryptException('Wrapping key not found');
+        }
+
+        return $this->unwrapKey($encrypted_key, $wrapping_key->toBinary(), $headers);
     }
 }
 

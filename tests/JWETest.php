@@ -3,6 +3,7 @@
 namespace SimpleJWT;
 
 use SimpleJWT\Keys\KeySet;
+use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\RSAKey;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Util\Util;
@@ -10,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 
 class JWETest extends TestCase {
-    protected $multi_token = '     {
+    protected $multi_token = '{
       "protected":
        "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
       "unprotected":
@@ -44,6 +45,16 @@ class JWETest extends TestCase {
             "dp" => "w0kZbV63cVRvVX6yk3C8cMxo2qCM4Y8nsq1lmMSYhG4EcL6FWbX5h9yuvngs4iLEFk6eALoUS4vIWEwcL4txw9LsWH_zKI-hwoReoP77cOdSL4AVcraHawlkpyd2TWjE5evgbhWtOxnZee3cXJBkAi64Ik6jZxbvk-RR3pEhnCs",
             "dq" => "o_8V14SezckO6CNLKs_btPdFiO9_kC1DsuUTd2LAfIIVeMZ7jn1Gus_Ff7B7IVx3p5KuBGOVF8L-qifLb6nQnLysgHDh132NDioZkhH7mI7hPG-PYE_odApKdnqECHWw0J-F0JWnUd6D2B_1TvF9mXA2Qx-iGYn8OVV1Bsmp6qU",
             "qi" => "eNho5yRBEBxhGBtQRww9QirZsB66TrfFReG_CcteI1aCneT0ELGhYlRlCtUkTRclIfuEPmNsNDPbLoLqqCVznFbvdB7x-Tl-m0l_eFTj2KiqwGqE9PZB9nNTwMVvH3VRRSLWACvPnSiwP8N5Usy-WRXS-V7TbpxIhvepTfE0NNo"
+        ], 'php'));
+
+        $set->add(new ECKey([
+            "kty"=> "EC",
+            "kid" => "issue-159",
+            "crv" => "P-384",
+            "use" => "enc",
+            "d" => "3DCgwJeF_IRdhF1B8JYRZOm4Frt_XrknFotgE_RcVj_z053yhHF4zhM6W-z7dd2X",
+            "x" => "q4yHCxdvXDA6PODaM9IkpjCUh9gRgpkIN_gV1i5HzJUOHCkC4HMrFiIduZZsVdQf",
+            "y" => "fFrsS5ZIlf0CKAnxRXhnbSHcGTByVxULEPyN_9jKOlb85wZv4VoIEtIBxeHYkLCe"
         ], 'php'));
 
         $set->add(new SymmetricKey([
@@ -203,6 +214,26 @@ class JWETest extends TestCase {
         $test_jwe = JWE::decrypt($token, $private_set, 'dir');
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
+
+
+    public function testDecryptECDHAESKW() {
+        // https://github.com/kelvinmo/simplejwt/issues/159
+        $algs = Crypt\AlgorithmFactory::getSupportedAlgs('key');
+        if (!in_array('ECDH-ES+A256KW', $algs)) {
+            $this->markTestSkipped('ECDH-ES+A256KW algorithm not available');
+            return;
+        }
+
+        $token = 'eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZHQ00iLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiVDFIazlQell6SUY5NW9ESDJENTFZXzJGVUZuZ3RKZWxpbW11UTZJbHlyVWhuVGlfYlk1ZFplY0lPNExQRmp1byIsInkiOiJlLVBQbTNEQjB0N2F1RUNCV0Q0MkZxMlVDeXNuQ0NjQUxDUy1NWHMwclV3U0pLQmFMWTcwb1lzcWprMnJQVjROIiwiY3J2IjoiUC0zODQifX0.6vW-S_7om9iHMYc2JzkwijQV4msn55YRrDYQ2EMs3-bg3Y7I0dBrDA.CQ45omsfTgrZlrJd.58LMMeqXOogn6i6JI5VbrFucwI_hStOGNXgOqXsExNARXlYPSHweSXXGS_nYaa90srl9a5HTbn1YJEtduB0YKekULRXK1la5uOiHnw5tuRJUqXVTA-_l_Nv7PZWzPZOua2quUGMw5c8y55c8qImO02gw_tbopnqwROUHR-eeBMiRwEkpBDl8AlSOQsLd-6MZ3kqaLuGyhw0rQ9DPZlucB1DB0rF2WYEwnz72I1aB2XLmrVuIRkTbVRRxMp9Qt8BLP8Uay-8Qr3HvMfQDftKydtAKiQLXHTMLoo5H8s69i-1baFynJjH4nNpnujJGONkBSQg9RmWf-5CdiZnQC1g4hSvL5p6RM0sGXR4jORlzd-TNSmZeOe1mvEHifCmeyCQ1T0NNBrtsSUeT6lckEFjyvjKau6eZxoa3nyzpzMooNw8u-e-s9uctYmdVmYm75PWqkzencTnccTtmZjuBdehplM0SLbGYrxoxIoBBoozrACeIQITHi73DB1kSQdbfOfb_nuo26PEaIgvsncj-he0v.y3mcOAn4nXDleSobp2eQYg';
+
+        $private_set = $this->getPrivateKeySet();
+        $test_jwe = JWE::decrypt($token, $private_set, 'ECDH-ES+A256KW');
+        $payload = json_decode($test_jwe->getPlaintext(), true);
+
+        $this->assertEquals('0607a317-044c-49dc-83ea-89bbf7766c03', $payload['refreshToken']);
+        $this->assertEquals('c8945473-6217-4ec7-a543-09371ee156e3', $payload['authToken']);
+    }
+
 
     /**
      * @expectedException SimpleJWT\InvalidTokenException

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.7.1
+
+- Fixed: Incorrect key selection when encrypting/decrypting keys in
+  ECDH-ES+AxxxKW (#159)
+- Fixed: Exporting keys as JSON in `jwkstool`
+
 ## 0.7.0
 
 - Changed: Split `SimpleJWT\Crypt` namespace into multiple namespaces, one

@@ -218,6 +218,12 @@ class JWETest extends TestCase {
 
     public function testDecryptECDHAESKW() {
         // https://github.com/kelvinmo/simplejwt/issues/159
+        $algs = Crypt\AlgorithmFactory::getSupportedAlgs('key');
+        if (!in_array('ECDH-ES+A256KW', $algs)) {
+            $this->markTestSkipped('ECDH-ES+A256KW algorithm not available');
+            return;
+        }
+
         $token = 'eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZHQ00iLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiVDFIazlQell6SUY5NW9ESDJENTFZXzJGVUZuZ3RKZWxpbW11UTZJbHlyVWhuVGlfYlk1ZFplY0lPNExQRmp1byIsInkiOiJlLVBQbTNEQjB0N2F1RUNCV0Q0MkZxMlVDeXNuQ0NjQUxDUy1NWHMwclV3U0pLQmFMWTcwb1lzcWprMnJQVjROIiwiY3J2IjoiUC0zODQifX0.6vW-S_7om9iHMYc2JzkwijQV4msn55YRrDYQ2EMs3-bg3Y7I0dBrDA.CQ45omsfTgrZlrJd.58LMMeqXOogn6i6JI5VbrFucwI_hStOGNXgOqXsExNARXlYPSHweSXXGS_nYaa90srl9a5HTbn1YJEtduB0YKekULRXK1la5uOiHnw5tuRJUqXVTA-_l_Nv7PZWzPZOua2quUGMw5c8y55c8qImO02gw_tbopnqwROUHR-eeBMiRwEkpBDl8AlSOQsLd-6MZ3kqaLuGyhw0rQ9DPZlucB1DB0rF2WYEwnz72I1aB2XLmrVuIRkTbVRRxMp9Qt8BLP8Uay-8Qr3HvMfQDftKydtAKiQLXHTMLoo5H8s69i-1baFynJjH4nNpnujJGONkBSQg9RmWf-5CdiZnQC1g4hSvL5p6RM0sGXR4jORlzd-TNSmZeOe1mvEHifCmeyCQ1T0NNBrtsSUeT6lckEFjyvjKau6eZxoa3nyzpzMooNw8u-e-s9uctYmdVmYm75PWqkzencTnccTtmZjuBdehplM0SLbGYrxoxIoBBoozrACeIQITHi73DB1kSQdbfOfb_nuo26PEaIgvsncj-he0v.y3mcOAn4nXDleSobp2eQYg';
 
         $private_set = $this->getPrivateKeySet();

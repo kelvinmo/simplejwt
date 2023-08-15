@@ -74,7 +74,7 @@ abstract class Key implements KeyInterface {
                 if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $jwk = json_decode($data, true);
 
-                if(null === $jwk) throw new KeyException('Incorrect key data format - malformed JSON');
+                if ((null === $jwk) && ($json_err = json_last_error_msg())) throw new KeyException('Incorrect key data format - malformed JSON: ' . $json_err);
 
                 if (isset($jwk['ciphertext'])) {
                     $this->data = self::decrypt($data, $password, $alg);

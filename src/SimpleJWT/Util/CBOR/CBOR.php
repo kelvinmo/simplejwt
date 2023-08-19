@@ -48,10 +48,10 @@ class CBOR {
      *
      * @param string $data the CBOR object
      * @param int $mode the decoding mode
-     * @return mixed the decoded object
+     * @return mixed|DataItem the decoded object
      * @throws CBORException if an error occurred
      */
-    function decode(string $data, int $mode = DataItem::DECODE_NATIVE): mixed {
+    function decode(string $data, int $mode = DataItem::DECODE_NATIVE) {
         $pos = 0;
         $value = $this->decodeNext($data, $pos);
         if ($value == null) {

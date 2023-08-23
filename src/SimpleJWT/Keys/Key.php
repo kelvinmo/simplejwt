@@ -124,10 +124,6 @@ abstract class Key implements KeyInterface {
                 }
                 break;
         }
-
-        if (!isset($this->data['kid'])) {
-            $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
-        }
     }
 
     /**
@@ -155,8 +151,11 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function getKeyId() {
-        return $this->data['kid'];
+    public function getKeyId(bool $generate = false) {
+        if (!isset($this->data['kid']) && $generate) {
+            $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
+        }
+        return isset($this->data['kid']) ? $this->data['kid'] : null;
     }
 
     /**

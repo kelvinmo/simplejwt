@@ -97,12 +97,13 @@ class OKPKey extends Key implements ECDHKeyInterface {
     }
 
     public function getPublicKey() {
-        return new OKPKey([
-            'kid' => $this->data['kid'],
+        $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
             'x' => $this->data['x']
-        ], 'php');
+        ];
+        if (isset($this->data['kid'])) $data['kid'] = $this->data['kid'];
+        return new OKPKey($data, 'php');
     }
 
     /**

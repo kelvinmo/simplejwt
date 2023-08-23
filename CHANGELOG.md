@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 - Changed: Refactored `Algorithm` (now renamed to `BaseAlgorithm`)
   and `Key` to extract interfaces (into `AlgorithmInterface` and 
   `KeyInterface` respectively)
+- Changed: Key ID `kid` parameter no longer automatically generated
+  when a Key object is created.  Use `Key::getKeyId(true)` or
+  `KeySet::add(..., true)` to generate a key ID
 - Removed: Helper::getObject() and Helper::getJWTObject() have been
   replaced by Helper::decode() and Helper::decodeFully() respectively
 - Removed: Support for PHP 7.1

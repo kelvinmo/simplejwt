@@ -290,13 +290,14 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
     }
 
     public function getPublicKey() {
-        return new ECKey([
-            'kid' => $this->data['kid'],
+        $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
             'x' => $this->data['x'],
             'y' => $this->data['y']
-        ], 'php');
+        ];
+        if (isset($this->data['kid'])) $data['kid'] = $this->data['kid'];
+        return new ECKey($data, 'php');
     }
 
     public function toPEM() {

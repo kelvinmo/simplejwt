@@ -43,6 +43,10 @@ class ECDH_AESKeyWrapTest extends TestCase {
         return $set;
     }
 
+    protected function getSymmetricKeySet($agreed_key) {
+        return \SimpleJWT\Keys\KeySet::createFromSecret($agreed_key, 'bin');
+    }
+
     function testECDHES_A128KW() {
         if (!$this->isAlgAvailable('ECDH-ES+A128KW')) return;
 
@@ -56,8 +60,14 @@ class ECDH_AESKeyWrapTest extends TestCase {
             'apv' => 'Qm9i'
         ];
 
-        $encrypted_key = $alg->encryptKey($key, $public_set, $headers);
-        $decrypted_key = $alg->decryptKey($encrypted_key, $private_set, $headers);
+        $derived_key_from_public = $alg->deriveKey($public_set, $headers);
+        $derived_key_set_from_public = $this->getSymmetricKeySet($derived_key_from_public);
+        $encrypted_key = $alg->encryptKey($key, $derived_key_set_from_public, $headers);
+
+        $derived_key_from_private = $alg->deriveKey($private_set, $headers);
+        $derived_key_set_from_private = $this->getSymmetricKeySet($derived_key_from_private);
+        $decrypted_key = $alg->decryptKey($encrypted_key, $derived_key_set_from_private, $headers);
+        
         $this->assertEquals($key, $decrypted_key);
     }
 
@@ -75,8 +85,14 @@ class ECDH_AESKeyWrapTest extends TestCase {
         ];
 
 
-        $encrypted_key = $alg->encryptKey($key, $public_set, $headers);
-        $decrypted_key = $alg->decryptKey($encrypted_key, $private_set, $headers);
+        $derived_key_from_public = $alg->deriveKey($public_set, $headers);
+        $derived_key_set_from_public = $this->getSymmetricKeySet($derived_key_from_public);
+        $encrypted_key = $alg->encryptKey($key, $derived_key_set_from_public, $headers);
+
+        $derived_key_from_private = $alg->deriveKey($private_set, $headers);
+        $derived_key_set_from_private = $this->getSymmetricKeySet($derived_key_from_private);
+        $decrypted_key = $alg->decryptKey($encrypted_key, $derived_key_set_from_private, $headers);
+        
         $this->assertEquals($key, $decrypted_key);
     }
 
@@ -93,8 +109,14 @@ class ECDH_AESKeyWrapTest extends TestCase {
             'apv' => 'Qm9i'
         ];
 
-        $encrypted_key = $alg->encryptKey($key, $public_set, $headers);
-        $decrypted_key = $alg->decryptKey($encrypted_key, $private_set, $headers);
+        $derived_key_from_public = $alg->deriveKey($public_set, $headers);
+        $derived_key_set_from_public = $this->getSymmetricKeySet($derived_key_from_public);
+        $encrypted_key = $alg->encryptKey($key, $derived_key_set_from_public, $headers);
+
+        $derived_key_from_private = $alg->deriveKey($private_set, $headers);
+        $derived_key_set_from_private = $this->getSymmetricKeySet($derived_key_from_private);
+        $decrypted_key = $alg->decryptKey($encrypted_key, $derived_key_set_from_private, $headers);
+        
         $this->assertEquals($key, $decrypted_key);
     }
 }

@@ -228,6 +228,7 @@ class CBOR {
                         if (($map_key == null) || ($map_value == null)) throw new CBORException('Unexpected end of map');
                         $key = $map_key->getValue();
                         if (!is_int($key) && !is_string($key)) throw new CBORException('Only integer and string map keys are supported');
+                        if (isset($value[$key])) throw new CBORException('Duplicate key in map: ' . $key);
                         $value[$key] = $map_value;
                     }
                     break;

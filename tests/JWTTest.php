@@ -222,13 +222,8 @@ class JWTTest extends TestCase {
         $this->assertEquals('RjS03KyiSWS85I4iFG-24w', $token_hash);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     function testNoneDefault() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('\UnexpectedValueException');
-        }
+        $this->expectException('\UnexpectedValueException');
 
         $set = new Keys\KeySet();
         $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
@@ -243,13 +238,8 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     function testNoneWithRemove() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('\UnexpectedValueException');
-        }
+        $this->expectException('\UnexpectedValueException');
 
         $set = new Keys\KeySet();
         $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
@@ -259,53 +249,33 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('http://example.com/is_root'));
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testAlgFailure() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
 
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q';
         $jwt = JWT::decode($token, $set, 'RS256'); // Error - should be ES256
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testSignatureFailure() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
         
         $set = $this->getPublicKeySet();
         $token = 'eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6XC9cL2V4YW1wbGUuY29tXC9pc19yb290Ijp0cnVlfQ.NrP7T3zsezqVjBPI35nJBtIQeoOrsT7Rib5NdaOzpgM';
         $jwt = JWT::decode($token, $set, 'HS256');
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testMissingSignature() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
         
         $set = $this->getPublicKeySet();
         $token = 'eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ';
         $jwt = JWT::decode($token, $set, 'HS256');
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testTimeFailureExp() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::TOO_LATE_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::TOO_LATE_ERROR);
         
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
@@ -317,14 +287,9 @@ class JWTTest extends TestCase {
         $jwt2 = JWT::decode($token, $set2, 'HS256');
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testTimeFailureNbf() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::TOO_EARLY_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::TOO_EARLY_ERROR);
         
         $set = $this->getPrivateKeySet();
         $claims = $this->getJWTClaims();
@@ -353,14 +318,9 @@ class JWTTest extends TestCase {
         }
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testCrit() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::UNSUPPORTED_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::UNSUPPORTED_ERROR);
 
         $set = $this->getPublicKeySet();
         $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImNyaXQiOlsieC11bmtub3duLWNyaXRpY2FsIl0sIngtdW5rbm93bi1jcml0aWNhbCI6dHJ1ZX0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODB9.lLajjIbnhRpthOPhbJTaxoQ8JHYSAwSUl1Vxc4eQcIU';
@@ -368,26 +328,16 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('iss'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     function testInvalidToken() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('\InvalidArgumentException');
-        }
+        $this->expectException('\InvalidArgumentException');
 
         $invalid_token = '12345';
         $result = JWT::deserialise($invalid_token);
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testMultiNoVerifiableSignature() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
 
         $set = new Keys\KeySet();
         $jwt = JWT::decode($this->multi_token, $set, 'ES256');

@@ -254,14 +254,9 @@ class JWETest extends TestCase {
     }
 
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     public function testEncryptedKeyFailure() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
 
         $plaintext = 'Live long and prosper.';
 
@@ -271,14 +266,9 @@ class JWETest extends TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     public function testIVFailure() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
 
         $plaintext = 'Live long and prosper.';
 
@@ -288,14 +278,9 @@ class JWETest extends TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     public function testTagFailure() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
 
         $plaintext = 'Live long and prosper.';
 
@@ -305,28 +290,17 @@ class JWETest extends TestCase {
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     public function testCrit() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::UNSUPPORTED_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::UNSUPPORTED_ERROR);
 
         $private_set = $this->getPrivateKeySet();
         $token = 'eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiY3JpdCI6WyJ4LXVua25vd24tY3JpdGljYWwiXSwieC11bmtub3duLWNyaXRpY2FsIjp0cnVlfQ.sJFRqh6iiJh2OykXQYQ3GI1NZKC6jDwkc3k9959k6AwIbOMZ41ELjQ.wyDWTBKJiewaNP0YOM8uWQ.obEeoNob7fepPaWGNZqVgh6qEMK9qsIWPQtMf0tI_-U.enkNNlZhspYfLmeWpXA2dg';
         $test_jwe = JWE::decrypt($token, $private_set, 'A128KW');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     function testInvalidToken() {
-        
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('\InvalidArgumentException');
-        }
+        $this->expectException('\InvalidArgumentException');
 
         $invalid_token = '12345';
         $dummy_set = $this->getPrivateKeySet();
@@ -334,14 +308,9 @@ class JWETest extends TestCase {
         $result = JWE::decrypt($invalid_token, $dummy_set, 'dummy');
     }
 
-    /**
-     * @expectedException SimpleJWT\InvalidTokenException
-     */
     function testMultiNoDecryptableRecipient() {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('SimpleJWT\InvalidTokenException');
-            $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
-        }
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
 
         $private_set = new KeySet();
         $test_jwe = JWE::decrypt($this->multi_token, $private_set, 'A128KW');

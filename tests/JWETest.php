@@ -74,7 +74,8 @@ class JWETest extends TestCase {
         $set = new KeySet();
         $set->add(new SymmetricKey([
             "kty" => "oct",
-            "k" => "lhMUu-TevIFn6mFgPzRgUyZVlIuHeu4uAzn6dexz7vY"
+            "k" => "lhMUu-TevIFn6mFgPzRgUyZVlIuHeu4uAzn6dexz7vY",
+            "kid" => "YI3EoIK"
         ], 'php'));
         return $set;
     }

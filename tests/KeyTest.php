@@ -2,6 +2,7 @@
 
 use SimpleJWT\JWE;
 use SimpleJWT\Keys\SymmetricKey;
+use SimpleJWT\Keys\OKPKey;
 use PHPUnit\Framework\TestCase;
 
 class KeyTest extends TestCase {
@@ -27,6 +28,25 @@ class KeyTest extends TestCase {
         $key = new SymmetricKey($json, 'json');
         $key_data = $key->getKeyData();
         $this->assertEquals($this->symmetric_key, $key_data['k']);
+    }
+
+    function testSymmetricCBORDecode() {
+        $base64url_key = 'zwsUMfNVd18EOMKUl2lmf4j3A1zpqJhDhpnJWPey76g';
+        $cbor = 'ogEEIFggzwsUMfNVd18EOMKUl2lmf4j3A1zpqJhDhpnJWPey76g=';
+
+        $key = new SymmetricKey(base64_decode($cbor), 'cbor');
+        $key_data = $key->getKeyData();
+        $this->assertEquals($base64url_key, $key_data['k']);
+    }
+
+    function testOKPCBORDecode() {
+        $base64url_d = 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8';
+        $cbor = 'pAEBAycgBiNYIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f';
+
+        $key = new OKPKey(base64_decode($cbor), 'cbor');
+        $key_data = $key->getKeyData();
+        $this->assertEquals('Ed25519', $key_data['crv']);
+        $this->assertEquals($base64url_d, $key_data['d']);
     }
 
     function testPassword() {

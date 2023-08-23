@@ -11,6 +11,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
   JSON web signatures [RFC7515](http://tools.ietf.org/html/rfc7515)
   and JSON web encryption [RFC7516](http://tools.ietf.org/html/rfc7516)
 - JSON web keys [RFC7517](http://tools.ietf.org/html/rfc7517)
+- COSE key objects [RFC9053](http://tools.ietf.org/html/rfc9053)
 - Signature algorithms
     * HMAC family (HS256, HS384, HS512)
     * RSA family (RS256, RS384, RS512)

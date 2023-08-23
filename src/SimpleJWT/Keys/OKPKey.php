@@ -43,6 +43,7 @@ use SimpleJWT\Util\Util;
  */
 class OKPKey extends Key implements ECDHKeyInterface {
     const KTY = 'OKP';
+    const COSE_KTY = 1;
 
     /**
      * Creates an octet key.
@@ -66,6 +67,13 @@ class OKPKey extends Key implements ECDHKeyInterface {
             case 'json':
             case 'jwe':
                 parent::__construct($data, $format, $password, $alg);
+                break;
+            case 'cbor':
+                parent::__construct($data, $format, $password, $alg);
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                $this->data['kty'] = self::KTY;
+                $this->replaceDataKeys([ -1 => 'crv', -2 => 'x', -4 => 'd' ]);
+                $this->replaceDataValues('crv', [ 4 => 'X25519', 6 => 'Ed25519' ]);
                 break;
             default:
                 throw new KeyException('Incorrect format');

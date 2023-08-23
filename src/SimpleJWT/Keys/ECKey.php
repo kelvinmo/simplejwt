@@ -46,6 +46,7 @@ use SimpleJWT\Util\Util;
 class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
 
     const KTY = 'EC';
+    const COSE_KTY = 2;
 
     const PEM_RFC5915_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
 
@@ -113,6 +114,13 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
             case 'json':
             case 'jwe':
                 parent::__construct($data, $format, $password, $alg);
+                break;
+            case 'cbor':
+                parent::__construct($data, $format, $password, $alg);
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                $this->data['kty'] = self::KTY;
+                $this->replaceDataKeys([ -1 => 'crv', -2 => 'x', -3 => 'y' ]);
+                $this->replaceDataValues('crv', [ 1 => 'P-256', 2 => 'P-384', 3 => 'P-521', 8 => 'secp256k1' ]);
                 break;
             case 'pem':
                 /** @var string $data */

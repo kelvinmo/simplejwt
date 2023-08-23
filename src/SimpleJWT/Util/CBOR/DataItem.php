@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Util\CBOR;
 
+use \SimpleJWT\Util\Util;
 use \InvalidArgumentException;
 
 /**
@@ -72,7 +73,8 @@ use \InvalidArgumentException;
 class DataItem {
 
     const DECODE_NATIVE = 0;
-    const DECODE_MIXED = 1;
+    const DECODE_CONVERT_BSTR = 1;
+    const DECODE_MIXED = 2;
     const DECODE_OBJECT = -1;
 
     // Type = major type or object
@@ -289,6 +291,8 @@ class DataItem {
      * 
      * - `self::DECODE_NATIVE` - this will always return a native PHP
      *   value
+     * - `self::DECODE_CONVERT_BSTR` - similar to `DECODE_NATIVE`, except that
+     *   binary strings are converted to base64url
      * - `self::DECODE_MIXED` - returns a native PHP value, unless it is a
      *   binary string (`bstr`), a simple value, an undefined item, or contains a tag
      *   (other than 55799, which identifies a CBOR stream), in which case a DataItem is returned
@@ -317,6 +321,12 @@ class DataItem {
                     return $this;
                 case self::DECODE_NATIVE:
                     return $this->value;
+                case self::DECODE_CONVERT_BSTR:
+                    if ($this->type == self::BSTR_TYPE) {
+                        return Util::base64url_encode($this->value);
+                    } else {
+                        return $this->value;
+                    }
                 case self::DECODE_MIXED:
                     if (($this->type == self::BSTR_TYPE)
                         || ($this->type == self::UNDEFINED_TYPE)

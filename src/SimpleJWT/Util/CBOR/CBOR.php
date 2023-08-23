@@ -142,7 +142,7 @@ class CBOR {
         // 4. Read additional bytes for argument
         if ($argument_length > 0) {
             $argument_bytes = substr($data, $pos, $argument_length);
-            if (strlen($argument_bytes) != $argument_length) throw new CBORException('Invalid argument size: expected ' . $argument_length . ' bytes, got' . strlen($argument_bytes));
+            if (strlen($argument_bytes) != $argument_length) throw new CBORException('Invalid argument size: expected ' . $argument_length . ' bytes, got ' . strlen($argument_bytes));
             $pos += $argument_length;
         }
 
@@ -162,7 +162,6 @@ class CBOR {
                 } else {
                     $value = -1 - $uint;
                 }
-                
                 break;
             case DataItem::BSTR_TYPE:
             case DataItem::TSTR_TYPE:
@@ -192,15 +191,16 @@ class CBOR {
             case DataItem::FLOAT64_TYPE:
                 $value = $this->unpack('E', $argument_bytes);
                 break;
+            case DataItem::BREAK_CODE:
+                return null;
             case DataItem::FALSE_TYPE:
             case DataItem::TRUE_TYPE:
             case DataItem::NULL_TYPE:
             case DataItem::UNDEFINED_TYPE:
-            case DataItem::BREAK_CODE:
                 // Do nothing, as we've already done all that is required in 2.
                 break;
             default:
-                throw new CBORException('Major type not supported: ' . $major_type);
+                throw new CBORException('Major type not supported: ' . ($major_type >> 5));
         }
 
         // 6. Parse contents (for major types which have a content stream)

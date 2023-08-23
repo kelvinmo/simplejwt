@@ -45,6 +45,7 @@ use SimpleJWT\Util\Util;
 class RSAKey extends Key implements PEMInterface {
 
     const KTY = 'RSA';
+    const COSE_KTY = 3;
 
     const PEM_PRIVATE = '/-----BEGIN RSA PRIVATE KEY-----([^-:]+)-----END RSA PRIVATE KEY-----/';
     const OID = '1.2.840.113549.1.1.1';
@@ -70,6 +71,12 @@ class RSAKey extends Key implements PEMInterface {
             case 'json':
             case 'jwe':
                 parent::__construct($data, $format, $password, $alg);
+                break;
+            case 'cbor':
+                parent::__construct($data, $format, $password, $alg);
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                $this->data['kty'] = self::KTY;
+                $this->replaceDataKeys([ -1 => 'n', -2 => 'e', -3 => 'd', -4 => 'p', -5 => 'q', -6 => 'dp', -7 => 'dq', -8 => 'qi' ]);
                 break;
             case 'pem':
                 /** @var string $data */

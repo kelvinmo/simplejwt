@@ -45,9 +45,11 @@ interface KeyInterface {
     /**
      * Returns the key ID
      *
-     * @return string the key ID
+     * @param bool $generate whether to generate the key ID if it is not
+     * present
+     * @return string|null the key ID
      */
-    public function getKeyId();
+    public function getKeyId(bool $generate = false);
 
     /**
      * Returns the type of the key

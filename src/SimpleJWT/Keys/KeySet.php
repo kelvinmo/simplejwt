@@ -111,14 +111,18 @@ class KeySet {
      * key contents) already exists in the key set.
      *
      * @param KeyInterface $key the key to add
+     * @param bool $generate whether to generate a key ID for the key being
+     * added, if it is not present
      * @return void
      * @throws KeyException if there is an identical key
      */
-    function add($key) {
+    function add($key, $generate = false) {
         $thumbnail = $key->getThumbnail();
+        $kid = $key->getKeyId($generate);
+
         foreach ($this->keys as $existing_key) {
             if ($existing_key->getThumbnail() == $thumbnail) throw new KeyException('Key already exists');
-            if ($existing_key->getKeyId() == $key->getKeyId()) throw new KeyException('Key already exists');
+            if (($kid != null) && ($existing_key->getKeyId(true) == $kid)) throw new KeyException('Key already exists');
         }
 
         $this->keys[] = $key;

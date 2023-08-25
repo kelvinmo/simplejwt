@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2022-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,14 +33,13 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace SimpleJWT\Util\ASN1;
-
-use SimpleJWT\Util\BinaryEncodingException;
+namespace SimpleJWT\Util;
 
 /**
- * An exception associated with encoding and decoding ASN.1 data.
+ * An exception associated with encoding and decoding of binary
+ * data.
  */
-class ASN1Exception extends BinaryEncodingException {
+class BinaryEncodingException extends \RuntimeException {
 
 }
 

@@ -72,6 +72,30 @@ class Util {
     }
 
     /**
+     * Replaces the keys of an array with specified replacements.
+     * 
+     * @param array<mixed, mixed> $array
+     * @param array<mixed, mixed> $replacements
+     * @return array<mixed, mixed>
+     */
+    static public function array_replace_keys(array $array, array $replacements): array {
+        return array_combine(self::array_replace_values(array_keys($array), $replacements), $array);
+    }
+
+    /**
+     * Replaces the values of an array with specified replacements.
+     * 
+     * @param array<mixed> $array
+     * @param array<mixed, mixed> $replacements
+     * @return array<mixed>
+     */
+    static public function array_replace_values(array $array, array $replacements): array {
+        return array_map(function ($value) use ($replacements) {
+            return isset($replacements[$value]) ? $replacements[$value] : $value;
+        }, $array);
+    }
+
+    /**
      * Compares two strings using the same time whether they're equal or not.
      * This function should be used to mitigate timing attacks when, for
      * example, comparing password hashes

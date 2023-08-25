@@ -38,7 +38,9 @@ namespace SimpleJWT\Keys;
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\ASN1\DER;
-use SimpleJWT\Util\ASN1;
+use SimpleJWT\Util\CBOR\CBOR;
+use SimpleJWT\Util\CBOR\DataItem as CBORItem;
+use SimpleJWT\Util\CBOR\CBORException;
 
 /**
  * A factory object for creating `KeyInterface` objects.
@@ -75,6 +77,14 @@ class KeyFactory {
         ECKey::EC_OID => 'SimpleJWT\Keys\ECKey'
     ];
 
+    /** @var array<int, string> $cose_map */
+    static $cose_map = [
+        RSAKey::COSE_KTY => 'SimpleJWT\Keys\RSAKey',
+        ECKey::COSE_KTY => 'SimpleJWT\Keys\ECKey',
+        OKPKey::COSE_KTY => 'SimpleJWT\Keys\OKPKey',
+        SymmetricKey::COSE_KTY => 'SimpleJWT\Keys\SymmetricKey'
+    ];
+
     /**
      * Detects the format of key data and returns a key object.
      *
@@ -93,6 +103,9 @@ class KeyFactory {
      * @throws KeyException if an error occurs in reading the data
      */
     static public function create($data, $format = null, $password = null, $alg = 'PBES2-HS256+A128KW') {
+        $cbor = new CBOR();
+        $cbor_item = null;
+
         // 1. Detect format
         if (($format == null) || ($format == 'auto')) {
             if (is_array($data)) {
@@ -104,11 +117,16 @@ class KeyFactory {
             } elseif (preg_match('/-----([^-:]+)-----/', $data)) {
                 $format = 'pem';
             }
+            try {
+                /** @var string $data */
+                $cbor_item = $cbor->decode($data, CBORItem::DECODE_CONVERT_BSTR);
+                if (is_array($cbor_item)) $format = 'cbor';
+            } catch (\Exception $e) {}
         }
 
         if (($format == null) || ($format == 'auto')) throw new KeyException('Cannot detect key format');
 
-        // 2. Decode JSON
+        // 2. Decode JSON into PHP array
         if ($format == 'json') {
             /** @var string $data */
             $json = json_decode($data, true);
@@ -147,7 +165,22 @@ class KeyFactory {
             }
         }
 
-        // 4. PEM
+        // 5. Decode CBOR into PHP array
+        if ($format == 'cbor') {
+            try {
+                if ($cbor_item == null) $cbor_item = $cbor->decode($data, CBORItem::DECODE_CONVERT_BSTR);
+                // Key attribute 1 = 'kty'
+                if (isset(self::$cose_map[$cbor_item[1]])) {
+                    /** @var KeyInterface $key */
+                    $key = new self::$cose_map[$cbor_item[1]]($cbor_item, 'cbor');
+                    return $key;
+                }
+            } catch (CBORException $e) {
+                throw new KeyException('Cannot decode CBOR key', 0, $e);
+            }
+        }
+
+        // 6. PEM
         if ($format == 'pem') {
             $der = new DER();
 
@@ -195,7 +228,7 @@ class KeyFactory {
             }
         }
 
-        // 5. Symmetric key
+        // 7. Symmetric key
         if (($format == 'base64url') || ($format == 'base64') || ($format == 'bin')) {
             return new SymmetricKey($data, $format);
         }

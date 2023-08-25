@@ -42,6 +42,7 @@ use SimpleJWT\Util\Util;
  */
 class SymmetricKey extends Key {
     const KTY = 'oct';
+    const COSE_KTY = 4;
 
     /**
      * Creates a symmetric key.
@@ -66,6 +67,12 @@ class SymmetricKey extends Key {
             case 'json':
             case 'jwe':
                 parent::__construct($data, $format, $password, $alg);
+                break;
+            case 'cbor':
+                parent::__construct($data, $format, $password, $alg);
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                $this->data['kty'] = self::KTY;
+                $this->replaceDataKeys([ -1 => 'k' ]);
                 break;
             case 'base64url':
                 if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');

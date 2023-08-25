@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Added: Support for `Ed25519` signatures and `X25519` key derviation
   algorithms
+- Added: Support for COSE based keys
 - Changed: Use `box` to package the `jwkstool` utility
 - Changed: Refactored `Algorithm` (now renamed to `BaseAlgorithm`)
   and `Key` to extract interfaces (into `AlgorithmInterface` and 

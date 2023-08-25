@@ -36,7 +36,7 @@
 namespace SimpleJWT\Keys;
 
 use SimpleJWT\Util\ASN1\DER;
-use SimpleJWT\Util\ASN1\Value;
+use SimpleJWT\Util\ASN1\Value as ASN1Value;
 use SimpleJWT\Util\BigNum;
 use SimpleJWT\Util\Util;
 
@@ -46,6 +46,7 @@ use SimpleJWT\Util\Util;
 class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
 
     const KTY = 'EC';
+    const COSE_KTY = 2;
 
     const PEM_RFC5915_PRIVATE = '/-----BEGIN EC PRIVATE KEY-----([^-:]+)-----END EC PRIVATE KEY-----/';
 
@@ -113,6 +114,13 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
             case 'json':
             case 'jwe':
                 parent::__construct($data, $format, $password, $alg);
+                break;
+            case 'cbor':
+                parent::__construct($data, $format, $password, $alg);
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                $this->data['kty'] = self::KTY;
+                $this->replaceDataKeys([ -1 => 'crv', -2 => 'x', -3 => 'y' ]);
+                $this->replaceDataValues('crv', [ 1 => 'P-256', 2 => 'P-384', 3 => 'P-521', 8 => 'secp256k1' ]);
                 break;
             case 'pem':
                 /** @var string $data */
@@ -298,22 +306,22 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
 
         if ($this->isPublic()) {
-            $seq = Value::sequence([
-                Value::sequence([
-                    Value::oid(self::EC_OID),
-                    Value::oid($oid)
+            $seq = ASN1Value::sequence([
+                ASN1Value::sequence([
+                    ASN1Value::oid(self::EC_OID),
+                    ASN1Value::oid($oid)
                 ]),
-                Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y']))
+                ASN1Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y']))
             ]);
             $binary = $der->encode($seq);
 
             return wordwrap("-----BEGIN PUBLIC KEY-----\n" . base64_encode($binary) . "\n-----END PUBLIC KEY-----\n", 64, "\n", true);
         } else {
-            $seq = Value::sequence([
-                Value::integer(1),
-                Value::octetString(Util::base64url_decode($this->data['d'])),
-                Value::explicit(0, Value::oid($oid)),
-                Value::explicit(1, Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])))
+            $seq = ASN1Value::sequence([
+                ASN1Value::integer(1),
+                ASN1Value::octetString(Util::base64url_decode($this->data['d'])),
+                ASN1Value::explicit(0, ASN1Value::oid($oid)),
+                ASN1Value::explicit(1, ASN1Value::bitString(chr(0x04) . Util::base64url_decode($this->data['x']) . Util::base64url_decode($this->data['y'])))
             ]);
             $binary = $der->encode($seq);
 

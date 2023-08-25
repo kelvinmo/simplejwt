@@ -38,6 +38,9 @@ namespace SimpleJWT\Keys;
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
+use SimpleJWT\Util\CBOR\CBOR;
+use SimpleJWT\Util\CBOR\DataItem as CBORItem;
+use SimpleJWT\Util\CBOR\CBORException;
 
 /**
  * Represents a key.
@@ -46,7 +49,26 @@ abstract class Key implements KeyInterface {
     const PEM_PUBLIC = '/-----BEGIN PUBLIC KEY-----([^-:]+)-----END PUBLIC KEY-----/';
     const PEM_PKCS8_PRIVATE = '/-----BEGIN PRIVATE KEY-----([^-:]+)-----END PRIVATE KEY-----/';  // used by PHP 8.1
 
-    /** @var array<string, mixed> $data */
+    /** @var array<int, string> $cose_attribute_map */
+    static $cose_attribute_map = [
+       1 => 'kty', // tstr / int
+       2 => 'kid', // bstr
+       3 => 'alg', // tstr / int
+       4 => 'key_ops' // [ tstr / int ]
+    ];
+
+    /** @var array<int, string> $cose_key_ops_map */
+    static $cose_key_ops_map = [
+        1 => 'sign',
+        2 => 'verify',
+        3 => 'encrypt',
+        4 => 'decrypt',
+        5 => 'wrapKey',
+        6 => 'unwrapKey',
+        7 => 'deriveKey'
+    ];
+
+    /** @var array<string|int, mixed> $data */
     protected $data;
 
     /**
@@ -85,6 +107,22 @@ abstract class Key implements KeyInterface {
             case 'jwe':
                 if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
                 $this->data = self::decrypt($data, $password, $alg);
+                break;
+            case 'cbor':
+                try {
+                    $cbor = new CBOR();
+                    if (is_string($data)) {
+                        $cbor_item = $cbor->decode($data, CBORItem::DECODE_CONVERT_BSTR);
+                    } else {
+                        $cbor_item = $data;
+                    }
+                    $cbor_item = Util::array_replace_keys($cbor_item, self::$cose_attribute_map);
+                    if (isset($cbor_item['key_ops'])) $cbor_item['key_ops'] = Util::array_replace_values($cbor_item['key_ops'], self::$cose_key_ops_map);
+                    $this->data = $cbor_item;
+                } catch (CBORException $e) {
+                    throw new KeyException('Cannot decode CBOR key', 0, $e);
+                }
+                break;
         }
     }
 
@@ -181,7 +219,9 @@ abstract class Key implements KeyInterface {
      * {@inheritdoc}
      */
     public function getKeyData() {
-        return $this->data;
+        /** @var array<string, mixed> $data */
+        $data = $this->data;
+        return $data;
     }
 
     /**
@@ -240,6 +280,34 @@ abstract class Key implements KeyInterface {
         $hash_input = json_encode($signing);
         if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
         return Util::base64url_encode(hash('sha256', $hash_input, true));
+    }
+
+    /**
+     * Replaces the keys of the underlying parameters with specified replacements.
+     * 
+     * @param array<mixed, mixed> $replacements
+     * @return void
+     */
+    protected function replaceDataKeys(array $replacements) {
+        $this->data = Util::array_replace_keys($this->data, $replacements);
+    }
+
+    /**
+     * Replaces the value of a specified parameter with specified replacements.
+     * 
+     * @param string $key
+     * @param array<mixed, mixed> $replacements
+     * @return void
+     */
+    protected function replaceDataValues(string $key, array $replacements) {
+        if (!isset($this->data[$key])) return;
+
+        if (is_scalar($this->data[$key])) {
+            if (isset($replacements[$this->data[$key]]))
+                $this->data[$key] = $replacements[$this->data[$key]];
+        } elseif (is_array($this->data[$key])) {
+            $this->data[$key] = Util::array_replace_values($this->data[$key], $replacements);
+        }
     }
 }
 

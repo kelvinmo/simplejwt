@@ -51,7 +51,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     private $aesgcm;
 
     public function __construct($alg) {
-        $this->aesgcm = new AESGCM($alg);
+        $this->aesgcm = new AESGCM(substr($alg, 0, -2));
         parent::__construct($alg);
     }
 

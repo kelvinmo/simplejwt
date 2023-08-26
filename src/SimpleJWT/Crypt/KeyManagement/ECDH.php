@@ -93,6 +93,9 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         return ['kty' => ['EC', 'OKP'], '@use' => 'enc', '@key_ops' => 'deriveKey'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deriveKey($keys, &$headers, $kid = null) {
         /** @var ECDHKeyInterface $key */
         $key = $this->selectKey($keys, $kid);
@@ -173,7 +176,21 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         return $this->concatKDF($Z, $alg, $size, $apu, $apv);
     }
 
-    private function concatKDF(string $Z, string $alg, int $size, string $apu = '', string $apv = ''): string {
+    /**
+     * Derives a key using the Concat KDF.
+     * 
+     * The KDF is defined in section 5.8.1 (Single-step Key-Derivation Function)
+     * of NIST publication 800-56A.
+     * 
+     * @param string $Z the shared secret as a binary string
+     * @param string $alg the enc or alg value
+     * @param int $size the size of the output, in bits
+     * @param string $apu the Part U value as a base64url encoded string
+     * @param string $apv the Part V value as a base64url encoded string
+     * @return string the derived key as a binary string
+     * @see https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf
+     */
+    final protected function concatKDF(string $Z, string $alg, int $size, string $apu = '', string $apv = ''): string {
         $apu = ($apu == null) ? '' : Util::base64url_decode($apu);
         $apv = ($apv == null) ? '' : Util::base64url_decode($apv);
 

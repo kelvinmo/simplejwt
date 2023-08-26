@@ -60,6 +60,7 @@ class AlgorithmFactory {
         '/^RSA-OAEP$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
         '/^RSA-OAEP-256$/' => 'SimpleJWT\Crypt\KeyManagement\RSAES',
         '/^A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\AESKeyWrap',
+        '/^A\d+GCMKW$/' => 'SimpleJWT\Crypt\KeyManagement\AESGCMKeyWrap',
         '/^PBES2-HS\d+\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\PBES2',
         '/^ECDH-ES$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH',
         '/^ECDH-ES\\+A\d+KW$/' => 'SimpleJWT\Crypt\KeyManagement\ECDH_AESKeyWrap',

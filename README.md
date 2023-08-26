@@ -21,7 +21,7 @@ SimpleJWT is a simple JSON web token library written in PHP.
     * Key agreement or direct encryption
     * RSAES-PKCS1-v1_5 (RSA1_5)
     * RSAES with OAEP (RSA-OAEP, RSA-OAEP-256)
-    * AES key wrap (A128KW, A192KW, A256KW)
+    * AES key wrap (A128KW, A192KW, A256KW, A128GCMKW, A192GCMKW, A256GCMKW)
     * PBES2 (PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW)
     * Elliptic Curve Diffie-Hellman (ECDH-ES), including X25519 -
       requires PHP 7.3 or later

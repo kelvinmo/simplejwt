@@ -66,6 +66,9 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
         parent::__construct($alg, $size);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedAlgs() {
         if (count(parent::getSupportedAlgs()) == 0) return [];
 
@@ -88,6 +91,9 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
         $criteria = $this->getWrappingKeyCriteria();
         if ($kid != null) $criteria['kid'] = $kid;
@@ -100,6 +106,9 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
         return $this->wrapKey($cek, $wrapping_key->toBinary(), $headers);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
         $criteria = $this->getWrappingKeyCriteria();
         if ($kid != null) $criteria['kid'] = $kid;

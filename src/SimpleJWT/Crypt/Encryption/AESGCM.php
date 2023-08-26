@@ -56,6 +56,9 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         parent::__construct($alg);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedAlgs() {
         if (!version_compare(PHP_VERSION, '7.1', '>=')) return [];
 
@@ -71,11 +74,16 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         return $results;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getKeyCriteria() {
         return ['kty' => 'oct', '@use' => 'enc', '@key_ops' => ['encrypt', 'decrypt']];
     }
 
-    // cek binary iv base64url
+    /**
+     * {@inheritdoc}
+     */
     public function encryptAndSign($plaintext, $cek, $additional, $iv) {
         $params = self::$alg_params[$this->getAlg()];
 
@@ -102,7 +110,9 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         ];
     }
 
-    // check cek and iv formats
+    /**
+     * {@inheritdoc}
+     */
     public function decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv) {
         $params = self::$alg_params[$this->getAlg()];
 
@@ -120,10 +130,16 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         return $plaintext;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCEKSize() {
         return 8 * self::$alg_params[$this->getAlg()]['key'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getIVSize() {
         return 96;
     }

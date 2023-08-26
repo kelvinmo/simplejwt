@@ -73,6 +73,9 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         $this->key_size = $key_size;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedAlgs() {
         if (defined('OPENSSL_KEYTYPE_EC') && function_exists('openssl_pkey_derive')) {
             // openssl_pkey_derive is made available from PHP 7.3?
@@ -83,6 +86,9 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getKeyCriteria() {
         return ['kty' => ['EC', 'OKP'], '@use' => 'enc', '@key_ops' => 'deriveKey'];
     }

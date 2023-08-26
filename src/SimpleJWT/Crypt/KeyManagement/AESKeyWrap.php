@@ -62,6 +62,9 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         parent::__construct($alg);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedAlgs() {
         $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $results = [];
@@ -75,6 +78,9 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return $results;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getKeyCriteria() {
         $alg = $this->getAlg();
         $size = self::$alg_params[$alg]['key'] * 8;
@@ -87,6 +93,9 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
@@ -121,6 +130,9 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return Util::base64url_encode($A . implode('', $R));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);

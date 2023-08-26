@@ -112,6 +112,9 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         $this->iterations = $iterations;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
         $salt_input = $this->generateSaltInput();
         $headers['p2s'] = Util::base64url_encode($salt_input);
@@ -127,6 +130,9 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return $this->wrapKey($cek, $derived_key, $headers);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);

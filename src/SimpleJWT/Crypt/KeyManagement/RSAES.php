@@ -62,10 +62,16 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         parent::__construct($alg);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedAlgs() {
         return array_keys(self::$alg_params);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getKeyCriteria() {
         return [
             'kty' => 'RSA',
@@ -85,6 +91,9 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return Util::random_bytes($len);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function encryptKey($cek, $keys, &$headers, $kid = null) {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true]);
         if (($key == null) || !$key->isPublic() || !($key instanceof PEMInterface)) {
@@ -109,6 +118,9 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return Util::base64url_encode($encrypted_key);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
         if (($key == null) || $key->isPublic() || !($key instanceof PEMInterface)) {

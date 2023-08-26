@@ -133,6 +133,9 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         if ($key == null) {
             throw new CryptException('Key not found or is invalid');
         }
+        if (!isset($headers['p2s']) || !isset($headers['p2c'])) {
+            throw new CryptException('p2s or p2c headers not set');
+        }
 
         $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
         return $this->unwrapKey($encrypted_key, $derived_key, $headers);

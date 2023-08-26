@@ -52,6 +52,9 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         'A256GCM' => ['cipher' => 'aes-256-gcm', 'key' => 32],
     ];
 
+    /** Size of the authentication tag in bits */
+    const TAG_SIZE = 128;
+
     public function __construct($alg) {
         parent::__construct($alg);
     }
@@ -96,7 +99,7 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
             if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
         }
 
-        $e = openssl_encrypt($plaintext, $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional, 16);
+        $e = openssl_encrypt($plaintext, $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional, self::TAG_SIZE / 8);
         if ($e == false) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
@@ -122,7 +125,7 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
         if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
 
         $tag = Util::base64url_decode($tag);
-        if (strlen($tag) != 16) throw new CryptException('Incorrect authentication tag length');
+        if (strlen($tag) != self::TAG_SIZE / 8) throw new CryptException('Incorrect authentication tag length');
         
         $plaintext = openssl_decrypt(Util::base64url_decode($ciphertext), $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional);
         if ($plaintext === false) throw new CryptException('Authentication tag does not match');

@@ -211,7 +211,6 @@ abstract class Key implements KeyInterface {
      * @return void
      */
     public function setOperations($ops) {
-        if (!is_array($ops)) $ops = explode(',', $ops);
         $this->data['key_ops'] = $ops;
     }
 

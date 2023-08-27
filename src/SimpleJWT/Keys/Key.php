@@ -271,14 +271,20 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function getThumbnail() {
-        $members = $this->getThumbnailMembers();
-        $signing = [];
-        foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
-        ksort($signing);
-        $hash_input = json_encode($signing);
-        if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
-        return Util::base64url_encode(hash('sha256', $hash_input, true));
+    public final function getThumbnail() {
+        static $thumbnail = null;
+
+        if ($thumbnail == null) {
+            $members = $this->getThumbnailMembers();
+            $signing = [];
+            foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
+            ksort($signing);
+            $hash_input = json_encode($signing);
+            if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
+            $thumbnail = Util::base64url_encode(hash('sha256', $hash_input, true));
+        }
+        
+        return $thumbnail;
     }
 
     /**

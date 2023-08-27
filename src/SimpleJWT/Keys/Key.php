@@ -162,10 +162,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the key ID
-     *
-     * @param string $kid the key ID
-     * @return void
+     * {@inheritdoc}
      */
     public function setKeyId($kid) {
         $this->data['kid'] = $kid;
@@ -186,12 +183,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the allowed usage for the key
-     *
-     * The usage can be one of: sig, enc
-     *
-     * @param string $use the allowed usage
-     * @return void
+     * {@inheritdoc}
      */
     public function setUse($use) {
         $this->data['use'] = $use;
@@ -205,13 +197,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the allowed operations for the key
-     *
-     * The values can be one or more of: sign, verify, encrypt, decrypt
-     * wrapKey, unwrapKey, deriveKey, deriveBits
-     *
-     * @param array<string> $ops the allowed operations
-     * @return void
+     * {@inheritdoc}
      */
     public function setOperations($ops) {
         $this->data['key_ops'] = $ops;

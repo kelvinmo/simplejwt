@@ -52,6 +52,14 @@ interface KeyInterface {
     public function getKeyId(bool $generate = false);
 
     /**
+     * Sets the key ID
+     *
+     * @param string $kid the key ID
+     * @return void
+     */
+    public function setKeyId($kid);
+
+    /**
      * Returns the type of the key
      *
      * @return string the type

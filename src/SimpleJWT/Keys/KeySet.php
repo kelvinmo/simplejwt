@@ -181,6 +181,30 @@ class KeySet {
     }
 
     /**
+     * Finds a key matching the specified thumbnail.
+     *
+     * In addition to exact match, this method also supports *fuzzy search*, which
+     * matches the beginning of the key ID string
+     *
+     * @param string $thumb the thumbnail to search
+     * @param bool $fuzzy whether fuzzy search is to be used
+     * @return KeyInterface|null the found key, or null
+     */
+    function getByThumbnail($thumb, $fuzzy = false) {
+        $fuzzy_keys = [];
+
+        foreach ($this->keys as $key) {
+            if ($key->getThumbnail() == $thumb) {
+                return $key;
+            } elseif ($fuzzy && (strpos($key->getThumbnail(), $thumb) === 0)) {
+                $fuzzy_keys[] = $key;
+            }
+        }
+        if (count($fuzzy_keys) == 1) return $fuzzy_keys[0];
+        return null;
+    }
+
+    /**
      * Finds a key matching specified criteria.
      *
      * The criteria are expressed as an associative array, with the keys being

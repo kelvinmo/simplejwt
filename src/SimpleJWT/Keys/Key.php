@@ -71,6 +71,9 @@ abstract class Key implements KeyInterface {
     /** @var array<string|int, mixed> $data */
     protected $data;
 
+    /** @var string */
+    private $thumbnail = null;
+
     /**
      * Creates a key.  By default the following formats are supported:
      *
@@ -159,10 +162,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the key ID
-     *
-     * @param string $kid the key ID
-     * @return void
+     * {@inheritdoc}
      */
     public function setKeyId($kid) {
         $this->data['kid'] = $kid;
@@ -183,12 +183,7 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the allowed usage for the key
-     *
-     * The usage can be one of: sig, enc
-     *
-     * @param string $use the allowed usage
-     * @return void
+     * {@inheritdoc}
      */
     public function setUse($use) {
         $this->data['use'] = $use;
@@ -202,16 +197,9 @@ abstract class Key implements KeyInterface {
     }
 
     /**
-     * Sets the allowed operations for the key
-     *
-     * The values can be one or more of: sign, verify, encrypt, decrypt
-     * wrapKey, unwrapKey, deriveKey, deriveBits
-     *
-     * @param array<string> $ops the allowed operations
-     * @return void
+     * {@inheritdoc}
      */
     public function setOperations($ops) {
-        if (!is_array($ops)) $ops = explode(',', $ops);
         $this->data['key_ops'] = $ops;
     }
 
@@ -272,14 +260,18 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function getThumbnail() {
-        $members = $this->getThumbnailMembers();
-        $signing = [];
-        foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
-        ksort($signing);
-        $hash_input = json_encode($signing);
-        if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
-        return Util::base64url_encode(hash('sha256', $hash_input, true));
+    public final function getThumbnail() {
+        if ($this->thumbnail == null) {
+            $members = $this->getThumbnailMembers();
+            $signing = [];
+            foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
+            ksort($signing);
+            $hash_input = json_encode($signing);
+            if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
+            $this->thumbnail = Util::base64url_encode(hash('sha256', $hash_input, true));
+        }
+        
+        return $this->thumbnail;
     }
 
     /**

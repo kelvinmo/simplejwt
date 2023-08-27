@@ -52,6 +52,14 @@ interface KeyInterface {
     public function getKeyId(bool $generate = false);
 
     /**
+     * Sets the key ID
+     *
+     * @param string $kid the key ID
+     * @return void
+     */
+    public function setKeyId($kid);
+
+    /**
      * Returns the type of the key
      *
      * @return string the type
@@ -66,11 +74,32 @@ interface KeyInterface {
     public function getUse();
 
     /**
+     * Sets the allowed usage for the key
+     *
+     * The usage can be one of: sig, enc
+     *
+     * @param string $use the allowed usage
+     * @return void
+     */
+    public function setUse($use);
+
+    /**
      * Returns the allowed operations for the key
      *
      * @return array<string> the allowed operations
      */
     public function getOperations();
+
+    /**
+     * Sets the allowed operations for the key
+     *
+     * The values can be one or more of: sign, verify, encrypt, decrypt
+     * wrapKey, unwrapKey, deriveKey, deriveBits
+     *
+     * @param array<string> $ops the allowed operations
+     * @return void
+     */
+    public function setOperations($ops);
 
     /**
      * Returns the size of the key, in bits.  The definition of "size"

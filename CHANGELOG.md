@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.8.0
 
 - Added: Support for `Ed25519` signatures and `X25519` key derviation
   algorithms

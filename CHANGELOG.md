@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fixed: Throw a `KeyException` when loading an invalid PEM-encoded
+  RSAKey
+
 ## 0.8.0
 
 - Added: Support for `Ed25519` signatures and `X25519` key derviation

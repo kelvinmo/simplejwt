@@ -119,6 +119,8 @@ class RSAKey extends Key implements PEMInterface {
                     $jwk['dp'] = Util::base64url_encode($seq->getChildAt(6)->getValueAsUIntOctets());
                     $jwk['dq'] = Util::base64url_encode($seq->getChildAt(7)->getValueAsUIntOctets());
                     $jwk['qi'] = Util::base64url_encode($seq->getChildAt(8)->getValueAsUIntOctets());
+                } else {
+                    throw new KeyException('Unrecognised key format');
                 }
 
                 parent::__construct($jwk);

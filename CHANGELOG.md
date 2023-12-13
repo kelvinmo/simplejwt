@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 - Removed: Support for PHP 7.2
 
+## 0.8.1
+
+- Fixed: Throw a `KeyException` when loading an invalid PEM-encoded
+  RSAKey
+
 ## 0.8.0
 
 - Added: Support for `Ed25519` signatures and `X25519` key derviation

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.8.1
 
 - Fixed: Throw a `KeyException` when loading an invalid PEM-encoded
   RSAKey

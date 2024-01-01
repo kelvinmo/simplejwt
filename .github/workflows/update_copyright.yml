@@ -34,8 +34,8 @@ jobs:
           key: "composer-${{ hashFiles('**/composer.json') }}"
           restore-keys: "composer-"
 
-      - name: Install dependencies
-        run: composer update && composer install
+      - name: Install dependencies without updating
+        run: composer install
 
       - name: Run composer update-copyright script
         run: composer update-copyright

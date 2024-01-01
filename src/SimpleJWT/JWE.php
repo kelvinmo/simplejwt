@@ -34,6 +34,7 @@
  */
 namespace SimpleJWT;
 
+use \JsonException;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Crypt\KeyManagement\KeyDerivationAlgorithm;
@@ -76,7 +77,7 @@ class JWE extends Token {
     public static function decrypt($token, $keys, $expected_alg) {
         $detect_result = Helper::detect($token);
         if ($detect_result == null)
-            throw new \InvalidArgumentException('Unrecognised token format');
+            throw new InvalidTokenException('Unrecognised token format', InvalidTokenException::TOKEN_PARSE_ERROR);
         $format = $detect_result['format'];
 
         switch ($format) {
@@ -86,38 +87,45 @@ class JWE extends Token {
                 list($protected, $encrypted_key, $iv, $ciphertext, $tag) = $parts;
                 break;
             case self::JSON_FORMAT:
-                $obj = json_decode($token, true);
-                if ($obj == null) throw new InvalidTokenException('Cannot decode JSON', InvalidTokenException::TOKEN_PARSE_ERROR);
-                $protected = $obj['protected'];
-                $unprotected = (isset($obj['unprotected'])) ? $obj['unprotected'] : [];
-                $iv = $obj['iv'];
-                $ciphertext = $obj['ciphertext'];
-                $tag = $obj['tag'];
+                try {
+                    $obj = json_decode($token, true, 512, JSON_THROW_ON_ERROR);
+                    
+                    $protected = $obj['protected'];
+                    $unprotected = (isset($obj['unprotected'])) ? $obj['unprotected'] : [];
+                    $iv = $obj['iv'];
+                    $ciphertext = $obj['ciphertext'];
+                    $tag = $obj['tag'];
 
-                if (isset($obj['recipients'])) {
-                    foreach ($obj['recipients'] as $recipient) {
-                        if (isset($recipient['header']['kid'])) {
-                            $target_kid = $recipient['header']['kid'];
-                            if ($keys->getById($target_kid) != null) {
-                                if (isset($recipient['header'])) $unprotected = array_merge($unprotected, $recipient['header']);
-                                $encrypted_key = $recipient['encrypted_key'];
-                                break;
+                    if (isset($obj['recipients'])) {
+                        foreach ($obj['recipients'] as $recipient) {
+                            if (isset($recipient['header']['kid'])) {
+                                $target_kid = $recipient['header']['kid'];
+                                if ($keys->getById($target_kid) != null) {
+                                    if (isset($recipient['header'])) $unprotected = array_merge($unprotected, $recipient['header']);
+                                    $encrypted_key = $recipient['encrypted_key'];
+                                    break;
+                                }
                             }
                         }
+                        if (!isset($encrypted_key)) throw new InvalidTokenException('Cannot find recipient with decryptable key', InvalidTokenException::DECRYPTION_ERROR);
+                    } else {
+                        if (isset($obj['header'])) $unprotected = array_merge($unprotected, $obj['header']);
+                        $encrypted_key = (isset($obj['encrypted_key'])) ? $obj['encrypted_key'] : '';
                     }
-                    if (!isset($encrypted_key)) throw new InvalidTokenException('Cannot find recipient with decryptable key', InvalidTokenException::DECRYPTION_ERROR);
-                } else {
-                    if (isset($obj['header'])) $unprotected = array_merge($unprotected, $obj['header']);
-                    $encrypted_key = (isset($obj['encrypted_key'])) ? $obj['encrypted_key'] : '';
+                } catch (JsonException $e) {
+                    throw new InvalidTokenException('Cannot decode JSON', InvalidTokenException::TOKEN_PARSE_ERROR, $e);
                 }
                 break;
             default:
                 throw new \InvalidArgumentException('Incorrect format');
         }
 
-        $headers = json_decode(Util::base64url_decode($protected), true);
-        if ($headers == null) throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR);
-        if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
+        try {
+            $headers = json_decode(Util::base64url_decode($protected), true, 512, JSON_THROW_ON_ERROR);
+            if (isset($unprotected)) $headers = array_merge($headers, $unprotected);
+        } catch (JsonException $e) {
+            throw new InvalidTokenException('Cannot decode header', InvalidTokenException::TOKEN_PARSE_ERROR, $e);
+        }
 
         // Process crit
         if (isset($headers['crit'])) {

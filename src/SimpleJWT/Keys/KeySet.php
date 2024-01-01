@@ -71,7 +71,7 @@ class KeySet {
         }
 
         try {
-            $data = json_decode($jwk, true, 512, JSON_THROW_ON_ERROR); var_dump($data);
+            $data = json_decode($jwk, true, 512, JSON_THROW_ON_ERROR);
             foreach ($data['keys'] as $key_data) {
                 $this->keys[] = KeyFactory::create($key_data, 'php');
             }

@@ -300,7 +300,7 @@ class JWETest extends TestCase {
     }
 
     function testInvalidToken() {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException('SimpleJWT\InvalidTokenException');
 
         $invalid_token = '12345';
         $dummy_set = $this->getPrivateKeySet();

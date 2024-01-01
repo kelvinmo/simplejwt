@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Util;
 
+use \JsonException;
 use SimpleJWT\JWT;
 use SimpleJWT\JWE;
 use SimpleJWT\Token;
@@ -163,9 +164,17 @@ class Helper {
     static function detect($data) {
         $results = [];
 
-        $obj = json_decode($data, true);
+        try {
+            $obj = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
 
-        if ($obj == null) {
+            if (isset($obj['signature']) || isset($obj['signatures'])) {
+                $results['type'] = 'JWT';
+                $results['format'] = Token::JSON_FORMAT;
+            } elseif (isset($obj['ciphertext'])) {
+                $results['type'] = 'JWE';
+                $results['format'] = Token::JSON_FORMAT;
+            }
+        } catch (JsonException $e) {
             $dot_count = substr_count($data, '.');
             if (($dot_count == 1) || ($dot_count == 2)) {
                 $results['type'] = 'JWT';
@@ -173,14 +182,6 @@ class Helper {
             } elseif ($dot_count == 4) {
                 $results['type'] = 'JWE';
                 $results['format'] = Token::COMPACT_FORMAT;
-            }
-        } else {
-            if (isset($obj['signature']) || isset($obj['signatures'])) {
-                $results['type'] = 'JWT';
-                $results['format'] = Token::JSON_FORMAT;
-            } elseif (isset($obj['ciphertext'])) {
-                $results['type'] = 'JWE';
-                $results['format'] = Token::JSON_FORMAT;
             }
         }
 

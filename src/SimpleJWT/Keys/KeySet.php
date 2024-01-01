@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
+use \JsonException;
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
 
@@ -69,10 +70,15 @@ class KeySet {
             }
         }
 
-        $data = json_decode($jwk, true);
-        foreach ($data['keys'] as $key_data) {
-            $this->keys[] = KeyFactory::create($key_data, 'php');
+        try {
+            $data = json_decode($jwk, true, 512, JSON_THROW_ON_ERROR);
+            foreach ($data['keys'] as $key_data) {
+                $this->keys[] = KeyFactory::create($key_data, 'php');
+            }
+        } catch (JsonException $e) {
+            throw new KeyException('Cannot decode key set JSON', 0, $e);
         }
+        
     }
 
     /**

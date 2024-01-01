@@ -168,6 +168,13 @@ class JWTTest extends TestCase {
         $this->assertEquals('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', $result['signatures'][0]['signature']);
     }
 
+    function testDeserialiseInvalidJSON() {
+        $token = '{"payload":"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ","protected":"eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9","signature":"dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",}';
+        $this->expectException(InvalidTokenException::class);
+        $this->expectExceptionCode(InvalidTokenException::TOKEN_PARSE_ERROR);
+        $result = JWT::deserialise($token, JWT::JSON_FORMAT);
+    }
+
     function testDeserialiseMulti() {
         $result = JWT::deserialise($this->multi_token);
         
@@ -329,7 +336,7 @@ class JWTTest extends TestCase {
     }
 
     function testInvalidToken() {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException('SimpleJWT\InvalidTokenException');
 
         $invalid_token = '12345';
         $result = JWT::deserialise($invalid_token);

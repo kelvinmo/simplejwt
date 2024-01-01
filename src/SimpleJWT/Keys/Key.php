@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
+use \JsonException;
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
@@ -97,14 +98,16 @@ abstract class Key implements KeyInterface {
                 break;
             case 'json':
                 if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
-                $jwk = json_decode($data, true);
+                try {
+                    $jwk = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
 
-                if ((null === $jwk) && ($json_err = json_last_error_msg())) throw new KeyException('Incorrect key data format - malformed JSON: ' . $json_err);
-
-                if (isset($jwk['ciphertext'])) {
-                    $this->data = self::decrypt($data, $password, $alg);
-                } else {
-                    $this->data = $jwk;
+                    if (isset($jwk['ciphertext'])) {
+                        $this->data = self::decrypt($data, $password, $alg);
+                    } else {
+                        $this->data = $jwk;
+                    }
+                } catch (JsonException $e) {
+                    throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
                 }
                 break;
             case 'jwe':
@@ -135,6 +138,8 @@ abstract class Key implements KeyInterface {
      * @param string $data the underlying key parameters, in JSON web key format
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
+     * @throws KeyException if the key cannot be decrypted, or if the decrypted
+     * plaintext is not valid JSON
      * @return array<mixed> the decrypted data
      */
     private static function decrypt($data, $password, $alg) {
@@ -144,9 +149,11 @@ abstract class Key implements KeyInterface {
             $keys = KeySet::createFromSecret($password, 'bin');
             try {
                 $jwe = JWE::decrypt($data, $keys, $alg);
-                return json_decode($jwe->getPlaintext(), true);
+                return json_decode($jwe->getPlaintext(), true, 512, JSON_THROW_ON_ERROR);
             } catch (CryptException $e) {
                 throw new KeyException('Cannot decrypt key', 0, $e);
+            } catch (JsonException $e) {
+                throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
             }
         }
     }

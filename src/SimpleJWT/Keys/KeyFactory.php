@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
+use \JsonException;
 use SimpleJWT\JWE;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\ASN1\DER;
@@ -129,13 +130,17 @@ class KeyFactory {
 
         // 2. Decode JSON into PHP array
         if ($format == 'json') {
-            /** @var string $data */
-            $json = json_decode($data, true);
-            if (isset($json['ciphertext'])) {
-                $format = 'jwe';
-            } else {
-                $data = $json;
-                $format = 'php';
+            try {
+                /** @var string $data */
+                $json = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+                if (isset($json['ciphertext'])) {
+                    $format = 'jwe';
+                } else {
+                    $data = $json;
+                    $format = 'php';
+                }
+            } catch (JsonException $e) {
+                throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
             }
         }
 

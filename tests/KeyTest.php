@@ -72,5 +72,14 @@ class KeyTest extends TestCase {
         $loaded_key_data = $loaded_key->getKeyData();
         $this->assertEquals($key_data['k'], $loaded_key_data['k']);
     }
+
+    function testInvalidJSONKey() {
+        $invalid = '{ "kty": "oct", "k": "' . $this->symmetric_key . '", }';
+
+        $this->expectException('SimpleJWT\Keys\KeyException');
+        $this->expectExceptionMessage('Incorrect key data format - malformed JSON');
+        $key = new SymmetricKey($invalid, 'json');
+    }
+
 }
 ?>

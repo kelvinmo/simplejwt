@@ -116,12 +116,13 @@ class KeyFactory {
                 $format = 'jwe';
             } elseif (preg_match('/-----([^-:]+)-----/', $data)) {
                 $format = 'pem';
+            } else {
+                try {
+                    /** @var string $data */
+                    $cbor_item = $cbor->decode($data, CBORItem::DECODE_CONVERT_BSTR);
+                    if (is_array($cbor_item)) $format = 'cbor';
+                } catch (\Exception $e) {}
             }
-            try {
-                /** @var string $data */
-                $cbor_item = $cbor->decode($data, CBORItem::DECODE_CONVERT_BSTR);
-                if (is_array($cbor_item)) $format = 'cbor';
-            } catch (\Exception $e) {}
         }
 
         if (($format == null) || ($format == 'auto')) throw new KeyException('Cannot detect key format');

@@ -69,5 +69,14 @@ class KeySetTest extends TestCase {
         $key = $keys->get(['kty' => 'oct', '~use' => 'enc']);
         $this->assertEquals('oct2', $key->getKeyId());
     }
+
+    function testInvalidJWKS() {
+        // Invalid due to additional comma at the end of keys array --------v
+        $invalid = '{"keys": [ { "kid": "oct1", "kty": "oct", "k": "12345" }, ] }';
+        $keys = new KeySet();
+
+        $this->expectException('SimpleJWT\Keys\KeyException');
+        $keys->load($invalid);
+    }
 }
 ?>

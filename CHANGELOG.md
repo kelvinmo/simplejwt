@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 - Changed: Providing invalid JSON tokens into JWT::deserialise() and
   JWE::decrypt() will throw an `InvalidTokenException` instead of
   `InvalidArgumentException`
+- Changed: `JWT` and `JWE` methods now check for validity of
+  algorithm classes
 - Removed: Support for PHP 7.2
 
 ## 0.8.1

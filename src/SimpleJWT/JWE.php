@@ -37,6 +37,8 @@ namespace SimpleJWT;
 use \JsonException;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
+use SimpleJWT\Crypt\Encryption\EncryptionAlgorithm;
+use SimpleJWT\Crypt\KeyManagement\KeyManagementAlgorithm;
 use SimpleJWT\Crypt\KeyManagement\KeyDerivationAlgorithm;
 use SimpleJWT\Crypt\KeyManagement\KeyEncryptionAlgorithm;
 use SimpleJWT\Keys\KeySet;
@@ -141,9 +143,13 @@ class JWE extends Token {
 
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::DECRYPTION_ERROR);
         $key_enc = AlgorithmFactory::create($headers['alg']);
+        if (!($key_enc instanceof KeyManagementAlgorithm))
+            throw new InvalidTokenException('Invalid key algorithm: ' . $headers['alg'], InvalidTokenException::DECRYPTION_ERROR);
 
-        /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
+        /** @var EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($headers['enc']);
+        if (!($content_enc instanceof EncryptionAlgorithm))
+            throw new InvalidTokenException('Invalid content encryption algorithm: ' . $headers['enc'], InvalidTokenException::DECRYPTION_ERROR);
 
         $key_decryption_keys = $keys;
 
@@ -239,9 +245,13 @@ class JWE extends Token {
         if (!isset($this->headers['enc'])) throw new \InvalidArgumentException('enc parameter missing');
 
         $key_enc = AlgorithmFactory::create($this->headers['alg']);
+        if (!($key_enc instanceof KeyManagementAlgorithm))
+            throw new \InvalidArgumentException('Invalid key algorithm: ' . $this->headers['alg']);
         
-        /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
+        /** @var EncryptionAlgorithm $content_enc */
         $content_enc = AlgorithmFactory::create($this->headers['enc']);
+        if (!($content_enc instanceof EncryptionAlgorithm))
+            throw new \InvalidArgumentException('Invalid content encryption algorithm: ' . $this->headers['enc']);
 
         $key_encryption_keys = $keys;
 

@@ -38,6 +38,7 @@ namespace SimpleJWT;
 use \JsonException;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
+use SimpleJWT\Crypt\Signature\SignatureAlgorithm;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
@@ -133,8 +134,10 @@ class JWT extends Token {
 
         // Check signatures
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
-        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
+        /** @var SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($expected_alg);
+        if (!($signer instanceof SignatureAlgorithm))
+            throw new InvalidTokenException('Invalid signature algorithm: ' . $expected_alg, InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
 
         try {
             // Override $kid argument with value from JWT header if present
@@ -205,8 +208,10 @@ class JWT extends Token {
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
 
         try {
-            /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
+            /** @var SignatureAlgorithm $signer */
             $signer = AlgorithmFactory::create($this->headers['alg']);
+            if (!($signer instanceof SignatureAlgorithm))
+                throw new \InvalidArgumentException('Invalid signature algorithm: ' . $this->headers['alg']);
         } catch (\UnexpectedValueException $e) {
             throw new CryptException($e->getMessage(), 0, $e);
         }
@@ -375,8 +380,10 @@ class JWT extends Token {
         $deserialised = self::deserialise($token);
         $alg = $deserialised['signatures'][0]['headers']['alg'];
 
-        /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
+        /** @var SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($alg);
+        if (!($signer instanceof SignatureAlgorithm))
+            throw new \InvalidArgumentException('Invalid signature algorithm: ' . $alg);
         return $signer->shortHash($token);
     }
 }

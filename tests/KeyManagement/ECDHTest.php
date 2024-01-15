@@ -21,7 +21,7 @@ class ECKeyMock extends ECKey {
         ], 'php');
     }
 
-    public function getPublicKey() {
+    public function getPublicKey(): ECKey {
         return new ECKeyMock([
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],

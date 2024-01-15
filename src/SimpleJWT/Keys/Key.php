@@ -161,7 +161,7 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function getKeyId(bool $generate = false): string {
+    public function getKeyId(bool $generate = false): ?string {
         if (!isset($this->data['kid']) && $generate) {
             $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
         }

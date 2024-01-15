@@ -141,7 +141,7 @@ class RSAKey extends Key implements PEMInterface {
         return !isset($this->data['p']);
     }
 
-    public function getPublicKey(): RSAKey {
+    public function getPublicKey(): ?KeyInterface {
         $data = [
             'kty' => $this->data['kty'],
             'n' => $this->data['n'],

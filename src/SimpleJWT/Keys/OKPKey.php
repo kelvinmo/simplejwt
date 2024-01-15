@@ -96,7 +96,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
         return true;
     }
 
-    public function getPublicKey(): OKPKey {
+    public function getPublicKey(): ?KeyInterface {
         $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],

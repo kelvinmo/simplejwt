@@ -289,7 +289,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         return ($this->isValid() && $public_key->isValid());
     }
 
-    public function getPublicKey(): ECKey {
+    public function getPublicKey(): ?KeyInterface {
         $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],

@@ -79,7 +79,7 @@ class InvalidTokenException extends \RuntimeException {
      * @param int $time for TOO_EARLY_ERROR or TOO_LATE_ERROR, the required time specified
      * in the token
      */
-    public function __construct($message = "", $code = 0, $previous = NULL, $time = 0) {
+    public function __construct(string $message = "", int $code = 0, \Exception $previous = NULL, int $time = 0) {
         parent::__construct($message, $code, $previous);
         $this->time = $time;
     }
@@ -89,7 +89,7 @@ class InvalidTokenException extends \RuntimeException {
      * 
      * @return int the required time time
      */
-    public function getTime() {
+    public function getTime(): int {
         return $this->time;
     }
 }

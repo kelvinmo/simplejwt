@@ -63,7 +63,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /** @var int $iterations */
     protected $iterations = 4096;
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         if ($alg != null) {
             $this->hash_alg = self::$alg_params[$alg]['hash'];
 
@@ -76,7 +76,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         parent::__construct($alg);
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $results = [];
 
         $aeskw_algs = $this->getAESKWAlgs();
@@ -92,7 +92,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         return $results;
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         $alg = $this->getAlg();
         return [
             'kty' => 'oct',
@@ -108,14 +108,14 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @param int $iterations number of iterations
      * @return void
      */
-    public function setIterations($iterations) {
+    public function setIterations(int $iterations) {
         $this->iterations = $iterations;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         $salt_input = $this->generateSaltInput();
         $headers['p2s'] = Util::base64url_encode($salt_input);
         $headers['p2c'] = $this->iterations;
@@ -133,7 +133,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
@@ -153,7 +153,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      *
      * @return string the salt input
      */
-    protected function generateSaltInput() {
+    protected function generateSaltInput(): string {
         return Util::random_bytes(8);
     }
 

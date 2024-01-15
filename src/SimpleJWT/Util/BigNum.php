@@ -49,7 +49,7 @@ class BigNum {
      * @param int $base an integer between 2 and 36, or 256
      * @return resource a bignum
      */
-    public function __construct($str, $base = 10) {
+    public function __construct($str = 0, int $base = 10) {
         switch ($base) {
             case 10:
                 $this->value = gmp_init($str, 10);
@@ -88,7 +88,7 @@ class BigNum {
      * @param BigNum $b
      * @return BigNum a bignum representing this + b
      */
-    function add($b) {
+    function add(BigNum $b): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_add($this->value, $b->value);
         return $result;
@@ -100,7 +100,7 @@ class BigNum {
      * @param BigNum $b
      * @return BigNum a bignum representing this * b
      */
-    function mul($b) {
+    function mul(BigNum $b): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_mul($this->value, $b->value);
         return $result;
@@ -112,7 +112,7 @@ class BigNum {
      * @param BigNum $exp the exponent
      * @return BigNum a bignum representing this ^ exp
      */
-    function pow($exp) {
+    function pow(BigNum $exp): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_pow($this->value, $exp->value);
         return $result;
@@ -124,7 +124,7 @@ class BigNum {
      * @param BigNum $b
      * @return BigNum a bignum representing this / b
      */
-    function div($b) {
+    function div(BigNum $b): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_div($this->value, $b->value);
         return $result;
@@ -136,7 +136,7 @@ class BigNum {
      * @param BigNum $d
      * @return BigNum a bignum representing this mod d
      */
-    function mod($d) {
+    function mod(BigNum $d): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_mod($this->value, $d->value);
         return $result;
@@ -149,7 +149,7 @@ class BigNum {
      * @param BigNum $mod the modulo
      * @return BigNum a bignum representing this ^ exp mod mod
      */
-    function powmod($exp, $mod) {
+    function powmod(BigNum $exp, BigNum $mod): BigNum {
         $result = new BigNum(0);
         $result->value = $this->_powmod($this->value, $exp->value, $mod->value);
         return $result;
@@ -161,7 +161,7 @@ class BigNum {
      * @param BigNum $b
      * @return int positive value if this > b, zero if this = b and a negative value if this < b
      */
-    function cmp($b) {
+    function cmp(BigNum $b): int {
         return $this->_cmp($this->value, $b->value);
     }
 
@@ -170,7 +170,7 @@ class BigNum {
      *
      * @return string
      */
-    function __toString() {
+    function __toString(): string {
         return gmp_strval($this->value, 10);
     }
 

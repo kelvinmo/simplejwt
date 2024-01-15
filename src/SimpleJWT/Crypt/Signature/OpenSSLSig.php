@@ -37,6 +37,7 @@ namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\PEMInterface;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\ASN1\DER;
@@ -52,7 +53,7 @@ class OpenSSLSig extends SHA2 {
     /** @var string $family */
     private $family;
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         if ($alg == null) {
             parent::__construct(null, null);
         } else {
@@ -62,7 +63,7 @@ class OpenSSLSig extends SHA2 {
         }
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         switch ($this->family) {
             case 'RS':
                 return ['kty' => 'RSA', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
@@ -73,7 +74,7 @@ class OpenSSLSig extends SHA2 {
         }
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $results = [];
         $hashes = [];
 
@@ -97,7 +98,7 @@ class OpenSSLSig extends SHA2 {
         return $results;
     }
 
-    public function sign($data, $keys, $kid = null) {
+    public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !($key instanceof PEMInterface)) {
             throw new KeyException('Key not found or is invalid');
@@ -127,7 +128,7 @@ class OpenSSLSig extends SHA2 {
         return Util::base64url_encode($binary);
     }
 
-    public function verify($signature, $data, $keys, $kid = null) {
+    public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof PEMInterface)) {
             throw new KeyException('Key not found or is invalid');
@@ -160,7 +161,7 @@ class OpenSSLSig extends SHA2 {
         }
     }
 
-    public function getSigningKey($keys, $kid = null) {
+    public function getSigningKey(KeySet $keys, ?string $kid = null): ?KeyInterface {
         return $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
     }
 }

@@ -49,7 +49,7 @@ interface KeyInterface {
      * present
      * @return string|null the key ID
      */
-    public function getKeyId(bool $generate = false);
+    public function getKeyId(bool $generate = false): ?string;
 
     /**
      * Sets the key ID
@@ -57,21 +57,21 @@ interface KeyInterface {
      * @param string $kid the key ID
      * @return void
      */
-    public function setKeyId($kid);
+    public function setKeyId(string $kid);
 
     /**
      * Returns the type of the key
      *
      * @return string the type
      */
-    public function getKeyType();
+    public function getKeyType(): string;
 
     /**
      * Returns the allowed usage for the key
      *
      * @return string the allowed usage
      */
-    public function getUse();
+    public function getUse(): ?string;
 
     /**
      * Sets the allowed usage for the key
@@ -81,14 +81,14 @@ interface KeyInterface {
      * @param string $use the allowed usage
      * @return void
      */
-    public function setUse($use);
+    public function setUse(string $use);
 
     /**
      * Returns the allowed operations for the key
      *
      * @return array<string> the allowed operations
      */
-    public function getOperations();
+    public function getOperations(): ?array;
 
     /**
      * Sets the allowed operations for the key
@@ -99,7 +99,7 @@ interface KeyInterface {
      * @param array<string> $ops the allowed operations
      * @return void
      */
-    public function setOperations($ops);
+    public function setOperations(array $ops);
 
     /**
      * Returns the size of the key, in bits.  The definition of "size"
@@ -107,7 +107,7 @@ interface KeyInterface {
      *
      * @return int the size of the key in bits
      */
-    public function getSize();
+    public function getSize(): int;
 
     /**
      * Returns the underlying parameters for the key.  The parameters should
@@ -115,7 +115,7 @@ interface KeyInterface {
      *
      * @return array<string, mixed> the parameters
      */
-    public function getKeyData();
+    public function getKeyData(): array;
 
     /**
      * Determines whether the key is a public key.
@@ -125,14 +125,15 @@ interface KeyInterface {
      *
      * @return bool true if the key is public
      */
-    public function isPublic();
+    public function isPublic(): bool;
 
     /**
      * Returns the public key.
      *
-     * @return Key|null the public key, or null if the public key does not exist (e.g. is a symmetric key)
+     * @return KeyInterface|null the public key, or null if the public key
+     * does not exist (e.g. is a symmetric key)
      */
-    public function getPublicKey();
+    public function getPublicKey(): ?KeyInterface;
 
     /**
      * Obtains a thumbnail for the key.  The thumbnail is derived from the
@@ -144,7 +145,7 @@ interface KeyInterface {
      *
      * @return string the thumbnail
      */
-    public function getThumbnail();
+    public function getThumbnail(): string;
 }
 
 ?>

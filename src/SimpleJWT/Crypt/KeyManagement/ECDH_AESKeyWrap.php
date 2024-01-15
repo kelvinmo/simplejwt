@@ -52,7 +52,7 @@ use SimpleJWT\Keys\SymmetricKey;
 class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
     use AESKeyWrapTrait;
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         if ($alg == null) {
             $this->initAESKW(null);
             $size = null;
@@ -69,7 +69,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         if (count(parent::getSupportedAlgs()) == 0) return [];
 
         $aeskw_algs = $this->getAESKWAlgs();
@@ -83,7 +83,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
      *
      * @return array<string, mixed> the key selection criteria
      */
-    protected function getWrappingKeyCriteria() {
+    protected function getWrappingKeyCriteria(): array {
         return [
             'kty' => 'oct',
             '~alg' => $this->getAlg(),
@@ -94,7 +94,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         $criteria = $this->getWrappingKeyCriteria();
         if ($kid != null) $criteria['kid'] = $kid;
 
@@ -109,7 +109,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         $criteria = $this->getWrappingKeyCriteria();
         if ($kid != null) $criteria['kid'] = $kid;
 

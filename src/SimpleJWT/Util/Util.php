@@ -49,7 +49,7 @@ class Util {
      * @return string the encoded data
      * @link http://tools.ietf.org/html/rfc4648#section-5
      */
-    static public function base64url_encode($data, $pad = false) {
+    static public function base64url_encode(string $data, bool $pad = false): string {
         $encoded = strtr(base64_encode($data), '+/', '-_');
         if (!$pad) $encoded = trim($encoded, '=');
         return $encoded;
@@ -63,7 +63,7 @@ class Util {
      * @link http://tools.ietf.org/html/rfc4648#section-5
      * @throws UnexpectedValueException if an error occurs in the decoding process
      */
-    static public function base64url_decode($data) {
+    static public function base64url_decode(string $data): string {
         $decoded = base64_decode(strtr($data, '-_', '+/'));
         if ($decoded == false) {
             throw new UnexpectedValueException('Invalid base64url string');
@@ -108,7 +108,7 @@ class Util {
      * @param string $str2
      * @return bool true if the two strings are equal
      */
-    static public function secure_compare($str1, $str2) {
+    static public function secure_compare(string $str1, string $str2): bool {
         return hash_equals($str1, $str2);
     }
 
@@ -118,7 +118,7 @@ class Util {
      * @param int $x the interger
      * @return string the byte string
      */
-    static function packInt64($x) {
+    static function packInt64(int $x): string {
         if (PHP_INT_SIZE == 8) {
             if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
                 return pack('J', $x);
@@ -140,7 +140,7 @@ class Util {
      * @param int<1, max> $num_bytes the number of bytes to generate
      * @return string a string containing random bytes
      */
-    static function random_bytes($num_bytes) {
+    static function random_bytes(int $num_bytes): string {
         return random_bytes($num_bytes);
     }
 }

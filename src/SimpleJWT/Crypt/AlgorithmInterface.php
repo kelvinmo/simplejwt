@@ -56,7 +56,7 @@ interface AlgorithmInterface {
      *
      * @return string|null the algorithm
      */
-    public function getAlg();
+    public function getAlg(): ?string;
 
     /**
      * Get `alg` or `enc` values supported by this class.
@@ -69,7 +69,7 @@ interface AlgorithmInterface {
      *
      * @return array<string> an array of supported algorithms
      */
-    public function getSupportedAlgs();
+    public function getSupportedAlgs(): array;
 }
 
 ?>

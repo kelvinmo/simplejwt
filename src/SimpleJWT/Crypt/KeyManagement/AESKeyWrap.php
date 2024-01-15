@@ -39,6 +39,7 @@ use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
 /**
@@ -58,14 +59,14 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         'A256KW' => ['cipher' => 'AES-256-ECB', 'key' => 32],
     ];
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $results = [];
 
@@ -81,7 +82,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         $alg = $this->getAlg();
         $size = self::$alg_params[$alg]['key'] * 8;
         return [
@@ -96,7 +97,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
@@ -133,7 +134,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
@@ -173,7 +174,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @param string $x the value
      * @return string the most significant half
      */
-    protected function msb($x) {
+    protected function msb(string $x): string {
         return substr($x, 0, (int) (strlen($x) / 2));
     }
 
@@ -183,7 +184,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @param string $x the value
      * @return string the least significant half
      */
-    protected function lsb($x) {
+    protected function lsb(string $x): string {
         return substr($x, (int) (strlen($x) / 2));
     }
 

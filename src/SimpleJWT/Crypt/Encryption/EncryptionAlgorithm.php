@@ -55,7 +55,7 @@ interface EncryptionAlgorithm extends AlgorithmInterface {
      * `iv` (the initialisation vector), with all values as base64url encoded strings
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function encryptAndSign($plaintext, $cek, $additional, $iv);
+    public function encryptAndSign(string $plaintext, string $cek, string $additional, ?string $iv): array;
 
     /**
      * Decrypts ciphertext and verifies the authentication tag.
@@ -72,7 +72,7 @@ interface EncryptionAlgorithm extends AlgorithmInterface {
      * @throws CryptException if there is an error in the cryptographic process, including
      * if the authentication tag does not match
      */
-    public function decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv);
+    public function decryptAndVerify(string $ciphertext, string $tag, string $cek, string $additional, string $iv): string;
 
     /**
      * Returns the required size of the content encryption key for this algorithm.

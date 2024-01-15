@@ -66,7 +66,7 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      * @throws \UnexpectedValueException if the `$alg` parameter is not supported
      * by this class
      */
-    protected function __construct($alg = null) {
+    protected function __construct(?string $alg = null) {
         if (($alg != null) && !in_array($alg, $this->getSupportedAlgs())) throw new \UnexpectedValueException('Algorithm not supported: ' . $alg);
         $this->alg = $alg;
     }
@@ -76,7 +76,7 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      *
      * @return string|null the algorithm
      */
-    public function getAlg() {
+    public function getAlg(): ?string {
         return $this->alg;
     }
 
@@ -99,7 +99,7 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      * @param array<string, mixed>|string $args the criteria
      * @return KeyInterface|null the found key, or null
      */
-    protected function selectKey($keys, ...$args) {
+    protected function selectKey(KeySet $keys, ...$args): ?KeyInterface {
         $criteria = $this->getKeyCriteria();
         
         foreach ($args as $arg) {
@@ -119,7 +119,7 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      *
      * @return array<string, mixed> the key selection criteria
      */
-    abstract public function getKeyCriteria();
+    abstract public function getKeyCriteria(): array;
 }
 
 ?>

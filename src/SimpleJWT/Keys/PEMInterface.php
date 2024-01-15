@@ -46,7 +46,7 @@ interface PEMInterface {
      * @return string the key in PEM format
      * @throws KeyException if the key cannot be converted
      */
-    public function toPEM();
+    public function toPEM(): string;
 }
 
 ?>

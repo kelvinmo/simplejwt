@@ -61,7 +61,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data, string $format, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
             case 'json':
@@ -80,11 +80,11 @@ class OKPKey extends Key implements ECDHKeyInterface {
         }
     }
 
-    public function getSize() {
+    public function getSize(): int {
         return 8 * strlen(Util::base64url_decode($this->data['x']));
     }
 
-    public function isPublic() {
+    public function isPublic(): bool {
         return !isset($this->data['d']);
     }
 
@@ -96,7 +96,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
         return true;
     }
 
-    public function getPublicKey() {
+    public function getPublicKey(): OKPKey {
         $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
@@ -112,7 +112,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
      * @return string the key in Sodium format
      * @throws KeyException if the key cannot be converted
      */
-    public function toSodium() {
+    public function toSodium(): string {
         if ($this->isPublic()) {
             return Util::base64url_decode($this->data['x']);
         } else {
@@ -179,7 +179,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
         return $result;
     }
 
-    protected function getThumbnailMembers() {
+    protected function getThumbnailMembers(): array {
         // https://datatracker.ietf.org/doc/html/rfc8037#section-2
         return ['crv', 'kty', 'x'];
     }

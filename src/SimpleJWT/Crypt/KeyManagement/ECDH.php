@@ -41,6 +41,7 @@ use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\ECDHKeyInterface;
 use SimpleJWT\Keys\KeyFactory;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
 
 /**
@@ -68,7 +69,7 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
      * @throws \UnexpectedValueException if the `$alg` parameter is not supported
      * by this class
      */
-    public function __construct($alg, $key_size = null) {
+    public function __construct(?string $alg, ?int $key_size = null) {
         parent::__construct($alg);
         $this->key_size = $key_size;
     }
@@ -76,7 +77,7 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         if (defined('OPENSSL_KEYTYPE_EC') && function_exists('openssl_pkey_derive')) {
             // openssl_pkey_derive is made available from PHP 7.3?
             return ['ECDH-ES'];
@@ -89,14 +90,14 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return ['kty' => ['EC', 'OKP'], '@use' => 'enc', '@key_ops' => 'deriveKey'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deriveKey($keys, &$headers, $kid = null) {
+    public function deriveKey(KeySet $keys, array &$headers, ?string $kid = null): string {
         /** @var ECDHKeyInterface $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {

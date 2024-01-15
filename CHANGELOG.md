@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
   `InvalidArgumentException`
 - Changed: `JWT` and `JWE` methods now check for validity of
   algorithm classes
+- Changed: Additional type hinting on public API methods
 - Removed: Support for PHP 7.2
 
 ## 0.8.1

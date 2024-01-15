@@ -4,6 +4,7 @@ namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\OKPKey;
+use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\ECDHKeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
@@ -21,7 +22,7 @@ class ECKeyMock extends ECKey {
         ], 'php');
     }
 
-    public function getPublicKey(): ECKey {
+    public function getPublicKey(): ?KeyInterface {
         return new ECKeyMock([
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],

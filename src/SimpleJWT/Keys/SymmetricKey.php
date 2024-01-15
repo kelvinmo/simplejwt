@@ -61,7 +61,7 @@ class SymmetricKey extends Key {
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data, string $format, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
             case 'json':
@@ -105,18 +105,18 @@ class SymmetricKey extends Key {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
-    public function getSize() {
+    public function getSize(): int {
         return 8 * strlen($this->toBinary());
     }
 
-    public function isPublic() {
+    public function isPublic(): bool {
         return false;
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function getPublicKey() {
+    public function getPublicKey(): ?KeyInterface {
         return null;
     }
 
@@ -125,11 +125,11 @@ class SymmetricKey extends Key {
      *
      * @return string the key
      */
-    public function toBinary() {
+    public function toBinary(): string {
         return Util::base64url_decode($this->data['k']);
     }
 
-    protected function getThumbnailMembers() {
+    protected function getThumbnailMembers(): array {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['k', 'kty'];
     }

@@ -55,14 +55,14 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     /** Size of the authentication tag in bits */
     const TAG_SIZE = 128;
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         if (!version_compare(PHP_VERSION, '7.1', '>=')) return [];
 
         $ciphers = array_map('strtolower', openssl_get_cipher_methods());
@@ -80,14 +80,14 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return ['kty' => 'oct', '@use' => 'enc', '@key_ops' => ['encrypt', 'decrypt']];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encryptAndSign($plaintext, $cek, $additional, $iv) {
+    public function encryptAndSign(string $plaintext, string $cek, string $additional, ?string $iv): array {
         $params = self::$alg_params[$this->getAlg()];
 
         if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
@@ -116,7 +116,7 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv) {
+    public function decryptAndVerify(string $ciphertext, string $tag, string $cek, string $additional, string $iv): string {
         $params = self::$alg_params[$this->getAlg()];
 
         if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');

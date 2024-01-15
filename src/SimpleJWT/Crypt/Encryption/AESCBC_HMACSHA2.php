@@ -52,14 +52,14 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
         'A256CBC-HS512' => ['cipher' => 'AES-256-CBC', 'hash' => 'sha512', 'key' => 64, 'tag' => 32],
     ];
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $ciphers = array_map('strtoupper', openssl_get_cipher_methods());
         $hashes = hash_algos();
         $results = [];
@@ -76,14 +76,14 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return ['kty' => 'oct', '@use' => 'enc', '@key_ops' => ['encrypt', 'decrypt']];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encryptAndSign($plaintext, $cek, $additional, $iv) {
+    public function encryptAndSign(string $plaintext, string $cek, string $additional, ?string $iv): array {
         $params = self::$alg_params[$this->getAlg()];
 
         if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
@@ -120,7 +120,7 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptAndVerify($ciphertext, $tag, $cek, $additional, $iv) {
+    public function decryptAndVerify(string $ciphertext, string $tag, string $cek, string $additional, string $iv): string {
         $params = self::$alg_params[$this->getAlg()];
 
         if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');

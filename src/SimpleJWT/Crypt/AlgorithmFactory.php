@@ -87,7 +87,7 @@ class AlgorithmFactory {
      * use
      * @return AlgorithmInterface the algorithm
      */
-    static public function create($alg, $use = null) {
+    static public function create(string $alg, ?string $use = null): AlgorithmInterface {
         if (($use != null) && !isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');
 
         foreach (self::$alg_map as $regex => $cls) {
@@ -116,7 +116,7 @@ class AlgorithmFactory {
      * @param string $use the use
      * @return array<string> an array of algorithms
      */
-    static public function getSupportedAlgs($use) {
+    static public function getSupportedAlgs(string $use): array {
         $results = [];
 
         if (!isset(self::$use_map[$use])) throw new \InvalidArgumentException('Invalid use');

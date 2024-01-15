@@ -38,6 +38,7 @@ namespace SimpleJWT\Crypt\KeyManagement;
 use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\PEMInterface;
 use SimpleJWT\Util\Util;
 
@@ -58,21 +59,21 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     ];
 
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         return array_keys(self::$alg_params);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return [
             'kty' => 'RSA',
             '@use' => 'enc',
@@ -87,14 +88,14 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @param int<1, max> $len the length of the seed required, in octets
      * @return string the seed
      */
-    protected function generateSeed($len) {
+    protected function generateSeed(int $len): string {
         return Util::random_bytes($len);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true]);
         if (($key == null) || !$key->isPublic() || !($key instanceof PEMInterface)) {
             throw new CryptException('Key not found or is invalid');
@@ -121,7 +122,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
         if (($key == null) || $key->isPublic() || !($key instanceof PEMInterface)) {
             throw new CryptException('Key not found or is invalid');
@@ -155,7 +156,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @return string the encoded message
      * @see https://tools.ietf.org/html/rfc3447
      */
-    final protected function oaep_encode($message, $key_length, $hash = 'sha1', $label = '') {
+    final protected function oaep_encode(string $message, int $key_length, string $hash = 'sha1', string $label = ''): string {
         $lHash = hash($hash, $label, true);
         $PS = str_repeat("\x00", $key_length - strlen($message) - 2 * strlen($lHash) - 2);
         $DB = $lHash . $PS . "\x01" . $message;
@@ -178,7 +179,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @throws CryptException if an error occurred in the decoding
      * @see https://tools.ietf.org/html/rfc3447
      */
-    final protected function oaep_decode($encoded, $key_length, $hash = 'sha1', $label = '') {
+    final protected function oaep_decode(string $encoded, int $key_length, string $hash = 'sha1', string $label = ''): string {
         $lHash = hash($hash, $label, true);
 
         $Y = ord($encoded[0]);
@@ -210,7 +211,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @return string the mask
      * @see https://tools.ietf.org/html/rfc3447#appendix-B.2.1
      */
-    final protected function mgf1($seed, $l, $hash = 'sha1') {
+    final protected function mgf1(string $seed, int $l, string $hash = 'sha1'): string {
         $hlen = strlen(hash($hash, '', true));
         $T = '';
         $count = ceil($l / $hlen);

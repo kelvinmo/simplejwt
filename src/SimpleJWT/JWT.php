@@ -39,6 +39,7 @@ use \JsonException;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Crypt\Signature\SignatureAlgorithm;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
@@ -74,7 +75,7 @@ class JWT extends Token {
      * @param array<string, mixed> $headers the headers
      * @param array<string, mixed> $claims the claims
      */
-    public function __construct($headers, $claims) {
+    public function __construct(array $headers, array $claims) {
         parent::__construct($headers);
         $this->claims = $claims;
     }
@@ -83,7 +84,7 @@ class JWT extends Token {
      * Decodes a serialised JWT.
      *
      * @param string $token the serialised JWT
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
+     * @param KeySet $keys the key set containing the key to verify the
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
@@ -95,7 +96,7 @@ class JWT extends Token {
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decode($token, $keys, $expected_alg, $kid = null, $skip_validation = []) {
+    public static function decode(string $token, KeySet $keys, string $expected_alg, string $kid = null, $skip_validation = []) {
         if ($skip_validation === false) $skip_validation = [];
 
         $headers = [];
@@ -171,7 +172,7 @@ class JWT extends Token {
      *
      * @return array<string, mixed> the claims
      */
-    public function getClaims() {
+    public function getClaims(): array {
         return $this->claims;
     }
 
@@ -181,14 +182,14 @@ class JWT extends Token {
      * @param string $claim the claim to return
      * @return mixed the claim value
      */
-    public function getClaim($claim) {
+    public function getClaim(string $claim) {
         return $this->claims[$claim];
     }
 
     /**
      * Signs and serialises the JWT.
      *
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to sign the
+     * @param KeySet $keys the key set containing the key to sign the
      * JWT
      * @param string $kid the ID of the key to use to sign. If null, this
      * is automatically retrieved
@@ -202,7 +203,7 @@ class JWT extends Token {
      * to sign the JWT
      * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
-    public function encode($keys, $kid = null, $auto_complete = ['iat', 'kid'], $alg = null, $format = self::COMPACT_FORMAT) {
+    public function encode(KeySet $keys, ?string $kid = null, $auto_complete = ['iat', 'kid'], string $alg = null, string $format = self::COMPACT_FORMAT): string {
         if ($auto_complete === false) $auto_complete = [];
         if ($alg != null) $this->headers['alg'] = $alg;
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();
@@ -255,7 +256,7 @@ class JWT extends Token {
      * parts of the serialised JWT) and `signature` (the signature)
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function deserialise($token) {
+    public static function deserialise(string $token): array {
         $detect_result = Helper::detect($token);
         if ($detect_result == null)
             throw new InvalidTokenException('Unrecognised token format', InvalidTokenException::TOKEN_PARSE_ERROR);
@@ -354,7 +355,7 @@ class JWT extends Token {
      * @codeCoverageIgnore
      * @phpstan-ignore-next-line
      */
-    public static function deserialize($token) {
+    public static function deserialize(string $token): array {
         return self::deserialise($token);
     }
 
@@ -372,7 +373,7 @@ class JWT extends Token {
      * @throws \InvalidArgumentException if the supplied token is not in a compact format
      * @throws \SimpleJWT\Crypt\CryptException if there is an error in the cryptographic process
      */
-    public static function tokenHash($token) {
+    public static function tokenHash(string $token): string {
         $detect_result = Helper::detect($token);
         if ($detect_result['format'] != self::COMPACT_FORMAT)
             throw new \InvalidArgumentException('Only compact format JWTs are permitted');

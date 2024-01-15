@@ -65,7 +65,7 @@ class RSAKey extends Key implements PEMInterface {
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data, string $format, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
             case 'json':
@@ -132,16 +132,16 @@ class RSAKey extends Key implements PEMInterface {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
-    public function getSize() {
+    public function getSize(): int {
         // The modulus is a signed integer, therefore ignore the first byte
         return 8 * (strlen(Util::base64url_decode($this->data['n'])) - 1);
     }
 
-    public function isPublic() {
+    public function isPublic(): bool {
         return !isset($this->data['p']);
     }
 
-    public function getPublicKey() {
+    public function getPublicKey(): ?KeyInterface {
         $data = [
             'kty' => $this->data['kty'],
             'n' => $this->data['n'],
@@ -151,7 +151,7 @@ class RSAKey extends Key implements PEMInterface {
         return new RSAKey($data, 'php');
     }
 
-    public function toPEM() {
+    public function toPEM(): string {
         $der = new DER();
 
         if ($this->isPublic()) {
@@ -189,7 +189,7 @@ class RSAKey extends Key implements PEMInterface {
         }
     }
 
-    protected function getThumbnailMembers() {
+    protected function getThumbnailMembers(): array {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['e', 'kty', 'n'];
     }

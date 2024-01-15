@@ -63,7 +63,7 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null);
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string;
 
     /**
      * Decrypts a content encryption key.
@@ -79,7 +79,7 @@ interface KeyEncryptionAlgorithm extends KeyManagementAlgorithm {
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null);
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string;
 }
 
 ?>

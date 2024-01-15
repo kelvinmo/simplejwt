@@ -58,7 +58,7 @@ interface SignatureAlgorithm extends AlgorithmInterface {
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function sign($data, $keys, $kid = null);
+    public function sign(string $data, KeySet $keys, ?string $kid = null): string;
 
     /**
      * Verifies a signature.
@@ -74,7 +74,7 @@ interface SignatureAlgorithm extends AlgorithmInterface {
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function verify($signature, $data, $keys, $kid = null);
+    public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool;
 
     /**
      * Obtains the key that will be used to sign the payload.
@@ -86,7 +86,7 @@ interface SignatureAlgorithm extends AlgorithmInterface {
      * @return KeyInterface|null the signing key, or null if there is no appropriate
      * key in $keys
      */
-    public function getSigningKey($keys, $kid = null);
+    public function getSigningKey(KeySet $keys, ?string $kid = null): ?KeyInterface;
 
     /**
      * Calculates an OpenID Connect short hash of a payload.
@@ -100,7 +100,7 @@ interface SignatureAlgorithm extends AlgorithmInterface {
      * @return string the base64url encoded short hash.
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function shortHash($data);
+    public function shortHash(string $data): string;
 }
 
 ?>

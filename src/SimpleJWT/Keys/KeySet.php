@@ -59,7 +59,7 @@ class KeySet {
      * @return void
      * @throws KeyException if there is an error in reading a key
      */
-    function load($jwk, $password = null, $alg = 'PBES2-HS256+A128KW') {
+    function load(string $jwk, ?string $password = null, string $alg = 'PBES2-HS256+A128KW') {
         if ($password != null) {
             $keys = KeySet::createFromSecret($password, 'bin');
             try {
@@ -92,7 +92,7 @@ class KeySet {
      * @param string $format the serialisation format for the JWE
      * @return string the key set
      */
-    function toJWKS($password = null, $format = JWE::COMPACT_FORMAT) {
+    function toJWKS(string $password = null, string $format = JWE::COMPACT_FORMAT): string {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);
@@ -122,7 +122,7 @@ class KeySet {
      * @return void
      * @throws KeyException if there is an identical key
      */
-    function add($key, $generate = false) {
+    function add(KeyInterface $key, bool $generate = false) {
         $thumbnail = $key->getThumbnail();
         $kid = $key->getKeyId($generate);
 
@@ -143,7 +143,7 @@ class KeySet {
      * @param KeySet $set the key set containing the keys to add
      * @return void
      */
-    function addAll($set) {
+    function addAll(KeySet $set) {
         foreach ($set->keys as $key) {
             try {
                 $this->add($key);
@@ -158,7 +158,7 @@ class KeySet {
      *
      * @return array<KeyInterface> an array of keys
      */
-    function getKeys() {
+    function getKeys(): array {
         return $this->keys;
     }
 
@@ -172,7 +172,7 @@ class KeySet {
      * @param bool $fuzzy whether fuzzy search is to be used
      * @return KeyInterface|null the found key, or null
      */
-    function getById($kid, $fuzzy = false) {
+    function getById(string $kid, bool $fuzzy = false) {
         $fuzzy_keys = [];
 
         foreach ($this->keys as $key) {
@@ -196,7 +196,7 @@ class KeySet {
      * @param bool $fuzzy whether fuzzy search is to be used
      * @return KeyInterface|null the found key, or null
      */
-    function getByThumbnail($thumb, $fuzzy = false) {
+    function getByThumbnail(string $thumb, bool $fuzzy = false): ?KeyInterface {
         $fuzzy_keys = [];
 
         foreach ($this->keys as $key) {
@@ -241,7 +241,7 @@ class KeySet {
      * @param array<string, mixed> $criteria the criteria
      * @return KeyInterface|null the found key, or null
      */
-    function get($criteria) {
+    function get(array $criteria): ?KeyInterface {
         $keys = $this->find($criteria);
         if ($keys == null) return null;
         return $keys[0];
@@ -281,7 +281,7 @@ class KeySet {
      * @return array<KeyInterface>|null an array of keys that matches the criteria, sorted
      * by decreasing order of optional criteria matched, or null
      */
-    protected function find($criteria) {
+    protected function find(array $criteria): ?array {
         $results = [];
 
         // 1. Sort the criteria into mandatory, mandatory-if-present
@@ -389,7 +389,7 @@ class KeySet {
      * @param mixed $key_value the value of a property in a key
      * @return bool true if there is match
      */
-    protected function isMatch($criterion_value, $key_value) {
+    protected function isMatch($criterion_value, $key_value): bool {
         if (is_scalar($criterion_value) && is_scalar($key_value)) {
             return ($criterion_value == $key_value);
         } elseif (is_scalar($criterion_value) && is_array($key_value)) {
@@ -408,7 +408,7 @@ class KeySet {
      * @param KeyInterface $key the key to remove
      * @return void
      */
-    function remove($key) {
+    function remove(KeyInterface $key) {
         for ($i = 0; $i < count($this->keys); $i++) {
             if ($this->keys[$i]->getThumbnail() == $key->getThumbnail()) {
                 unset($this->keys[$i]);
@@ -425,7 +425,7 @@ class KeySet {
      *
      * @return bool true if all the keys are public
      */
-    function isPublic() {
+    function isPublic(): bool {
         foreach ($this->keys as $key) {
             if (!$key->isPublic()) return false;
         }
@@ -441,7 +441,7 @@ class KeySet {
      * for further details
      * @return KeySet the created key set
      */
-    static public function createFromSecret($secret, $format = 'bin') {
+    static public function createFromSecret(string $secret, string $format = 'bin'): KeySet {
         $set = new KeySet();
         $key = new SymmetricKey($secret, $format);
         $set->add($key);

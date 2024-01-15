@@ -37,6 +37,7 @@ namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\OKPKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Util;
@@ -45,22 +46,22 @@ use SimpleJWT\Util\Util;
  * Abstract class for SHA2-based signature algorithms.
  */
 class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return ['kty' => 'OKP', 'crv' => 'Ed25519', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         if (function_exists('sodium_crypto_sign_detached')) {
             return ['EdDSA'];
         }
         return [];
     }
 
-    public function sign($data, $keys, $kid = null) {
+    public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !($key instanceof OKPKey)) {
             throw new KeyException('Key not found or is invalid');
@@ -73,7 +74,7 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
         return Util::base64url_encode($binary);
     }
 
-    public function verify($signature, $data, $keys, $kid = null) {
+    public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof OKPKey)) {
             throw new KeyException('Key not found or is invalid');
@@ -88,11 +89,11 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     }
 
 
-    public function getSigningKey($keys, $kid = null) {
+    public function getSigningKey(KeySet $keys, ?string $kid = null): ?KeyInterface {
         return $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
     }
 
-    public function shortHash($data) {
+    public function shortHash(string $data): string {
         // EdDSA uses SHA-512
         // https://datatracker.ietf.org/doc/html/rfc8032#section-5.1
         $hash = hash('sha512', $data, true);

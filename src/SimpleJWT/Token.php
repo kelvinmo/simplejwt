@@ -56,7 +56,7 @@ abstract class Token {
      *
      * @param array<string, mixed> $headers the headers
      */
-    public function __construct($headers) {
+    public function __construct(array $headers) {
         $this->headers = $headers;
     }
 
@@ -65,7 +65,7 @@ abstract class Token {
      *
      * @return array<string, mixed> the headers
      */
-    public function getHeaders() {
+    public function getHeaders(): array {
         return $this->headers;
     }
 
@@ -75,7 +75,7 @@ abstract class Token {
      * @param string $header the header to return
      * @return mixed the header value
      */
-    public function getHeader($header) {
+    public function getHeader(string $header) {
         return $this->headers[$header];
     }
 }

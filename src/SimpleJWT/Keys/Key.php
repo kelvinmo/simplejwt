@@ -90,7 +90,7 @@ abstract class Key implements KeyInterface {
      * @param string $alg the algorithm, if the key is password protected
      * @throws KeyException if the key cannot be created
      */
-    public function __construct($data = [], $format = 'php', $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data = [], string $format = 'php', ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
                 if (!is_array($data)) throw new KeyException('Incorrect key data format');
@@ -142,7 +142,7 @@ abstract class Key implements KeyInterface {
      * plaintext is not valid JSON
      * @return array<mixed> the decrypted data
      */
-    private static function decrypt($data, $password, $alg) {
+    private static function decrypt(string $data, string $password, string $alg) {
         if ($password == null) {
             throw new KeyException('No password for encrypted key');
         } else {
@@ -161,7 +161,7 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function getKeyId(bool $generate = false) {
+    public function getKeyId(bool $generate = false): ?string {
         if (!isset($this->data['kid']) && $generate) {
             $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
         }
@@ -171,49 +171,49 @@ abstract class Key implements KeyInterface {
     /**
      * {@inheritdoc}
      */
-    public function setKeyId($kid) {
+    public function setKeyId(string $kid) {
         $this->data['kid'] = $kid;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getKeyType() {
+    public function getKeyType(): string {
         return $this->data['kty'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUse() {
+    public function getUse(): ?string {
         return (isset($this->data['use'])) ? $this->data['use'] : null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setUse($use) {
+    public function setUse(string $use) {
         $this->data['use'] = $use;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOperations() {
+    public function getOperations(): ?array {
         return (isset($this->data['key_ops'])) ? $this->data['key_ops'] : null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setOperations($ops) {
+    public function setOperations(array $ops) {
         $this->data['key_ops'] = $ops;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getKeyData() {
+    public function getKeyData(): array {
         /** @var array<string, mixed> $data */
         $data = $this->data;
         return $data;
@@ -231,10 +231,10 @@ abstract class Key implements KeyInterface {
      * @param string $password the password
      * @param string $format the serialisation format for the JWE (ignored if the
      * key is a public key)
-     * @return string the key set
+     * @return string the JSON web key
      * @throws KeyException if the key cannot be converted
      */
-    public function toJWK($password = null, $format = JWE::COMPACT_FORMAT) {
+    public function toJWK(string $password = null, string $format = JWE::COMPACT_FORMAT): string {
         $json = json_encode($this->data);
         if ($json == false) throw new KeyException('Cannot encode key');
         if (($password == null) || $this->isPublic()) return $json;
@@ -262,12 +262,12 @@ abstract class Key implements KeyInterface {
      * @return array<string> the array of keys
      * @see https://tools.ietf.org/html/rfc7638
      */
-    abstract protected function getThumbnailMembers();
+    abstract protected function getThumbnailMembers(): array;
 
     /**
      * {@inheritdoc}
      */
-    public final function getThumbnail() {
+    public final function getThumbnail(): string {
         if ($this->thumbnail == null) {
             $members = $this->getThumbnailMembers();
             $signing = [];

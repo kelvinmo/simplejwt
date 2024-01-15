@@ -62,7 +62,7 @@ interface KeyDerivationAlgorithm extends KeyManagementAlgorithm {
      * key(s) required for this operation
      * @throws CryptException if there is an error in the cryptographic process
      */
-    public function deriveKey($keys, &$headers, $kid = null);
+    public function deriveKey(KeySet $keys, array &$headers, ?string $kid = null): string;
 }
 
 ?>

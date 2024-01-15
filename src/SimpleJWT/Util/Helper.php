@@ -40,6 +40,7 @@ use SimpleJWT\JWT;
 use SimpleJWT\JWE;
 use SimpleJWT\Token;
 use SimpleJWT\InvalidTokenException;
+use SimpleJWT\Keys\KeySet;
 
 /**
  * A helper class for detecting JWTs and JWEs in various serialisation
@@ -64,7 +65,7 @@ class Helper {
      * @param string $data an encoded JWT or JWE
      * @throw InvalidTokenException if the encoded data is invalid
      */
-    function __construct($data) {
+    function __construct(string $data) {
         $results = self::detect($data);
 
         if ($results == null) {
@@ -81,7 +82,7 @@ class Helper {
      *
      * @return string either `JWT` or `JWE`
      */
-    function getType() {
+    function getType(): string {
         return $this->type;
     }
 
@@ -90,7 +91,7 @@ class Helper {
      *
      * @return string either `compact` or `json`
      */
-    function getFormat() {
+    function getFormat(): string {
         return $this->format;
     }
 
@@ -98,7 +99,7 @@ class Helper {
      * Decrypts or verifies the signature of the token and returns
      * the SimpleJWT object representing the token.
      *
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption or
+     * @param KeySet $keys the key set containing the decryption or
      * verification keys
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
@@ -107,13 +108,14 @@ class Helper {
      * @return Token the decoded JWT or JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    function decode($keys, $expected_alg, $kid = null) {
-        // @phpstan-ignore-next-line
+    function decode(KeySet $keys, string $expected_alg, ?string $kid = null): Token {
         switch ($this->type) {
             case 'JWT':
                 return JWT::decode($this->data, $keys, $expected_alg, $kid, []);
             case 'JWE':
                 return JWE::decrypt($this->data, $keys, $expected_alg);
+            default:
+                throw new InvalidTokenException('Unexpected token type');
         }
     }
 
@@ -126,7 +128,7 @@ class Helper {
      * If the supplied token is a JWE, the JWE is firstly decrypted, then the underlying
      * plaintext is treated as a JWT, and further decoded.
      *
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the decryption
+     * @param KeySet $keys the key set containing the decryption
      * and verification keys
      * @param string $expected_jwe_alg the expected value of the `alg` parameter for the
      * JWE, which should be agreed between the parties out-of-band
@@ -137,8 +139,7 @@ class Helper {
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    function decodeFully($keys, $expected_jwe_alg, $expected_jwt_alg, $jwt_kid = null) {
-        // @phpstan-ignore-next-line
+    function decodeFully(KeySet $keys, string $expected_jwe_alg, string $expected_jwt_alg, ?string $jwt_kid = null): JWT {
         switch ($this->type) {
             case 'JWT':
                 /** @var JWT $jwt */
@@ -150,6 +151,8 @@ class Helper {
                     throw new InvalidTokenException('Not a nested JWT', InvalidTokenException::TOKEN_PARSE_ERROR);
                 }
                 return JWT::decode($jwe->getPlaintext(), $keys, $expected_jwt_alg, $jwt_kid);
+            default:
+                throw new InvalidTokenException('Unexpected token type');
         }
     }
 
@@ -157,11 +160,11 @@ class Helper {
      * Attempts to detect the format of JWT or JWE encoded data.
      *
      * @param string $data the encoded data
-     * @return mixed an array with keys `type` and `format`
+     * @return ?array<string, string> an array with keys `type` and `format`
      * (see {@link getType()} and {@link getFormat()}), or `null`
      * if the format cannot be detected
      */
-    static function detect($data) {
+    static function detect(string $data): ?array {
         $results = [];
 
         try {

@@ -108,7 +108,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
      * @param string $password the password, if the key is password protected
      * @param string $alg the algorithm, if the key is password protected
      */
-    public function __construct($data, $format, $password = null, $alg = 'PBES2-HS256+A128KW') {
+    public function __construct($data, string $format, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
             case 'json':
@@ -240,11 +240,11 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
     }
 
-    public function getSize() {
+    public function getSize(): int {
         return 8 * strlen(Util::base64url_decode($this->data['x']));
     }
 
-    public function isPublic() {
+    public function isPublic(): bool {
         return !isset($this->data['d']);
     }
 
@@ -259,7 +259,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
      * @return bool true if the EC key is valid
      * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
      */
-    public function isValid() {
+    public function isValid(): bool {
         $x = new BigNum(Util::base64url_decode($this->data['x']), 256);
         $y = new BigNum(Util::base64url_decode($this->data['y']), 256);
 
@@ -278,18 +278,18 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
     /**
      * Checks whether another EC key is on the same curve as this key.
      * 
-     * @param ECKey $public_key the public key to check
+     * @param ECDHKeyInterface $public_key the public key to check
      * @return bool true if the EC key is on the same curve
      * @see https://auth0.com/blog/critical-vulnerability-in-json-web-encryption/
      */
-    public function isOnSameCurve($public_key): bool {
+    public function isOnSameCurve(ECDHKeyInterface $public_key): bool {
         if (!($public_key instanceof ECKey)) return false;
-        if (!Util::secure_compare($this->data['crv'], $public_key->data['crv'])) return false;
+        if (!Util::secure_compare($this->getCurve(), $public_key->getCurve())) return false;
 
         return ($this->isValid() && $public_key->isValid());
     }
 
-    public function getPublicKey() {
+    public function getPublicKey(): ?KeyInterface {
         $data = [
             'kty' => $this->data['kty'],
             'crv' => $this->data['crv'],
@@ -300,7 +300,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         return new ECKey($data, 'php');
     }
 
-    public function toPEM() {
+    public function toPEM(): string {
         $der = new DER();
         $oid = self::$curves[$this->data['crv']]['oid'];
         if ($oid == null) throw new KeyException('Unrecognised EC curve');
@@ -390,7 +390,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         return $result;
     }
 
-    protected function getThumbnailMembers() {
+    protected function getThumbnailMembers(): array {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['crv', 'kty', 'x', 'y'];
     }

@@ -39,6 +39,7 @@ use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Util\Util;
 use SimpleJWT\Keys\Key;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 
 /**
@@ -46,22 +47,22 @@ use SimpleJWT\Keys\SymmetricKey;
  * the shared content encryption key
  */
 class DirectEncryption extends BaseAlgorithm implements KeyDerivationAlgorithm {
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         return ['dir'];
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return [
             'kty' => 'oct',
             '~alg' => $this->getAlg()
         ];
     }
 
-    public function deriveKey($keys, &$headers, $kid = null) {
+    public function deriveKey(KeySet $keys, array &$headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {

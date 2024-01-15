@@ -57,7 +57,7 @@ trait AESKeyWrapTrait {
      * @param string $alg the AES key wrap algorithm parameter
      * @return void
      */
-    protected function initAESKW($alg = null) {
+    protected function initAESKW(?string $alg = null) {
         if ($alg == null) {
             $this->aeskw = new AESKeyWrap(null);
         } else {
@@ -70,7 +70,7 @@ trait AESKeyWrapTrait {
      * 
      * @return array<string> an array of AES Key Wrap algorithms
      */
-    protected function getAESKWAlgs() {
+    protected function getAESKWAlgs(): array {
         return $this->aeskw->getSupportedAlgs();
     }
 
@@ -79,7 +79,7 @@ trait AESKeyWrapTrait {
      *
      * @return int the key size, in bits
      */
-    protected function getAESKWKeySize() {
+    protected function getAESKWKeySize(): int {
         $criteria = $this->aeskw->getKeyCriteria();
         return $criteria[KeyInterface::SIZE_PROPERTY];
     }
@@ -92,7 +92,7 @@ trait AESKeyWrapTrait {
      * @param array<string, mixed> &$headers the JWE header, which can be modified
      * @return string the wrapped key as a binary string
      */
-    protected function wrapKey($plain_key, $wrapping_key, &$headers) {
+    protected function wrapKey(string $plain_key, string $wrapping_key, array &$headers): string {
         $keys = $this->createKeySet($wrapping_key);
         return $this->aeskw->encryptKey($plain_key, $keys, $headers);
     }
@@ -105,7 +105,7 @@ trait AESKeyWrapTrait {
      * @param array<string, mixed> $headers the JWE header, which can be modified
      * @return string the unwrapped key as a binary string
      */
-    protected function unwrapKey($encrypted_key, $unwrapping_key, $headers) {
+    protected function unwrapKey(string $encrypted_key, string $unwrapping_key, array $headers): string {
         $keys = $this->createKeySet($unwrapping_key);
         return $this->aeskw->decryptKey($encrypted_key, $keys, $headers);
     }
@@ -114,7 +114,7 @@ trait AESKeyWrapTrait {
      * @param string $key
      * @return KeySet
      */
-    private function createKeySet($key) {
+    private function createKeySet(string $key): KeySet {
         $keys = new KeySet();
         $keys->add(new SymmetricKey($key, 'bin'));
         return $keys;
@@ -125,7 +125,7 @@ trait AESKeyWrapTrait {
      * 
      * @return AESKeyWrap the underlying AES key wrap algorithm
      */
-    public function getAESKW() {
+    public function getAESKW(): AESKeyWrap {
         return $this->aeskw;
     }
 }

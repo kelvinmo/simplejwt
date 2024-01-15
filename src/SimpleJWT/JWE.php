@@ -60,7 +60,7 @@ class JWE extends Token {
      * @param array<string, mixed> $headers the headers
      * @param string $plaintext the plaintext to encrypt
      */
-    public function __construct($headers, $plaintext) {
+    public function __construct(array $headers, string $plaintext) {
         parent::__construct($headers);
         $this->plaintext = $plaintext;
     }
@@ -69,14 +69,14 @@ class JWE extends Token {
      * Decrypts a JWE.
      *
      * @param string $token the serialised JWE
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to verify the
+     * @param KeySet $keys the key set containing the key to verify the
      * JWT's signature
      * @param string $expected_alg the expected value of the `alg` parameter, which
      * should be agreed between the parties out-of-band
      * @return JWE the decrypted JWE
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decrypt($token, $keys, $expected_alg) {
+    public static function decrypt(string $token, KeySet $keys, string $expected_alg): JWE {
         $detect_result = Helper::detect($token);
         if ($detect_result == null)
             throw new InvalidTokenException('Unrecognised token format', InvalidTokenException::TOKEN_PARSE_ERROR);
@@ -223,14 +223,14 @@ class JWE extends Token {
      *
      * @return string the plaintext
      */
-    public function getPlaintext() {
+    public function getPlaintext(): string {
         return $this->plaintext;
     }
 
     /**
      * Encrypts the JWE.
      *
-     * @param \SimpleJWT\Keys\KeySet $keys the key set containing the key to encrypt the
+     * @param KeySet $keys the key set containing the key to encrypt the
      * content encryption key
      * @param string $kid the ID of the key to use to encrypt. If null, this
      * is automatically retrieved
@@ -240,7 +240,7 @@ class JWE extends Token {
      * to sign the JWT
      * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
-    public function encrypt($keys, $kid = null, $format = self::COMPACT_FORMAT) {
+    public function encrypt(KeySet $keys, ?string $kid = null, string $format = self::COMPACT_FORMAT) {
         if (!isset($this->headers['alg'])) throw new \InvalidArgumentException('alg parameter missing');
         if (!isset($this->headers['enc'])) throw new \InvalidArgumentException('enc parameter missing');
 
@@ -347,7 +347,7 @@ class JWE extends Token {
      * @return string the generated content encryption key as a binary
      * string
      */
-    protected function generateCEK($length) {
+    protected function generateCEK(int $length): string {
         return Util::random_bytes($length);
     }
 
@@ -361,7 +361,7 @@ class JWE extends Token {
      * @return string the generated initialisation vector as a base64url
      * encoded string
      */
-    protected function generateIV($length) {
+    protected function generateIV(int $length): string {
         if ($length <= 0) return '';
         return Util::base64url_encode(Util::random_bytes($length));
     }

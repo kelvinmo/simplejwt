@@ -38,6 +38,7 @@ namespace SimpleJWT\Crypt\KeyManagement;
 use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Crypt\Encryption\AESGCM;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\SymmetricKey;
 use SimpleJWT\Util\Util;
 
@@ -50,17 +51,17 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /** @var AESGCM $aesgcm */
     private $aesgcm;
 
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         $this->aesgcm = new AESGCM(substr($alg, 0, -2));
         parent::__construct($alg);
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $aesgcm_algs = $this->aesgcm->getSupportedAlgs();
         return array_map(function ($alg) { return $alg . 'KW'; }, $aesgcm_algs);
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return [
             'kty' => 'oct',
             '~alg' => $this->getAlg(),
@@ -72,7 +73,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function encryptKey($cek, $keys, &$headers, $kid = null) {
+    public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
@@ -89,7 +90,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     /**
      * {@inheritdoc}
      */
-    public function decryptKey($encrypted_key, $keys, $headers, $kid = null) {
+    public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
@@ -110,7 +111,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      *
      * @return string the initialisation vector as a binary string
      */
-    protected function generateIV() {
+    protected function generateIV(): string {
         /** @var int<1, max> $len */
         $len = intval($this->aesgcm->getIVSize() / 8);
         return Util::random_bytes($len);

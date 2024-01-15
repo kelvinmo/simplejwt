@@ -36,6 +36,8 @@
 namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\BaseAlgorithm;
+use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 
 /**
  * Implements the `none` signature algorithm.
@@ -53,32 +55,32 @@ use SimpleJWT\Crypt\BaseAlgorithm;
  * @codeCoverageIgnore
  */
 class None extends BaseAlgorithm implements SignatureAlgorithm {
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         parent::__construct($alg);
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return [];
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         return ['none'];
     }
 
-    public function sign($data, $keys, $kid = null) {
+    public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         return '';
     }
 
-    public function shortHash($data) {
+    public function shortHash(string $data): string {
         return '';
     }
 
-    public function verify($signature, $data, $keys, $kid = null) {
+    public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         if ($kid != null) return false;
         return ($signature === '');
     }
 
-    public function getSigningKey($keys, $kid = null) {
+    public function getSigningKey(KeySet $keys, ?string $kid = null): ?KeyInterface {
         return null;
     }
 }

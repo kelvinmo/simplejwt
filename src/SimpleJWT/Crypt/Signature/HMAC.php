@@ -36,6 +36,8 @@
 namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Keys\KeyException;
+use SimpleJWT\Keys\KeyInterface;
+use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util;
 
 /**
@@ -45,7 +47,7 @@ use SimpleJWT\Util\Util;
  *
  */
 class HMAC extends SHA2 {
-    public function __construct($alg) {
+    public function __construct(?string $alg) {
         if ($alg == null) {
             parent::__construct(null, null);
         } else {
@@ -54,11 +56,11 @@ class HMAC extends SHA2 {
         }
     }
 
-    public function getKeyCriteria() {
+    public function getKeyCriteria(): array {
         return ['kty' => 'oct', '@use' => 'sig', '@key_ops' => ['sign', 'verify']];
     }
 
-    public function getSupportedAlgs() {
+    public function getSupportedAlgs(): array {
         $results = [];
         $hash_algos = hash_algos();
         if (in_array('sha256', $hash_algos)) $results[] = 'HS256';
@@ -68,7 +70,7 @@ class HMAC extends SHA2 {
         return $results;
     }
 
-    public function sign($data, $keys, $kid = null) {
+    public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !is_a($key, 'SimpleJWT\Keys\SymmetricKey')) {
             throw new KeyException('Key not found or is invalid');
@@ -76,12 +78,12 @@ class HMAC extends SHA2 {
         return Util::base64url_encode(hash_hmac('sha' . $this->size, $data, $key->toBinary(), true));
     }
 
-    public function verify($signature, $data, $keys, $kid = null) {
+    public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $compare = $this->sign($data, $keys, $kid);
         return Util::secure_compare($signature, $compare);
     }
 
-    public function getSigningKey($keys, $kid = null) {
+    public function getSigningKey(KeySet $keys, ?string $kid = null): ?KeyInterface {
         return $this->selectKey($keys, $kid);
     }
 }

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Changed: Update dependency on `symfony/console` to support v7.0
+
 ## 0.8.1
 
 - Fixed: Throw a `KeyException` when loading an invalid PEM-encoded

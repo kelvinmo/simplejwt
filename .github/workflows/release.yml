@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -26,7 +26,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: "composer-${{ hashFiles('**/composer.json') }}"
@@ -42,7 +42,7 @@ jobs:
         run: composer phar
 
       - name: Upload jwkstool.phar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jwkstool
           path: bin/jwkstool.phar
@@ -53,19 +53,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download jwkstool.phar
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: jwkstool
 
       - name: Get semantic version
         id: semver
-        uses: booxmedialtd/ws-action-parse-semver@v1.4.7
+        uses: madhead/semver-utils@v4
         with:
-          input_string: ${{ github.ref }}
-          version_extractor_regex: '\/v(.*)$'
+          version: ${{ github.ref }}   # The initial 'v' is automatically stripped off
 
       - name: Get Changelog
         id: changelog

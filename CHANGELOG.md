@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.8.2
 
 - Changed: Update dependency on `symfony/console` to support v7.0
 

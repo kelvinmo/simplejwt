@@ -60,11 +60,15 @@ jobs:
         with:
           name: jwkstool
 
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
       - name: Get semantic version
         id: semver
         uses: madhead/semver-utils@v4
         with:
-          version: ${{ github.ref }}   # The initial 'v' is automatically stripped off
+          version: ${{ steps.version.outputs.version }}
 
       - name: Get Changelog
         id: changelog

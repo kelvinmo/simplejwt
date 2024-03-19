@@ -72,14 +72,15 @@ jobs:
 
       - name: Get Changelog
         id: changelog
-        uses: ocavue/changelog-parser-action@v1.2
+        uses: mindsers/changelog-reader-action@v2
         with:
-          removeMarkdown: false
+          version: ${{ steps.version.outputs.version }}
+          path: ./CHANGELOG.md
 
       - name: Create Github release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: jwkstool.phar
-          body: ${{ steps.changelog.outputs.latestBody }}
+          body: ${{ steps.changelog.outputs.changes }}
           prerelease: ${{ !!steps.semver.outputs.prerelease }}

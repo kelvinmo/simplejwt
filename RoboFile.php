@@ -59,20 +59,21 @@ class RoboFile extends RoboTasks {
 
     public function update_copyright() {
         $current_year = date('Y', time());
+        $col = $this->collectionBuilder();
 
         $finder = new Finder();
         $finder->in(['src', 'bin'])->name('*.php')->append(['LICENSE.txt']);
 
         foreach($finder as $file) {
-            $this->taskReplaceInFile($file)
+            $col->taskReplaceInFile($file)
                 ->regex('/Copyright \(C\) Kelvin Mo (\d{4})-(\d{4})(\R)/m')
-                ->to('Copyright (C) Kelvin Mo $1-'. $current_year . '$3')
-                ->run();
-            $this->taskReplaceInFile($file)
+                ->to('Copyright (C) Kelvin Mo $1-'. $current_year . '$3');
+            $col->taskReplaceInFile($file)
                 ->regex('/Copyright \(C\) Kelvin Mo (\d{4})(\R)/m')
-                ->to('Copyright (C) Kelvin Mo $1-'. $current_year . '$2')
-                ->run();
+                ->to('Copyright (C) Kelvin Mo $1-'. $current_year . '$2');
         }
+
+        return $col->run();
     }
 
     /**

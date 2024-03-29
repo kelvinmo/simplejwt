@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Removed: Support for PHP 7.3 and 7.4
+
 ## [0.9.0]
 
 - Changed: Providing invalid JSON tokens into JWT::deserialise() and
@@ -206,33 +210,34 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
-[0.9.0]: https://github.com/kelvinmo/simpleid/compare/v0.8.2...v0.9.0
-[0.8.2]: https://github.com/kelvinmo/simpleid/compare/v0.8.1...v0.8.2
-[0.8.1]: https://github.com/kelvinmo/simpleid/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/kelvinmo/simpleid/compare/v0.7.1...v0.8.0
-[0.7.1]: https://github.com/kelvinmo/simpleid/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/kelvinmo/simpleid/compare/v0.6.3...v0.7.0
-[0.6.3]: https://github.com/kelvinmo/simpleid/compare/v0.6.2...v0.6.3
-[0.6.2]: https://github.com/kelvinmo/simpleid/compare/v0.6.1...v0.6.2
-[0.6.1]: https://github.com/kelvinmo/simpleid/compare/v0.6.0...v0.6.1
-[0.6.0]: https://github.com/kelvinmo/simpleid/compare/v0.5.3...v0.6.0
-[0.5.3]: https://github.com/kelvinmo/simpleid/compare/v0.5.2...v0.5.3
-[0.5.2]: https://github.com/kelvinmo/simpleid/compare/v0.5.1...v0.5.2
-[0.5.1]: https://github.com/kelvinmo/simpleid/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/kelvinmo/simpleid/compare/v0.4.2...v0.5.0
-[0.4.2]: https://github.com/kelvinmo/simpleid/compare/v0.4.1...v0.4.2
-[0.4.1]: https://github.com/kelvinmo/simpleid/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/kelvinmo/simpleid/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/kelvinmo/simpleid/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/kelvinmo/simpleid/compare/v0.2.4...v0.3.0
-[0.2.5]: https://github.com/kelvinmo/simpleid/compare/v0.2.4...v0.2.5
-[0.2.4]: https://github.com/kelvinmo/simpleid/compare/v0.2.2...v0.2.4
-[0.2.2]: https://github.com/kelvinmo/simpleid/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/kelvinmo/simpleid/compare/v0.1.6...v0.2.1
-[0.1.6]: https://github.com/kelvinmo/simpleid/compare/v0.1.5...v0.1.6
-[0.1.5]: https://github.com/kelvinmo/simpleid/compare/v0.1.4...v0.1.5
-[0.1.4]: https://github.com/kelvinmo/simpleid/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/kelvinmo/simpleid/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/kelvinmo/simpleid/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/kelvinmo/simpleid/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/kelvinmo/simpleid/releases/tag/v0.1.0
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/kelvinmo/simplejwt/compare/v0.8.2...v0.9.0
+[0.8.2]: https://github.com/kelvinmo/simplejwt/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/kelvinmo/simplejwt/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/kelvinmo/simplejwt/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/kelvinmo/simplejwt/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/kelvinmo/simplejwt/compare/v0.6.3...v0.7.0
+[0.6.3]: https://github.com/kelvinmo/simplejwt/compare/v0.6.2...v0.6.3
+[0.6.2]: https://github.com/kelvinmo/simplejwt/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/kelvinmo/simplejwt/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/kelvinmo/simplejwt/compare/v0.5.3...v0.6.0
+[0.5.3]: https://github.com/kelvinmo/simplejwt/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/kelvinmo/simplejwt/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/kelvinmo/simplejwt/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/kelvinmo/simplejwt/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/kelvinmo/simplejwt/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/kelvinmo/simplejwt/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/kelvinmo/simplejwt/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/kelvinmo/simplejwt/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/kelvinmo/simplejwt/compare/v0.2.4...v0.3.0
+[0.2.5]: https://github.com/kelvinmo/simplejwt/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/kelvinmo/simplejwt/compare/v0.2.2...v0.2.4
+[0.2.2]: https://github.com/kelvinmo/simplejwt/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/kelvinmo/simplejwt/compare/v0.1.6...v0.2.1
+[0.1.6]: https://github.com/kelvinmo/simplejwt/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/kelvinmo/simplejwt/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/kelvinmo/simplejwt/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/kelvinmo/simplejwt/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/kelvinmo/simplejwt/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/kelvinmo/simplejwt/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/kelvinmo/simplejwt/releases/tag/v0.1.0

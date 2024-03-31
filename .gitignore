@@ -1,5 +1,4 @@
 tests/coverage
 vendor
-vendor-bin/build/composer.lock
 *.phar
 .phpunit*

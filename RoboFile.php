@@ -16,7 +16,7 @@ class RoboFile extends RoboTasks {
         $col = $this->collectionBuilder();
 
         $finder = new Finder();
-        $finder->in(['src', 'bin'])->name('*.php')->append(['LICENSE.txt']);
+        $finder->in(['src'])->name('*.php')->append(['LICENSE.txt']);
 
         foreach($finder as $file) {
             $col->taskReplaceInFile($file)

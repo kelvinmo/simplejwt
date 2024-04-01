@@ -162,11 +162,15 @@ class KeyFactory {
 
         // 4. PHP/JSON
         if ($format == 'php') {
-            if (($data != null) && isset($data['kty'])) {
-                if (isset(self::$jwk_kty_map[$data['kty']])) {
-                    /** @var KeyInterface $key */
-                    $key = new self::$jwk_kty_map[$data['kty']]($data, 'php');
-                    return $key;
+            if ($data != null) {
+                if (isset($data['kty'])) {
+                    if (isset(self::$jwk_kty_map[$data['kty']])) {
+                        /** @var KeyInterface $key */
+                        $key = new self::$jwk_kty_map[$data['kty']]($data, 'php');
+                        return $key;
+                    }
+                } elseif (isset($data['keys']) && is_array($data['keys'])) {
+                    throw new KeyException('Cannot import key set as a single key');
                 }
             }
         }

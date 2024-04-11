@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - Removed: Support for PHP 7.3 and 7.4
+- Removed: `jwkstool` command-line tool and associated dependencies
+  (most notably `symfony/console`). `jwkstool` is now available
+  as a separate package `kelvinmo/jwkstool`
 
 ## [0.9.0]
 

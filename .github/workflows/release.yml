@@ -6,47 +6,6 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: bz2, Phar
-          ini-values: phar.readonly=0
-          tools: composer
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: "composer-${{ hashFiles('**/composer.json') }}"
-          restore-keys: "composer-"
-
-      - name: Install dependencies
-        run: composer update && composer install
-
-      - name: Install dependencies for build
-        run: composer bin build update && composer bin build install
-
-      - name: Build jwkstool.phar
-        run: composer phar
-
-      - name: Upload jwkstool.phar
-        uses: actions/upload-artifact@v4
-        with:
-          name: jwkstool
-          path: bin/jwkstool.phar
-
   release:
     name: Release
     needs: build
@@ -54,11 +13,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download jwkstool.phar
-        uses: actions/download-artifact@v4
-        with:
-          name: jwkstool
 
       - name: Get version from tag
         id: version
@@ -81,6 +35,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: jwkstool.phar
           body: ${{ steps.changelog.outputs.changes }}
           prerelease: ${{ !!steps.semver.outputs.prerelease }}

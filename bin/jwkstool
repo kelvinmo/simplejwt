@@ -1,7 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-// turn off html errors
-ini_set('html_errors', 'off');
-
-require_once __DIR__ . '/jwkstool.php';

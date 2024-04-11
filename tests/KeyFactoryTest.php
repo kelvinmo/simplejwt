@@ -71,11 +71,11 @@ class KeyFactoryTest extends TestCase {
         $this->assertInstanceOf(SymmetricKey::class, $key);
         $key_data = $key->getKeyData();
         $this->assertFalse($key->isPublic());
-        $this->assertEquals("0jqm_0FY5mxPnCorid1Ooz0A08h0-eCkFQXE7uu9zRtkb8EulPU7hU1zaUdwNA3RiQupNXZ39edv62XxBM_vnWxGh-2gIFKV9b7qpqtBK55cQyZTkuoEJ3ms-Qnpg46FkoTfeewVPywbInGStF9hy5mlpN6v3M-PTpQRFr8_Z6k", $key_data['k']);
+        $this->assertEquals("VGhpcyBpcyBhIHN0cmluZyB0byBiZSBpbnRlcnByZXRlZCBhcyBhIGJ5dGVzdHJlYW0gdG8gYmUgdXNlZCBhcyBzeW1tZXRyaWMga2V5IDMuMTQxNTkyNjUzNTg5NzkzMjM4NDYyNjQzMzgzMjc5NTAyODg0MTk3MTY5Mzk5Mzc", $key_data['k']);
     }
 
     function testInvalidJSONKey() {
-        $invalid = '{ "kty": "oct", "k": "0jqm_0FY5mxPnCorid1Ooz0A08h0-eCkFQXE7uu9zRtkb8EulPU7hU1zaUdwNA3RiQupNXZ39edv62XxBM_vnWxGh-2gIFKV9b7qpqtBK55cQyZTkuoEJ3ms-Qnpg46FkoTfeewVPywbInGStF9hy5mlpN6v3M-PTpQRFr8_Z6k", }';
+        $invalid = '{ "kty": "oct", "k": "VGhpcyBpcyBhIHN0cmluZyB0byBiZSBpbnRlcnByZXRlZCBhcyBhIGJ5dGVzdHJlYW0gdG8gYmUgdXNlZCBhcyBzeW1tZXRyaWMga2V5IDMuMTQxNTkyNjUzNTg5NzkzMjM4NDYyNjQzMzgzMjc5NTAyODg0MTk3MTY5Mzk5Mzc=", }';
 
         $this->expectException('SimpleJWT\Keys\KeyException');
         $this->expectExceptionMessage('Incorrect key data format - malformed JSON');

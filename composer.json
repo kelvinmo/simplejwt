@@ -16,7 +16,8 @@
         "phlak/semver": "^4.1"
     },
     "suggest": {
-        "ext-sodium": "Provides support for OKP (X25519/Ed25519) keys"
+        "ext-sodium": "Provides support for OKP (X25519/Ed25519) keys",
+        "kelvinmo/jwkstool": "Command-line tool to manage JSON web keys"
     },
     "license": "BSD-3-Clause",
     "authors": [

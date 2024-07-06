@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Fixed: Deprecation warning in constructor of AESGCMKeyWrap (#197)
+
 ## [0.9.0]
 
 - Changed: Providing invalid JSON tokens into JWT::deserialise() and
@@ -206,6 +210,7 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v0.9.0...HEAD
 [0.9.0]: https://github.com/kelvinmo/simpleid/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/kelvinmo/simpleid/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/kelvinmo/simpleid/compare/v0.8.0...v0.8.1

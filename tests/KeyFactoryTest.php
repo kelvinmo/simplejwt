@@ -7,8 +7,8 @@ use SimpleJWT\Keys\SymmetricKey;
 use PHPUnit\Framework\TestCase;
 
 class KeyFactoryTest extends TestCase {
-    public function testPEMRSA() {
-        $pem = file_get_contents('rsa_private.pem');
+    public function testPEMRSA_PKCS1() {
+        $pem = file_get_contents('rsa_private_pkcs1.pem');
         $key = KeyFactory::create($pem, 'pem');
         $this->assertInstanceOf(RSAKey::class, $key);
         $key_data = $key->getKeyData();
@@ -18,7 +18,7 @@ class KeyFactoryTest extends TestCase {
         $this->assertEquals("2sUA6n24v51XMCk_H3WKTELYfEyWzdr6yI3a8xNol8RlLNcjr9NxthPWkOGY6uT1JAbDgBNsiPQXpAiOdRD5FQ", $key_data['p']);
         $this->assertEquals("xFpV_GjvAlkzeElY_fb5AWgV9_APIfyuo3NxqmvaRTIUyatsHdrUNE0jsOTJF-2uZZ818sbHltDOb-x3_3y0lw", $key_data['q']);
 
-        $pem = file_get_contents('rsa_public.pem');
+        $pem = file_get_contents('rsa_public_pkcs1.pem');
         $key = KeyFactory::create($pem, 'pem');
         $this->assertInstanceOf(RSAKey::class, $key);
         $key_data = $key->getKeyData();

@@ -163,30 +163,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
 
                     $seq = $der->decode($binary);
 
-                    $version = $seq->getChildAt(0)->getValue();
-                    if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
-
-                    $d = $seq->getChildAt(1)->getValue();
-
-                    $curve_oid = $seq->getChildWithTag(0)->getValue();
-                    $curve = self::getCurveNameFromOID($curve_oid);
-                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
-
-                    $len = self::$curves[$curve]['len'];
-
-                    $point = $seq->getChildWithTag(1)->getValue();
-                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
-
-                    if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
-
-                    $x = substr($point, 1, $len / 2);
-                    $y = substr($point, 1 + $len / 2);
-
-                    $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = $curve;
-                    $jwk['d'] = Util::base64url_encode($d);
-                    $jwk['x'] = Util::base64url_encode($x);
-                    $jwk['y'] = Util::base64url_encode($y);
+                    $jwk = self::parseASN1PrivateKey($seq);
                 } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
@@ -204,29 +181,10 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
                     $curve = self::getCurveNameFromOID($curve_oid);
                     if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
 
-                    $len = self::$curves[$curve]['len'];
-
                     $private_octet_string = $seq->getChildAt(2)->getValue();
                     $private_seq = $der->decode($private_octet_string);
 
-                    $version = $private_seq->getChildAt(0)->getValue();
-                    if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
-
-                    $d = $private_seq->getChildAt(1)->getValue();
-
-                    $point = $private_seq->getChildWithTag(1)->getValue();
-                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
-
-                    if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
-
-                    $x = substr($point, 1, $len / 2);
-                    $y = substr($point, 1 + $len / 2);
-
-                    $jwk['kty'] = self::KTY;
-                    $jwk['crv'] = $curve;
-                    $jwk['d'] = Util::base64url_encode($d);
-                    $jwk['x'] = Util::base64url_encode($x);
-                    $jwk['y'] = Util::base64url_encode($y);
+                    $jwk = self::parseASN1PrivateKey($private_seq, $curve);
                 } else {
                     throw new KeyException('Unrecognised key format');
                 }
@@ -393,6 +351,51 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
     protected function getThumbnailMembers(): array {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['crv', 'kty', 'x', 'y'];
+    }
+
+    /**
+     * Parses an EC private key in DER form.
+     * 
+     * An EC private key is encoded using the ECPrivateKey type as per SEC 1.
+     * 
+     * @param ASN1Value $seq the ASN.1 sequence to parse
+     * @param string $curve the name of the elliptic curve. If null, this will be
+     * read from the sequence
+     * @return array<string, mixed> the parsed private key data
+     * @throws KeyException if an error occurs in parsing the key
+     */
+    protected static function parseASN1PrivateKey(ASN1Value $seq, $curve = null): array {
+        $version = $seq->getChildAt(0)->getValue();
+        if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
+
+        $d = $seq->getChildAt(1)->getValue();
+
+        if ($curve == null) {
+            $curve_oid_param = $seq->getChildWithTag(0);
+            if ($curve_oid_param == null) throw new KeyException('Missing EC curve parameter');
+            $curve_oid = $curve_oid_param->getValue();
+            $curve = self::getCurveNameFromOID($curve_oid);
+            if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
+        }
+
+        if (!isset(self::$curves[$curve])) throw new KeyException('Curve not found');
+        $len = self::$curves[$curve]['len'];
+
+        $point = $seq->getChildWithTag(1)->getValue();
+        if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
+
+        if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
+
+        $x = substr($point, 1, $len / 2);
+        $y = substr($point, 1 + $len / 2);
+
+        return [
+            'kty' => self::KTY,
+            'crv' => $curve,
+            'd' => Util::base64url_encode($d),
+            'x' => Util::base64url_encode($x),
+            'y' => Util::base64url_encode($y)
+        ];
     }
 
     private static function getCurveNameFromOID(string $curve_oid): ?string {

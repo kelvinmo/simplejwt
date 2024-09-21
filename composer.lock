@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c87d1c8e22eb89c4a6d1aaf6061fbcfc",
+    "content-hash": "ddc09714964e65e455f22f15a5606cdd",
     "packages": [],
     "packages-dev": [
         {
@@ -749,20 +749,20 @@
         },
         {
             "name": "phlak/semver",
-            "version": "5.0.0",
+            "version": "6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHLAK/SemVer.git",
-                "reference": "3c4db3a7953ac414b947c183548b6a5b825da738"
+                "reference": "412f0b3051b6f92c204e14f47aad888b0bb2ac56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHLAK/SemVer/zipball/3c4db3a7953ac414b947c183548b6a5b825da738",
-                "reference": "3c4db3a7953ac414b947c183548b6a5b825da738",
+                "url": "https://api.github.com/repos/PHLAK/SemVer/zipball/412f0b3051b6f92c204e14f47aad888b0bb2ac56",
+                "reference": "412f0b3051b6f92c204e14f47aad888b0bb2ac56",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0 || ^8.1 || ^8.2 || 8.3"
+                "php": "^8.1 || ^8.2 || ^8.3"
             },
             "require-dev": {
                 "phlak/coding-standards": "^2.0",
@@ -792,7 +792,7 @@
             "description": "Semantic versioning helper library",
             "support": {
                 "issues": "https://github.com/PHLAK/SemVer/issues",
-                "source": "https://github.com/PHLAK/SemVer/tree/5.0.0"
+                "source": "https://github.com/PHLAK/SemVer/tree/6.0.0"
             },
             "funding": [
                 {
@@ -804,7 +804,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2024-08-02T16:57:17+00:00"
+            "time": "2024-09-19T16:40:03+00:00"
         },
         {
             "name": "phootwork/collection",

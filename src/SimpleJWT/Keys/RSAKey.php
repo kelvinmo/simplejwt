@@ -107,18 +107,24 @@ class RSAKey extends Key implements PEMInterface {
 
                     $seq = $der->decode($binary);
 
-                    $version = $seq->getChildAt(0)->getValue();
-                    if ($version != 0) throw new KeyException('Unsupported RSA private key version');
+                    $jwk = self::parseASN1PrivateKey($seq);
+                } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
+                    /** @var string $binary */
+                    $binary = base64_decode($matches[1]);
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
 
-                    $jwk['kty'] = self::KTY;
-                    $jwk['n'] = Util::base64url_encode($seq->getChildAt(1)->getValueAsUIntOctets());
-                    $jwk['e'] = Util::base64url_encode($seq->getChildAt(2)->getValueAsUIntOctets());
-                    $jwk['d'] = Util::base64url_encode($seq->getChildAt(3)->getValueAsUIntOctets());
-                    $jwk['p'] = Util::base64url_encode($seq->getChildAt(4)->getValueAsUIntOctets());
-                    $jwk['q'] = Util::base64url_encode($seq->getChildAt(5)->getValueAsUIntOctets());
-                    $jwk['dp'] = Util::base64url_encode($seq->getChildAt(6)->getValueAsUIntOctets());
-                    $jwk['dq'] = Util::base64url_encode($seq->getChildAt(7)->getValueAsUIntOctets());
-                    $jwk['qi'] = Util::base64url_encode($seq->getChildAt(8)->getValueAsUIntOctets());
+                    $seq = $der->decode($binary);
+
+                    $version = $seq->getChildAt(0)->getValue();
+                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                    
+                    $key_oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
+                    if ($key_oid != self::OID) throw new KeyException('Invalid key type: ' . $key_oid);
+
+                    $private_octet_string = $seq->getChildAt(2)->getValue();
+                    $private_seq = $der->decode($private_octet_string);
+
+                    $jwk = self::parseASN1PrivateKey($private_seq);
                 } else {
                     throw new KeyException('Unrecognised key format');
                 }
@@ -192,6 +198,32 @@ class RSAKey extends Key implements PEMInterface {
     protected function getThumbnailMembers(): array {
         // https://tools.ietf.org/html/rfc7638#section-3.2
         return ['e', 'kty', 'n'];
+    }
+
+    /**
+     * Parses an RSA private key in DER form.
+     * 
+     * An RSA private key is encoded using the RSAPrivateKey type as per PKCS#1
+     * 
+     * @param ASN1Value $seq the ASN.1 sequence to parse
+     * @return array<string, mixed> the parsed private key data
+     * @throws KeyException if an error occurs in parsing the key
+     */
+    protected static function parseASN1PrivateKey(ASN1Value $seq): array {
+        $version = $seq->getChildAt(0)->getValue();
+        if ($version != 0) throw new KeyException('Unsupported RSA private key version');
+
+        return [
+            'kty' => self::KTY,
+            'n' => Util::base64url_encode($seq->getChildAt(1)->getValueAsUIntOctets()),
+            'e' => Util::base64url_encode($seq->getChildAt(2)->getValueAsUIntOctets()),
+            'd' => Util::base64url_encode($seq->getChildAt(3)->getValueAsUIntOctets()),
+            'p' => Util::base64url_encode($seq->getChildAt(4)->getValueAsUIntOctets()),
+            'q' => Util::base64url_encode($seq->getChildAt(5)->getValueAsUIntOctets()),
+            'dp' => Util::base64url_encode($seq->getChildAt(6)->getValueAsUIntOctets()),
+            'dq' => Util::base64url_encode($seq->getChildAt(7)->getValueAsUIntOctets()),
+            'qi' => Util::base64url_encode($seq->getChildAt(8)->getValueAsUIntOctets())
+        ];
     }
 }
 

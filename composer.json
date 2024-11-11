@@ -12,7 +12,7 @@
     "require-dev": {
         "phpunit/phpunit": "^9.6 || ^10.0 || ^11.0",
         "consolidation/robo": "^4.0 || ^5.0",
-        "phpstan/phpstan": "^1.3.0",
+        "phpstan/phpstan": "^2.0.1",
         "phlak/semver": "^5.0 || ^6.0"
     },
     "suggest": {

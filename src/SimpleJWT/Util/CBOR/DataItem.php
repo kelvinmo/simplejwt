@@ -123,7 +123,6 @@ class DataItem {
      * @param int $type the type
      * @param mixed $value the native PHP value
      * @param int $tag the tag number (i.e. excluding the class and constructed bit masks)
-     * @throws InvalidArgumentException
      */
     function __construct(int $type, $value, int $tag = null) {
         $this->type = $type;
@@ -233,7 +232,7 @@ class DataItem {
      * @return DataItem
      */
     static public function list(array $value): self {
-        if (!is_array($value) || !self::array_is_list($value)) {
+        if (!self::array_is_list($value)) {
             throw new InvalidArgumentException('Not an array');
         }
         return new self(static::LIST_TYPE, $value);
@@ -246,7 +245,7 @@ class DataItem {
      * @return DataItem
      */
     static public function map(array $value): self {
-        if (!is_array($value)|| self::array_is_list($value)) {
+        if (self::array_is_list($value)) {
             throw new InvalidArgumentException('Not an associative array');
         }
         return new self(static::MAP_TYPE, $value);

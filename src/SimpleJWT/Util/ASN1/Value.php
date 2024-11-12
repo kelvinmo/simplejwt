@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Util\ASN1;
 
+use \SimpleJWT\Util\Util;
 use \InvalidArgumentException;
 
 /**
@@ -207,7 +208,7 @@ class Value {
      * @return Value
      */
     static public function sequence(array $value): self {
-        if (!is_array($value)) {
+        if (!Util::array_is_list($value)) {
             throw new InvalidArgumentException('Not a sequence');
         }
         return new self(static::SEQUENCE, $value);

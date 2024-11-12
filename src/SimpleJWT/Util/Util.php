@@ -139,6 +139,19 @@ class Util {
     static function random_bytes(int $num_bytes): string {
         return random_bytes($num_bytes);
     }
+
+    /**
+     * Returns whether an array is a list.
+     * 
+     * This is a polyfill for PHP 8.1's array_as_list function.
+     * 
+     * @param array<mixed> $array
+     * @return bool if the array is a list
+     */
+    public static function array_is_list(array $array): bool {
+        if (function_exists('array_is_list')) return \array_is_list($array);
+        return $array === [] || (array_keys($array) === range(0, count($array) - 1));
+    }
 }
 
 ?>

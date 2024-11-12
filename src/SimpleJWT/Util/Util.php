@@ -120,11 +120,7 @@ class Util {
      */
     static function packInt64(int $x): string {
         if (PHP_INT_SIZE == 8) {
-            if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
-                return pack('J', $x);
-            } else {
-                return pack('NN', ($x & 0xFFFFFFFF00000000) >> 32, $x & ($x & 0x00000000FFFFFFFF)); 
-            }
+            return pack('J', $x);
         } else {
             // 32-bit system
             return "\x00\x00\x00\x00" . pack('N', $x);

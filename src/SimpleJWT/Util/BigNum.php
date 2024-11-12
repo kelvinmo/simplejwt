@@ -68,7 +68,7 @@ class BigNum {
                 $this->value = $value;
                 return;
             default:
-                if (!is_integer($base) || ($base < 2) || ($base > 36))
+                if (($base < 2) || ($base > 36))
                     throw new \InvalidArgumentException('$base cannot be less than 2 or greater than 36');
 
                 $value = (new BigNum(0))->value;

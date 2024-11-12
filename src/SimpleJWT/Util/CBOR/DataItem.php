@@ -123,7 +123,6 @@ class DataItem {
      * @param int $type the type
      * @param mixed $value the native PHP value
      * @param int $tag the tag number (i.e. excluding the class and constructed bit masks)
-     * @throws InvalidArgumentException
      */
     function __construct(int $type, $value, int $tag = null) {
         $this->type = $type;
@@ -233,7 +232,7 @@ class DataItem {
      * @return DataItem
      */
     static public function list(array $value): self {
-        if (!is_array($value) || !self::array_is_list($value)) {
+        if (!Util::array_is_list($value)) {
             throw new InvalidArgumentException('Not an array');
         }
         return new self(static::LIST_TYPE, $value);
@@ -246,7 +245,7 @@ class DataItem {
      * @return DataItem
      */
     static public function map(array $value): self {
-        if (!is_array($value)|| self::array_is_list($value)) {
+        if (Util::array_is_list($value)) {
             throw new InvalidArgumentException('Not an associative array');
         }
         return new self(static::MAP_TYPE, $value);
@@ -260,7 +259,7 @@ class DataItem {
         if ($value instanceof DataItem) {
             return $value;
         } elseif (is_array($value)) {
-            if (self::array_is_list($value)) {
+            if (Util::array_is_list($value)) {
                 return static::list($value);
             } else {
                 return static::map($value);
@@ -423,19 +422,6 @@ class DataItem {
      */
     public function __toString(): string {
         return $this->prettyPrint();
-    }
-
-    /**
-     * Returns whether an array is a list.
-     * 
-     * This is a polyfill for PHP 8.1's array_as_list function.
-     * 
-     * @param array<mixed> $array
-     * @return bool if the array is a list
-     */
-    public static function array_is_list(array $array): bool {
-        if (function_exists('array_is_list')) return \array_is_list($array);
-        return $array === [] || (array_keys($array) === range(0, count($array) - 1));
     }
 }
 

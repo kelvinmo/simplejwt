@@ -63,8 +63,6 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
      * {@inheritdoc}
      */
     public function getSupportedAlgs(): array {
-        if (!version_compare(PHP_VERSION, '7.1', '>=')) return [];
-
         $ciphers = array_map('strtolower', openssl_get_cipher_methods());
         $results = [];
 

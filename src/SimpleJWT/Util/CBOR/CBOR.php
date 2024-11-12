@@ -233,7 +233,7 @@ class CBOR {
                     }
                     break;
                 default:
-                    assert(true);
+                    throw new CBORException('Invalid major type: expected list or map, got ' . ($major_type >> 5));;
             }
         }
 

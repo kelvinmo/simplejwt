@@ -57,7 +57,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         'PBES2-HS512+A256KW' => ['hash' => 'sha512']
     ];
 
-    /** @var string $hash_alg */
+    /** @var truthy-string $hash_alg */
     protected $hash_alg;
 
     /** @var int $iterations */
@@ -162,8 +162,10 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      */
     private function generateKeyFromPassword(string $password, array $headers): string {
         $salt = $headers['alg'] . "\x00" . Util::base64url_decode($headers['p2s']);
+        /** @var int<0, max> $length */
+        $length = intdiv($this->getAESKWKeySize(), 8);
 
-        return hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $this->getAESKWKeySize() / 8, true);
+        return hash_pbkdf2($this->hash_alg, $password, $salt, $headers['p2c'], $length, true);
     }
 }
 ?>

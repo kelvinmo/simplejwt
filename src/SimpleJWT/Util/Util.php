@@ -120,11 +120,7 @@ class Util {
      */
     static function packInt64(int $x): string {
         if (PHP_INT_SIZE == 8) {
-            if (version_compare(PHP_VERSION, '5.6.3', '>=')) {
-                return pack('J', $x);
-            } else {
-                return pack('NN', ($x & 0xFFFFFFFF00000000) >> 32, $x & ($x & 0x00000000FFFFFFFF)); 
-            }
+            return pack('J', $x);
         } else {
             // 32-bit system
             return "\x00\x00\x00\x00" . pack('N', $x);
@@ -142,6 +138,19 @@ class Util {
      */
     static function random_bytes(int $num_bytes): string {
         return random_bytes($num_bytes);
+    }
+
+    /**
+     * Returns whether an array is a list.
+     * 
+     * This is a polyfill for PHP 8.1's array_as_list function.
+     * 
+     * @param array<mixed> $array
+     * @return bool if the array is a list
+     */
+    public static function array_is_list(array $array): bool {
+        if (function_exists('array_is_list')) return \array_is_list($array);
+        return $array === [] || (array_keys($array) === range(0, count($array) - 1));
     }
 }
 

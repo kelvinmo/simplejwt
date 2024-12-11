@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.3]
+
+- Fixed: Issue with gmp_pow for certain versions of PHP (#214)
+
 ## [0.9.2]
 
 - Fixed: `RSAKey` cannot parse PKCS#8 encoded RSA private keys (#206)

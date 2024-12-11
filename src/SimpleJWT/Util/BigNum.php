@@ -217,6 +217,9 @@ class BigNum {
     function _pow($base, $exp) {
         if (is_object($exp) && ($exp instanceof \GMP))
             $exp = gmp_intval($exp);
+        /** @disregard P1006  */
+        if (version_compare(PHP_VERSION, '8.2.26', '==') || version_compare(PHP_VERSION, '8.3.14', '=='))
+            return ($base ** $exp);
         return gmp_pow($base, $exp);
     }
 

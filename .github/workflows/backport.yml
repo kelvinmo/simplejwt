@@ -1,0 +1,31 @@
+name: Pull Request Backporting using Git Backporting
+
+on: 
+  workflow_dispatch:
+    inputs:
+      targetBranch:
+        description: 'Target branch'
+        required: true
+        type: string
+      pullRequest:
+        description: 'Pull request url'
+        required: true 
+        type: string
+      dryRun:
+        description: 'Dry run'
+        required: false
+        default: "true" 
+        type: string
+
+jobs:
+  backporting:
+    name: "Backporting"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Backporting
+        uses: kiegroup/git-backporting@v4
+        with:
+          target-branch: ${{ inputs.targetBranch }}
+          pull-request: ${{ inputs.pullRequest }}
+          auth: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: ${{ inputs.dryRun }}

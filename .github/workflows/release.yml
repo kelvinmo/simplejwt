@@ -1,4 +1,4 @@
-name: Build and release
+name: Release
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 jobs:
   release:
     name: Release
-    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write

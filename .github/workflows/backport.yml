@@ -1,31 +1,30 @@
-name: Pull Request Backporting using Git Backporting
+name: Automatic backport pull requests
 
-on: 
-  workflow_dispatch:
-    inputs:
-      targetBranch:
-        description: 'Target branch'
-        required: true
-        type: string
-      pullRequest:
-        description: 'Pull request url'
-        required: true 
-        type: string
-      dryRun:
-        description: 'Dry run'
-        required: false
-        default: "true" 
-        type: string
+on:
+  pull_request_target:
+    types:
+      - labeled
+      - closed
 
 jobs:
-  backporting:
-    name: "Backporting"
+  backport:
+    name: Create backport pull requests
+    if: github.event.pull_request.merged == true && !(contains(github.event.pull_request.labels.*.name, 'backport'))
     runs-on: ubuntu-latest
     steps:
       - name: Backporting
-        uses: kiegroup/git-backporting@v4
+        uses: sorenlouv/backport-github-action@v9.5.1
         with:
-          target-branch: ${{ inputs.targetBranch }}
-          pull-request: ${{ inputs.pullRequest }}
-          auth: ${{ secrets.GITHUB_TOKEN }}
-          dry-run: ${{ inputs.dryRun }}
+          # github_token requires the following permissions
+          # repo or public_repo
+          # workflow
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_backport_label_prefix: backport-to-
+
+      - name: Log output on success
+        if: ${{ success() }}
+        run: cat ~/.backport/backport.info.log
+
+      - name: Log output on failure
+        if: ${{ failure() }}
+        run: cat ~/.backport/backport.debug.log

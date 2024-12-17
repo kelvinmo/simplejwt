@@ -749,26 +749,25 @@
         },
         {
             "name": "phlak/semver",
-            "version": "6.0.0",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHLAK/SemVer.git",
-                "reference": "412f0b3051b6f92c204e14f47aad888b0bb2ac56"
+                "reference": "59dc259f7b734bcdf17c2072c35131e0b0e250d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHLAK/SemVer/zipball/412f0b3051b6f92c204e14f47aad888b0bb2ac56",
-                "reference": "412f0b3051b6f92c204e14f47aad888b0bb2ac56",
+                "url": "https://api.github.com/repos/PHLAK/SemVer/zipball/59dc259f7b734bcdf17c2072c35131e0b0e250d3",
+                "reference": "59dc259f7b734bcdf17c2072c35131e0b0e250d3",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1 || ^8.2 || ^8.3"
+                "php": "^8.1 || ^8.2 || ^8.3 || ^8.4"
             },
             "require-dev": {
-                "phlak/coding-standards": "^2.0",
-                "phpstan/phpstan": "^1.11",
-                "phpunit/phpunit": "^9.0 || ^10.0",
-                "yoast/phpunit-polyfills": "^2.0"
+                "phlak/coding-standards": "^4.0",
+                "phpstan/phpstan": "^2.0",
+                "yoast/phpunit-polyfills": "^3.0"
             },
             "type": "library",
             "autoload": {
@@ -792,7 +791,7 @@
             "description": "Semantic versioning helper library",
             "support": {
                 "issues": "https://github.com/PHLAK/SemVer/issues",
-                "source": "https://github.com/PHLAK/SemVer/tree/6.0.0"
+                "source": "https://github.com/PHLAK/SemVer/tree/6.1.0"
             },
             "funding": [
                 {
@@ -804,7 +803,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2024-09-19T16:40:03+00:00"
+            "time": "2024-12-11T16:29:12+00:00"
         },
         {
             "name": "phootwork/collection",

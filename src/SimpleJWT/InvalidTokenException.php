@@ -49,12 +49,20 @@ class InvalidTokenException extends \RuntimeException {
 
     /** An error code indicating that the JWT's signature cannot be verified.
      * This may be due to the lack of a key, cryptographic errors, or the
-     * signature is incorrect. */
+     * signature is incorrect.
+     * 
+     * Further information on the error may be available with the
+     * {@link getPrevious()} method.
+     */
     const SIGNATURE_VERIFICATION_ERROR = 16;
 
     /** An error code indicating that the JWE cannot be decrypted.
      * This may be due to the lack of a key, cryptographic errors, or the
-     * authentication information is incorrect. */
+     * authentication information is incorrect.
+     * 
+     * Further information on the error may be available with the
+     * {@link getPrevious()} method.
+     */
     const DECRYPTION_ERROR = 17;
 
     /** An error code indicating that the JWT or JWE is invalid as a result
@@ -86,6 +94,10 @@ class InvalidTokenException extends \RuntimeException {
 
     /**
      * Returns the required time specified in the token.
+     * 
+     * This is used if the exception code is one of
+     * {@link self::TOO_EARLY_ERROR TOO_EARLY_ERROR} or
+     * {@link self::TOO_LATE_ERROR TOO_LATE_ERROR}.
      * 
      * @return int the required time time
      */

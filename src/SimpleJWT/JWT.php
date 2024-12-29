@@ -197,7 +197,8 @@ class JWT extends Token {
      * should be automatically completed, or false if no auto-completion is
      * to be performed
      * @param string $alg if not null, override the `alg` header
-     * @param string $format the JWT serialisation format
+     * @param string $format the JWT serialisation format, should be one of
+     * {@link Token::COMPACT_FORMAT} or {@link Token::JSON_FORMAT}
      * @return string the signed and serialised JWT
      * @throws \SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT

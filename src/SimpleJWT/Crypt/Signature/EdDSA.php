@@ -43,7 +43,10 @@ use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Util;
 
 /**
- * Abstract class for SHA2-based signature algorithms.
+ * Edwards-curve Digital Signature Algorithm (EdDSA).  This class implements
+ * the `EdDSA` algorithm.
+ * 
+ * @link https://datatracker.ietf.org/doc/html/rfc8032 RFC 8032
  */
 class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     public function __construct(?string $alg) {

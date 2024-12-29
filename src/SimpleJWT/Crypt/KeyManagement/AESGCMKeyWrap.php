@@ -107,7 +107,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
 
     /**
      * Generates the initialisation vector.  This uses
-     * {@link SimpleJWT\Util\Util::random_bytes()} to generate random bytes.
+     * {@link \SimpleJWT\Util\Util::random_bytes()} to generate random bytes.
      *
      * @return string the initialisation vector as a binary string
      */

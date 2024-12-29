@@ -42,8 +42,9 @@ use SimpleJWT\Keys\KeySet;
  * Interface for a cryptographic algorithm.
  *
  * Algorithms will ordinarily implement one or more of the subinterfaces
- * of this interface: {@link SignatureAlgorithm},
- * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm}.
+ * of this interface: {@link Signature\SignatureAlgorithm SignatureAlgorithm},
+ * {@link Encryption\EncryptionAlgorithm EncryptionAlgorithm} or
+ * {@link KeyManagement\KeyManagementAlgorithm KeyManagementAlgorithm}.
  */
 interface AlgorithmInterface {
 
@@ -63,7 +64,7 @@ interface AlgorithmInterface {
      *
      * Implementations should test the host system's configuration to determine
      * an algorithm is supported.  For example, if an algorithm requires a
-     * particular PHP extension is installed, then this method should test
+     * particular PHP extension to be installed, then this method should test
      * the presence of this extension before including the algorithm in the
      * return value.
      *

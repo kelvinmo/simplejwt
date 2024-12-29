@@ -47,8 +47,10 @@ use SimpleJWT\Keys\KeySet;
  * The actual `alg` or `enc` to be used is specified by the `$alg` parameter
  * in the constructor.
  *
- * Algorithms will ordinarily implement one or more of {@link SignatureAlgorithm},
- * {@link EncryptionAlgorithm} or {@link KeyManagementAlgorithm} interfaces.
+ * Algorithms will ordinarily implement one or more of
+ * {@link Signature\SignatureAlgorithm SignatureAlgorithm},
+ * {@link Encryption\EncryptionAlgorithm EncryptionAlgorithm} or
+ * {@link KeyManagement\KeyManagementAlgorithm KeyManagementAlgorithm} interfaces.
  */
 abstract class BaseAlgorithm implements AlgorithmInterface {
 
@@ -85,14 +87,14 @@ abstract class BaseAlgorithm implements AlgorithmInterface {
      *
      * The criteria specified in this function is combined with the default
      * criteria for the algorithm (through the {@link getKeyCriteria()} function)
-     * before it is bassed to the {@link SimpleJWT\Keys\KeySet::get()} function
+     * before it is bassed to the {@link KeySet::get()} function
      * to retrieve the key.
      *
      * `$criteria` can be one of the following:
      *
      * 1. `null`, in which case only the default criteria are used
      * 2. a string containing the key ID; or
-     * 3. an array compatible with the {@link SimpleJWT\Keys\KeySet::get()} function
+     * 3. an array compatible with the {@link KeySet::get()} function
      *
      * @param KeySet $keys the key set from which the key will
      * be selected

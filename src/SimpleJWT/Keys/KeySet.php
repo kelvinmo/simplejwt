@@ -259,8 +259,8 @@ class KeySet {
      * There are also a number of special properties that can be used to match
      * keys:
      * 
-     * - {@link Key::SIZE_PROPERTY}, which specifies the length of the key in bits
-     * - {@link Key::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
+     * - {@link KeyInterface::SIZE_PROPERTY}, which specifies the length of the key in bits
+     * - {@link KeyInterface::PUBLIC_PROPERTY}, which is true if the key is an asymmetric public
      *   key
      *
      * A criterion can be mandatory, mandatory-if-present (indicated using a `@`
@@ -437,7 +437,7 @@ class KeySet {
      * key.
      *
      * @param string $secret the secret
-     * @param string $format the format of the secret - see {@link SymmetricKey::__create()}
+     * @param string $format the format of the secret - see {@link SymmetricKey::__construct()}
      * for further details
      * @return KeySet the created key set
      */

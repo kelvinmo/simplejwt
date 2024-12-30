@@ -47,8 +47,9 @@ use SimpleJWT\Keys\KeySet;
  * 
  * By default, the `none` algorithm is disabled in SimpleJWT.  Attempts
  * to decode a JWT with a `none` algorithm will return a
- * {@link SimpleJWT\InvalidTokenException}.  In order to enable this
- * algorithm, call {@link AlgorithmFactory::addNoneAlg()} static
+ * {@link \SimpleJWT\InvalidTokenException InvalidTokenException}.
+ * In order to enable this algorithm, call the 
+ * {@link \SimpleJWT\Crypt\AlgorithmFactory::addNoneAlg()} static
  * method.
  * 
  * @link https://datatracker.ietf.org/doc/html/rfc8725.html#section-3.2

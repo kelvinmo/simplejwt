@@ -111,7 +111,7 @@ class AlgorithmFactory {
     /**
      * Returns a list of supported algorithms for a particular use.
      *
-     * The uses can be one of the constants in the {@link Algorithm} class.
+     * The uses can be one of the constants in the {@link AlgorithmInterface} class.
      *
      * @param string $use the use
      * @return array<string> an array of algorithms

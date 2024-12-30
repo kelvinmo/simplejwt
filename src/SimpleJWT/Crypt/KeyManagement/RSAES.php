@@ -82,7 +82,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     }
 
     /**
-     * Generates a seed for OAEP encoding.  This uses {@link SimpleJWT\Util\Util::random_bytes()}
+     * Generates a seed for OAEP encoding.  This uses {@link \SimpleJWT\Util\Util::random_bytes()}
      * to generate random bytes.
      *
      * @param int<1, max> $len the length of the seed required, in octets

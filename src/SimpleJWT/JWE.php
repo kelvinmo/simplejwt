@@ -47,6 +47,17 @@ use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\Util\Util;
 
+/**
+ * A JSON web encryption (JWE) object.
+ * 
+ * A JWE consists of a header and ciphertext.  To create a JWE, use the
+ * constructor with the header and plaintext as the parameter.  The JWE can then
+ * be encrypted using the {@link encrypt()} function.
+ *
+ * To decrypt a JWE, use the {@link decrypt()} static function.  If
+ * successful, the static function will return a JWE object.  The plaintext
+ * can then be retrieved using the {@link getPlaintext()} function.
+ */
 class JWE extends Token {
     /** @var array<string, mixed> $headers */
     protected $headers = ['typ' => 'JWE'];
@@ -234,7 +245,8 @@ class JWE extends Token {
      * content encryption key
      * @param string $kid the ID of the key to use to encrypt. If null, this
      * is automatically retrieved
-     * @param string $format the JWE serialisation format
+     * @param string $format the JWE serialisation format, should be one of
+     * {@link Token::COMPACT_FORMAT} or {@link Token::JSON_FORMAT}
      * @return string the encrypted JWE
      * @throws \SimpleJWT\Keys\KeyException if there is an error obtaining the key
      * to sign the JWT

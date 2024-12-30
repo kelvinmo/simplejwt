@@ -148,7 +148,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     }
 
     /**
-     * Generates salt input.  This uses {@link SimpleJWT\Util\Util::random_bytes()}
+     * Generates salt input.  This uses {@link \SimpleJWT\Util\Util::random_bytes()}
      * to generate random bytes.
      *
      * @return string the salt input

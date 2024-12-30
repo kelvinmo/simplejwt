@@ -18,7 +18,7 @@ jobs:
           # github_token requires the following permissions
           # repo or public_repo
           # workflow
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.BACKPORT_TOKEN }}
           auto_backport_label_prefix: backport-to-
 
       - name: Log output on success

@@ -53,7 +53,7 @@ class DER {
         $pos = 0;
         $value = $this->decodeNext($data, $pos);
         if ($value == null) {
-            throw new ASN1Exception('Data too short');
+            throw new ASN1Exception('Data too short', ASN1Exception::INVALID_DATA_ERROR);
         }
         return $value;
     }
@@ -76,7 +76,7 @@ class DER {
         $additional = [];
 
         $size = strlen($data);
-        if ($size < 2) throw new ASN1Exception('Data too short');
+        if ($size < 2) throw new ASN1Exception('Data too short', ASN1Exception::INVALID_DATA_ERROR);
         if ($pos >= $size) return null;  // End of stream
 
         // Identifier
@@ -84,7 +84,7 @@ class DER {
         $is_constructed = boolval((ord($id) >> 5) & 0x01);
         $class = ord($id) & 0xc0;
         $tag = ord($id) & 0x1f;
-        if ($tag == 0x1f) throw new ASN1Exception('Long-form type not supported');
+        if ($tag == 0x1f) throw new ASN1Exception('Long-form type not supported', ASN1Exception::NOT_SUPPORTED_ERROR);
 
         // Length
         $len = ord($data[$pos++]);
@@ -95,16 +95,16 @@ class DER {
                 $len = ($len << 8) | ord($data[$pos++]);
             }
         }
-        if (($len > 0) && ($pos >= $size || $len > $size - $pos)) throw new ASN1Exception('Data too short');
+        if (($len > 0) && ($pos >= $size || $len > $size - $pos)) throw new ASN1Exception('Data too short', ASN1Exception::INVALID_DATA_ERROR);
 
         // Contents
         $contents = substr($data, $pos, $len);
-        if (strlen($contents) != $len) throw new ASN1Exception('Invalid content length: expected ' . $len . ', got' . strlen($contents));
+        if (strlen($contents) != $len) throw new ASN1Exception('Invalid content length: expected ' . $len . ', got' . strlen($contents), ASN1Exception::INVALID_DATA_ERROR);
 
         if ($class == Value::UNIVERSAL_CLASS) {
             switch ($tag) {
                 case Value::INTEGER_TYPE:
-                    if ($is_constructed) throw new ASN1Exception('Integer type encoded as constructed');
+                    if ($is_constructed) throw new ASN1Exception('Integer type encoded as constructed', ASN1Exception::INVALID_DATA_ERROR);
                     $value = $this->decodeInteger($contents);
                     break;
                 case Value::BIT_STRING:
@@ -116,14 +116,14 @@ class DER {
                     $value = $contents;
                     break;
                 case Value::NULL_TYPE:
-                    if ($is_constructed) throw new ASN1Exception('Null type encoded as constructed');
-                    if ($len > 0) throw new ASN1Exception('Null type has length specified');
+                    if ($is_constructed) throw new ASN1Exception('Null type encoded as constructed', ASN1Exception::INVALID_DATA_ERROR);
+                    if ($len > 0) throw new ASN1Exception('Null type has length specified', ASN1Exception::INVALID_DATA_ERROR);
                     break;
                 case Value::OID:
                     $value = $this->decodeOID($contents);
                     break;
                 case Value::SEQUENCE:
-                    if (!$is_constructed) throw new ASN1Exception('Sequence type not encoded as constructed');
+                    if (!$is_constructed) throw new ASN1Exception('Sequence type not encoded as constructed', ASN1Exception::INVALID_DATA_ERROR);
                     $child_pos = 0;
                     $value = [];
                     while (($child = $this->decodeNext($contents, $child_pos)) != null) {
@@ -131,17 +131,17 @@ class DER {
                     }
                     break;
                 default:
-                    throw new ASN1Exception('Universal type not supported: ' . $tag);
+                    throw new ASN1Exception('Universal type not supported: ' . $tag, ASN1Exception::NOT_SUPPORTED_ERROR);
             }
         } elseif ($is_constructed) {
             $child_pos = 0;
             if (($child = $this->decodeNext($contents, $child_pos)) != null) {
                 $value = $child;
             } else {
-                throw new ASN1Exception('Incorrect constructed encoding');
+                throw new ASN1Exception('Incorrect constructed encoding', ASN1Exception::INVALID_DATA_ERROR);
             }
         } else {
-            throw new ASN1Exception('Type not supported: 0x' . bin2hex($id));
+            throw new ASN1Exception('Type not supported: 0x' . bin2hex($id), ASN1Exception::NOT_SUPPORTED_ERROR);
         }
 
         $pos += $len;
@@ -183,7 +183,7 @@ class DER {
                     break;
                 case Value::BIT_STRING:
                     if (!isset($additional['bitstring_length']))
-                        throw new ASN1Exception('Length not specified in bit string');
+                        throw new ASN1Exception('Length not specified in bit string', ASN1Exception::INVALID_DATA_ERROR);
                     $contents = $this->encodeBitString($val, $additional['bitstring_length']);
                     break;
                 case Value::OCTET_STRING:
@@ -196,7 +196,7 @@ class DER {
                     $contents = $this->encodeOID($val);
                     break;
                 default:
-                    throw new ASN1Exception('Type not supported: ' . $tag);
+                    throw new ASN1Exception('Type not supported: ' . $tag, ASN1Exception::NOT_SUPPORTED_ERROR);
             }
         }
 
@@ -214,7 +214,7 @@ class DER {
             }
 
             if ($n >= 127) {
-                throw new ASN1Exception('Encoded length too long');
+                throw new ASN1Exception('Encoded length too long', ASN1Exception::INVALID_DATA_ERROR);
             }
 
             $encoded_length = chr($n | 0x80);
@@ -233,7 +233,7 @@ class DER {
         if ($tag < 0x1f) {
             $id = chr($type_header | $tag);
         } else {
-            throw new ASN1Exception('Long form tags not supported.');
+            throw new ASN1Exception('Long form tags not supported', ASN1Exception::NOT_SUPPORTED_ERROR);
         }
 
         return $id . $encoded_length . $contents;
@@ -280,7 +280,7 @@ class DER {
         $is_bigint = ($int instanceof \GMP);
         $is_negative = ($is_bigint) ? (gmp_sign($int) < 0): ($int < 0);
 
-        if ($is_negative) throw new ASN1Exception('Negative numbers not supported');
+        if ($is_negative) throw new ASN1Exception('Negative numbers not supported', ASN1Exception::NOT_SUPPORTED_ERROR);
 
         if (!$is_bigint) $int = gmp_init($int);
         $data = gmp_export($int);
@@ -299,7 +299,7 @@ class DER {
      */
     static function decodeBitString($data) {
         $unused_bits = ord($data[0]);
-        if ($unused_bits > 7) throw new ASN1Exception('Incorrect unused bit length in bit string: ' . $unused_bits);
+        if ($unused_bits > 7) throw new ASN1Exception('Incorrect unused bit length in bit string: ' . $unused_bits, ASN1Exception::INVALID_DATA_ERROR);
 
         $bits = substr($data, 1);
 

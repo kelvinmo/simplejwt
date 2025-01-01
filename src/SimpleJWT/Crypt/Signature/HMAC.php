@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2024
+ * Copyright (C) Kelvin Mo 2015-2025
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

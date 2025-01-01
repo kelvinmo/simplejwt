@@ -35,7 +35,7 @@ jobs:
           restore-keys: "composer-"
 
       - name: Install dependencies without updating
-        run: composer install
+        run: rm composer.lock && bcomposer install
 
       - name: Run composer update-copyright script
         run: composer update-copyright

@@ -211,7 +211,7 @@ class RSAKey extends Key implements PEMInterface {
      */
     protected static function parseASN1PrivateKey(ASN1Value $seq): array {
         $version = $seq->getChildAt(0)->getValue();
-        if ($version != 0) throw new KeyException('Unsupported RSA private key version', KeyException::UNSUPPORTED_ERROR);
+        if ($version != 0) throw new KeyException('Unsupported RSA private key version', KeyException::NOT_SUPPORTED_ERROR);
 
         return [
             'kty' => self::KTY,

@@ -80,7 +80,7 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
             $binary = sodium_crypto_sign_detached($data, $secret_key);
             return Util::base64url_encode($binary);
         } catch (SodiumException $e) {
-            throw new CryptException('Cannot calculate signature: ' . $e->getMessage(), 0, $e);
+            throw new CryptException('Cannot calculate signature: ' . $e->getMessage(), CryptException::SYSTEM_LIBRARY_ERROR, $e);
         }
     }
 
@@ -98,7 +98,7 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
         try {
             return sodium_crypto_sign_verify_detached($binary, $data, $public_key);
         } catch (SodiumException $e) {
-            throw new CryptException('Cannot verify signature: ' . $e->getMessage(), 0, $e);
+            throw new CryptException('Cannot verify signature: ' . $e->getMessage(), CryptException::SYSTEM_LIBRARY_ERROR, $e);
         }
     }
 

@@ -88,20 +88,20 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     public function encryptAndSign(string $plaintext, string $cek, string $additional, ?string $iv): array {
         $params = self::$alg_params[$this->getAlg()];
 
-        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
+        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
 
         if ($iv == null) {
             $iv = openssl_random_pseudo_bytes($this->getIVSize() / 8);
         } else {
             $iv = Util::base64url_decode($iv);
-            if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
+            if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length', CryptException::INVALID_DATA_ERROR);
         }
 
         $e = openssl_encrypt($plaintext, $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional, self::TAG_SIZE / 8);
         if ($e == false) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages));
+            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         return [
@@ -117,16 +117,16 @@ class AESGCM extends BaseAlgorithm implements EncryptionAlgorithm {
     public function decryptAndVerify(string $ciphertext, string $tag, string $cek, string $additional, string $iv): string {
         $params = self::$alg_params[$this->getAlg()];
 
-        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
+        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
 
         $iv = Util::base64url_decode($iv);
-        if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
+        if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length', CryptException::INVALID_DATA_ERROR);
 
         $tag = Util::base64url_decode($tag);
-        if (strlen($tag) != self::TAG_SIZE / 8) throw new CryptException('Incorrect authentication tag length');
+        if (strlen($tag) != self::TAG_SIZE / 8) throw new CryptException('Incorrect authentication tag length', CryptException::INVALID_DATA_ERROR);
         
         $plaintext = openssl_decrypt(Util::base64url_decode($ciphertext), $params['cipher'], $cek, OPENSSL_RAW_DATA, $iv, $tag, $additional);
-        if ($plaintext === false) throw new CryptException('Authentication tag does not match');
+        if ($plaintext === false) throw new CryptException('Authentication tag does not match', CryptException::VALIDATION_FAILED_ERROR);
 
         return $plaintext;
     }

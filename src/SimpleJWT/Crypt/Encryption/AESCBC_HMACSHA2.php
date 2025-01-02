@@ -86,17 +86,17 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
     public function encryptAndSign(string $plaintext, string $cek, string $additional, ?string $iv): array {
         $params = self::$alg_params[$this->getAlg()];
 
-        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
+        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
 
         if ($iv == null) {
             $iv = openssl_random_pseudo_bytes($this->getIVSize() / 8);
         } else {
             $iv = Util::base64url_decode($iv);
-            if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
+            if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length', CryptException::INVALID_DATA_ERROR);
         }
 
         $split = (int) (strlen($cek) / 2);
-        if ($split < 1) throw new CryptException('Incorrect key length');
+        if ($split < 1) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
         list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
 
@@ -104,7 +104,7 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
         if ($e == false) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages));
+            throw new CryptException('Cannot encrypt plaintext: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         $m = hash_hmac($params['hash'], $additional . $iv . $e . $al, $mac_key, true);
@@ -123,13 +123,13 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
     public function decryptAndVerify(string $ciphertext, string $tag, string $cek, string $additional, string $iv): string {
         $params = self::$alg_params[$this->getAlg()];
 
-        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length');
+        if (strlen($cek) != $this->getCEKSize() / 8) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
 
         $iv = Util::base64url_decode($iv);
-        if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length');
+        if (strlen($iv) != $this->getIVSize() / 8) throw new CryptException('Incorrect IV length', CryptException::INVALID_DATA_ERROR);
 
         $split = (int) (strlen($cek) / 2);
-        if ($split < 1) throw new CryptException('Incorrect key length');
+        if ($split < 1) throw new CryptException('Incorrect key length', CryptException::INVALID_DATA_ERROR);
         list($mac_key, $enc_key) = str_split($cek, $split);
         list($mac_key, $enc_key) = str_split($cek, $split);
         $al = Util::packInt64(strlen($additional) * 8);
@@ -138,13 +138,13 @@ class AESCBC_HMACSHA2 extends BaseAlgorithm implements EncryptionAlgorithm {
         $m = hash_hmac($params['hash'], $additional . $iv . $e . $al, $mac_key, true);
         $t = substr($m, 0, $params['tag']);
 
-        if (!Util::secure_compare(Util::base64url_decode($tag), $t)) throw new CryptException('Authentication tag does not match');
+        if (!Util::secure_compare(Util::base64url_decode($tag), $t)) throw new CryptException('Authentication tag does not match', CryptException::VALIDATION_FAILED_ERROR);
         
         $plaintext = openssl_decrypt($e, $params['cipher'], $enc_key, OPENSSL_RAW_DATA, $iv);
         if ($plaintext == false) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot decrypt ciphertext: ' . implode("\n", $messages));
+            throw new CryptException('Cannot decrypt ciphertext: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         return $plaintext;

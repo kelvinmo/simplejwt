@@ -101,10 +101,10 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
-        if ((strlen($cek) % 8) != 0) throw new CryptException('Content encryption key not a multiple of 64 bits');
+        if ((strlen($cek) % 8) != 0) throw new CryptException('Content encryption key not a multiple of 64 bits', CryptException::INVALID_DATA_ERROR);
 
         $cipher = self::$alg_params[$this->getAlg()]['cipher'];
 
@@ -120,7 +120,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
                 if ($B == false) {
                     $messages = [];
                     while ($message = openssl_error_string()) $messages[] = $message;
-                    throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages));
+                    throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
                 }
 
                 $A = $this->msb($B) ^ Util::packInt64($t);
@@ -138,7 +138,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         $cipher = self::$alg_params[$this->getAlg()]['cipher'];
@@ -154,7 +154,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
                 if ($B == false) {
                     $messages = [];
                     while ($message = openssl_error_string()) $messages[] = $message;
-                    throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages));
+                    throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
                 }
                 $A = $this->msb($B);
                 $R[$i] = $this->lsb($B);
@@ -162,7 +162,7 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         }
 
         if (!Util::secure_compare($A, self::RFC3394_IV)) {
-            throw new CryptException('AES key wrap integrity check failed');
+            throw new CryptException('AES key wrap integrity check failed', CryptException::VALIDATION_FAILED_ERROR);
         }
 
         return implode('', $R);

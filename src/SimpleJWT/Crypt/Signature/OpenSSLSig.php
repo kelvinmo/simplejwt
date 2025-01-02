@@ -108,7 +108,7 @@ class OpenSSLSig extends SHA2 {
         if (!openssl_sign($data, $binary, $key->toPEM(), 'SHA' . $this->size)) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot calculate signature: ' . implode("\n", $messages));
+            throw new CryptException('Cannot calculate signature: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
@@ -157,7 +157,7 @@ class OpenSSLSig extends SHA2 {
             default:
                 $messages = [];
                 while ($message = openssl_error_string()) $messages[] = $message;
-                throw new CryptException('Cannot verify signature: ' . implode("\n", $messages));
+                throw new CryptException('Cannot verify signature: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
     }
 

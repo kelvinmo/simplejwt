@@ -39,7 +39,28 @@ namespace SimpleJWT\Crypt;
  * An exception associated with cryptographic processing.
  */
 class CryptException extends \RuntimeException {
-    
+    /**
+     * Error code indicating that the source data is invalid.
+     */
+    const INVALID_DATA_ERROR = 1;
+
+    /**
+     * Error code indicating that a key matching the required criteria
+     * cannot be found in the supplied keyset
+     */
+    const KEY_NOT_FOUND_ERROR = 3;
+
+    /**
+     * Error code indicating that an error occurred in an underlying
+     * system library (such as openssl or libsodium).
+     */
+    const SYSTEM_LIBRARY_ERROR = 4;
+
+    /**
+     * Error code indicating that the validation of a signature or
+     * authentication tag has failed.
+     */
+    const VALIDATION_FAILED_ERROR = 10;
 }
 
 ?>

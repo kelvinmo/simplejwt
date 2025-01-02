@@ -66,7 +66,7 @@ class DirectEncryption extends BaseAlgorithm implements KeyDerivationAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
         $headers['kid'] = $key->getKeyId();
 

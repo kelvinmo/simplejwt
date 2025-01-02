@@ -98,7 +98,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     public function encryptKey(string $cek, KeySet $keys, array &$headers, ?string $kid = null): string {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true]);
         if (($key == null) || !$key->isPublic() || !($key instanceof PEMInterface)) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         $params = self::$alg_params[$this->getAlg()];
@@ -113,7 +113,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         if (!openssl_public_encrypt($cek, $encrypted_key, $key->toPEM(), $params['openssl_padding'])) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages));
+            throw new CryptException('Cannot encrypt key: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         return Util::base64url_encode($encrypted_key);
@@ -125,7 +125,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     public function decryptKey(string $encrypted_key, KeySet $keys, array $headers, ?string $kid = null): string {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => false]);
         if (($key == null) || $key->isPublic() || !($key instanceof PEMInterface)) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         $params = self::$alg_params[$this->getAlg()];
@@ -134,7 +134,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         if (!openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), $params['openssl_padding'])) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages));
+            throw new CryptException('Cannot decrypt key: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         if (isset($params['encoding']) && ($params['encoding'] == 'oaep')) {
@@ -192,12 +192,12 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
 
         $lHash2 = substr($DB, 0, strlen($lHash));
         if (!Util::secure_compare($lHash, $lHash2)) {
-            throw new CryptException('OAEP decoding error');
+            throw new CryptException('OAEP decoding error', CryptException::VALIDATION_FAILED_ERROR);
         }
         $PSM = substr($DB, strlen($lHash));
         $PSM = ltrim($PSM, "\x00");
         if (substr($PSM, 0, 1) != "\x01") {
-            throw new CryptException('OAEP decoding error');
+            throw new CryptException('OAEP decoding error', CryptException::INVALID_DATA_ERROR);
         }
         return substr($PSM, 1);
     }

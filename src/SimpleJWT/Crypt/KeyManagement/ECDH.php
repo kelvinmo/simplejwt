@@ -101,7 +101,7 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         /** @var ECDHKeyInterface $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         // 1. Get the required key length and alg input into Concat KDF
@@ -111,12 +111,12 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
                 $enc = AlgorithmFactory::create($headers['enc'], AlgorithmInterface::ENCRYPTION_ALGORITHM);
                 $size = $enc->getCEKSize();
             } catch (\UnexpectedValueException $e) {
-                throw new CryptException('Unexpected enc algorithm', 0, $e);
+                throw new CryptException('Unexpected enc algorithm', CryptException::INVALID_DATA_ERROR, $e);
             }
         } elseif ($this->key_size != null) {
             $size = $this->key_size;
         } else {
-            throw new CryptException('Key size not specified');
+            throw new CryptException('Key size not specified', CryptException::INVALID_DATA_ERROR);
         }
 
         if ($this->getAlg() == 'ECDH-ES') {
@@ -134,18 +134,18 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
             // (a) Load the ephemeral public key
             $ephemeral_public_key = KeyFactory::create($headers['epk'], 'php');
             if (!($ephemeral_public_key instanceof ECDHKeyInterface)) {
-                throw new CryptException("Invalid epk: not an ECDH compatible key");
+                throw new CryptException("Invalid epk: not an ECDH compatible key", CryptException::INVALID_DATA_ERROR);
             }
 
             // (b) Check that $key is a private key
             if ($key->isPublic()) {
-                throw new CryptException('Key is a public key; private key expected');
+                throw new CryptException('Key is a public key; private key expected', CryptException::INVALID_DATA_ERROR);
             }
 
             // (c) Check whether the epk is on the private key's curve to mitigate
             // against invalid curve attacks
             if (!$key->isOnSameCurve($ephemeral_public_key)) {
-                throw new CryptException('Invalid epk: incompatible curve');
+                throw new CryptException('Invalid epk: incompatible curve', CryptException::INVALID_DATA_ERROR);
             }
 
             // (d) Set the ECDH keys
@@ -154,7 +154,7 @@ class ECDH extends BaseAlgorithm implements KeyDerivationAlgorithm {
         } else {
             // (a) Check that $key is a public key (i.e. the recipient's)
             if (!$key->isPublic()) {
-                throw new CryptException('Key is a private key; public key expected');
+                throw new CryptException('Key is a private key; public key expected', CryptException::INVALID_DATA_ERROR);
             }
 
             // (b) Create an ephemeral key pair with the same curve as the recipient's public

@@ -101,7 +101,7 @@ class OpenSSLSig extends SHA2 {
     public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !($key instanceof PEMInterface)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
 
         $binary = '';
@@ -131,7 +131,7 @@ class OpenSSLSig extends SHA2 {
     public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof PEMInterface)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
 
         $binary = Util::base64url_decode($signature);

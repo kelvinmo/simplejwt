@@ -73,7 +73,7 @@ class HMAC extends SHA2 {
     public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !is_a($key, 'SimpleJWT\Keys\SymmetricKey')) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
         return Util::base64url_encode(hash_hmac('sha' . $this->size, $data, $key->toBinary(), true));
     }

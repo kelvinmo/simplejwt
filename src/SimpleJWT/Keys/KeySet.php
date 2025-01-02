@@ -66,7 +66,7 @@ class KeySet {
                 $jwe = JWE::decrypt($jwk, $keys, $alg);
                 $jwk = $jwe->getPlaintext();
             } catch (CryptException $e) {
-                throw new KeyException('Cannot decrypt key set', 0, $e);
+                throw new KeyException('Cannot decrypt key set', KeyException::KEY_DECRYPTION_ERROR, $e);
             }
         }
 
@@ -76,7 +76,7 @@ class KeySet {
                 $this->keys[] = KeyFactory::create($key_data, 'php');
             }
         } catch (JsonException $e) {
-            throw new KeyException('Cannot decode key set JSON', 0, $e);
+            throw new KeyException('Cannot decode key set JSON', KeyException::INVALID_KEY_ERROR, $e);
         }
         
     }
@@ -127,8 +127,8 @@ class KeySet {
         $kid = $key->getKeyId($generate);
 
         foreach ($this->keys as $existing_key) {
-            if ($existing_key->getThumbnail() == $thumbnail) throw new KeyException('Key already exists');
-            if (($kid != null) && ($existing_key->getKeyId(true) == $kid)) throw new KeyException('Key already exists');
+            if ($existing_key->getThumbnail() == $thumbnail) throw new KeyException('Key already exists', KeyException::KEY_ALREADY_EXISTS_ERROR);
+            if (($kid != null) && ($existing_key->getKeyId(true) == $kid)) throw new KeyException('Key already exists', KeyException::KEY_ALREADY_EXISTS_ERROR);
         }
 
         $this->keys[] = $key;

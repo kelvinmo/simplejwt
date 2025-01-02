@@ -67,7 +67,7 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !($key instanceof OKPKey)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
         /** @var non-empty-string $key_pair */
         $key_pair = $key->toSodium();
@@ -80,7 +80,7 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
     public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof OKPKey)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
 
         /** @var non-empty-string $binary */

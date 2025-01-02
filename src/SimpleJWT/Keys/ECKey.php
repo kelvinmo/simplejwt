@@ -117,7 +117,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
                 break;
             case 'cbor':
                 parent::__construct($data, $format, $password, $alg);
-                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type', KeyException::INVALID_KEY_ERROR);
                 $this->data['kty'] = self::KTY;
                 $this->replaceDataKeys([ -1 => 'crv', -2 => 'x', -3 => 'y' ]);
                 $this->replaceDataValues('crv', [ 1 => 'P-256', 2 => 'P-384', 3 => 'P-521', 8 => 'secp256k1' ]);
@@ -131,23 +131,23 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
                     $algorithm = $seq->getChildAt(0)->getChildAt(0)->getValue();
-                    if ($algorithm != self::EC_OID) throw new KeyException('Not EC key');
+                    if ($algorithm != self::EC_OID) throw new KeyException('Not EC key', KeyException::INVALID_KEY_ERROR);
 
                     $curve_oid = $seq->getChildAt(0)->getChildAt(1)->getValue();
                     $curve = $this->getCurveNameFromOID($curve_oid);
-                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid, KeyException::INVALID_KEY_ERROR);
 
                     $len = self::$curves[$curve]['len'];
 
                     $point = $seq->getChildAt(1)->getValue();
-                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect public key length: ' . strlen($point));
+                    if (strlen($point) != $len + 1) throw new KeyException('Incorrect public key length: ' . strlen($point), KeyException::INVALID_KEY_ERROR);
 
-                    if (ord($point[0]) != 0x04) throw new KeyException('Invalid public key');  // W
+                    if (ord($point[0]) != 0x04) throw new KeyException('Invalid public key', KeyException::INVALID_KEY_ERROR);  // W
 
                     $x = substr($point, 1, $len / 2);
                     $y = substr($point, 1 + $len / 2);
@@ -159,7 +159,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
                 } elseif (preg_match(self::PEM_RFC5915_PRIVATE, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
@@ -167,32 +167,32 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
                 } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
                     $version = $seq->getChildAt(0)->getValue();
-                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version, KeyException::INVALID_KEY_ERROR);
                     
                     $key_oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
-                    if ($key_oid != self::EC_OID) throw new KeyException('Invalid key type: ' . $key_oid);
+                    if ($key_oid != self::EC_OID) throw new KeyException('Invalid key type: ' . $key_oid, KeyException::INVALID_KEY_ERROR);
 
                     $curve_oid = $seq->getChildAt(1)->getChildAt(1)->getValue();
                     $curve = self::getCurveNameFromOID($curve_oid);
-                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
+                    if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid, KeyException::INVALID_KEY_ERROR);
 
                     $private_octet_string = $seq->getChildAt(2)->getValue();
                     $private_seq = $der->decode($private_octet_string);
 
                     $jwk = self::parseASN1PrivateKey($private_seq, $curve);
                 } else {
-                    throw new KeyException('Unrecognised key format');
+                    throw new KeyException('Unrecognised key format', KeyException::INVALID_KEY_ERROR);
                 }
 
                 parent::__construct($jwk);
                 break;
             default:
-                throw new KeyException('Incorrect format');
+                throw new KeyException('Incorrect format', KeyException::INVALID_KEY_ERROR);
         }
 
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
@@ -261,7 +261,7 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
     public function toPEM(): string {
         $der = new DER();
         $oid = self::$curves[$this->data['crv']]['oid'];
-        if ($oid == null) throw new KeyException('Unrecognised EC curve');
+        if ($oid == null) throw new KeyException('Unrecognised EC curve', KeyException::NOT_SUPPORTED_ERROR);
 
         if ($this->isPublic()) {
             $seq = ASN1Value::sequence([
@@ -304,10 +304,10 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
         $openssl_curve_name = self::$curves[$crv]['openssl'];
 
         $curves = openssl_get_curve_names();
-        if ($curves == false) throw new KeyException('Cannot get openssl supported curves');
+        if ($curves == false) throw new KeyException('Cannot get openssl supported curves', KeyException::SYSTEM_LIBRARY_ERROR);
 
         if (!in_array($openssl_curve_name, $curves))
-            throw new KeyException('Unable to create ephemeral key: unsupported curve');
+            throw new KeyException('Unable to create ephemeral key: unsupported curve', KeyException::SYSTEM_LIBRARY_ERROR);
 
         // Note openssl.cnf needs to be correctly configured for this to work.
         // See https://www.php.net/manual/en/openssl.installation.php for the
@@ -317,13 +317,13 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
             'private_key_type' => OPENSSL_KEYTYPE_EC,
             'config' => dirname(__FILE__) . '/openssl.cnf'
         ]);
-        if ($pkey === false) throw new KeyException('Unable to create ephemeral key (is openssl.cnf missing?)');
+        if ($pkey === false) throw new KeyException('Unable to create ephemeral key (is openssl.cnf missing?)', KeyException::SYSTEM_LIBRARY_ERROR);
         
         // Note openssl.cnf needs to be correctly configured for this to work.
         // See https://www.php.net/manual/en/openssl.installation.php for the
         // appropriate location of this configuration file
         $result = openssl_pkey_export($pkey, $pem, null, [ 'config' => dirname(__FILE__) . '/openssl.cnf' ]);
-        if ($result === false) throw new KeyException('Unable to create ephemeral key');
+        if ($result === false) throw new KeyException('Unable to create ephemeral key', KeyException::SYSTEM_LIBRARY_ERROR);
 
         return new ECKey($pem, 'pem');
     }
@@ -334,17 +334,17 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
     public function deriveAgreementKey(ECDHKeyInterface $public_key): string {
         assert(function_exists('openssl_pkey_derive'));
 
-        if (!($public_key instanceof ECKey)) throw new KeyException('Key type does not match');
-        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key');
+        if (!($public_key instanceof ECKey)) throw new KeyException('Key type does not match', KeyException::INVALID_KEY_ERROR);
+        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key', KeyException::INVALID_KEY_ERROR);
 
         $public_key_res = openssl_pkey_get_public($public_key->toPEM());
-        if ($public_key_res === false) throw new KeyException('Public key load error: ' . openssl_error_string());
+        if ($public_key_res === false) throw new KeyException('Public key load error: ' . openssl_error_string(), KeyException::SYSTEM_LIBRARY_ERROR);
 
         $private_key_res = openssl_pkey_get_private($this->toPEM());
-        if ($private_key_res === false) throw new KeyException('Private key load error: ' . openssl_error_string());
+        if ($private_key_res === false) throw new KeyException('Private key load error: ' . openssl_error_string(), KeyException::SYSTEM_LIBRARY_ERROR);
 
         $result = openssl_pkey_derive($public_key_res, $private_key_res);
-        if ($result === false) throw new KeyException('Key agreement error: ' . openssl_error_string());
+        if ($result === false) throw new KeyException('Key agreement error: ' . openssl_error_string(), KeyException::SYSTEM_LIBRARY_ERROR);
         return $result;
     }
 
@@ -366,25 +366,25 @@ class ECKey extends Key implements ECDHKeyInterface, PEMInterface {
      */
     protected static function parseASN1PrivateKey(ASN1Value $seq, $curve = null): array {
         $version = $seq->getChildAt(0)->getValue();
-        if ($version != 1) throw new KeyException('Invalid private key version: ' . $version);
+        if ($version != 1) throw new KeyException('Invalid private key version: ' . $version, KeyException::INVALID_KEY_ERROR);
 
         $d = $seq->getChildAt(1)->getValue();
 
         if ($curve == null) {
             $curve_oid_param = $seq->getChildWithTag(0);
-            if ($curve_oid_param == null) throw new KeyException('Missing EC curve parameter');
+            if ($curve_oid_param == null) throw new KeyException('Missing EC curve parameter', KeyException::INVALID_KEY_ERROR);
             $curve_oid = $curve_oid_param->getValue();
             $curve = self::getCurveNameFromOID($curve_oid);
-            if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid);
+            if ($curve == null) throw new KeyException('Unrecognised EC parameter: ' . $curve_oid, KeyException::INVALID_KEY_ERROR);
         }
 
-        if (!isset(self::$curves[$curve])) throw new KeyException('Curve not found');
+        if (!isset(self::$curves[$curve])) throw new KeyException('Curve not found', KeyException::INVALID_KEY_ERROR);
         $len = self::$curves[$curve]['len'];
 
         $point = $seq->getChildWithTag(1)->getValue();
-        if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point));
+        if (strlen($point) != $len + 1) throw new KeyException('Incorrect private key length: ' . strlen($point), KeyException::INVALID_KEY_ERROR);
 
-        if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key');  // W
+        if (ord($point[0]) != 0x04) throw new KeyException('Invalid private key', KeyException::INVALID_KEY_ERROR);  // W
 
         $x = substr($point, 1, $len / 2);
         $y = substr($point, 1 + $len / 2);

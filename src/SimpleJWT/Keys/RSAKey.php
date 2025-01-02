@@ -74,7 +74,7 @@ class RSAKey extends Key implements PEMInterface {
                 break;
             case 'cbor':
                 parent::__construct($data, $format, $password, $alg);
-                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type', KeyException::INVALID_KEY_ERROR);
                 $this->data['kty'] = self::KTY;
                 $this->replaceDataKeys([ -1 => 'n', -2 => 'e', -3 => 'd', -4 => 'p', -5 => 'q', -6 => 'dp', -7 => 'dq', -8 => 'qi' ]);
                 break;
@@ -87,12 +87,12 @@ class RSAKey extends Key implements PEMInterface {
                 if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
                     $algorithm = $seq->getChildAt(0)->getChildAt(0)->getValue();
-                    if ($algorithm != self::OID) throw new KeyException('Not RSA key');
+                    if ($algorithm != self::OID) throw new KeyException('Not RSA key', KeyException::INVALID_KEY_ERROR);
 
                     $public_bitstring = $seq->getChildAt(1)->getValue();
                     $public_seq = $der->decode($public_bitstring);
@@ -103,7 +103,7 @@ class RSAKey extends Key implements PEMInterface {
                 } elseif (preg_match(self::PEM_PRIVATE, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
@@ -111,28 +111,28 @@ class RSAKey extends Key implements PEMInterface {
                 } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
                     /** @var string $binary */
                     $binary = base64_decode($matches[1]);
-                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                    if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                     $seq = $der->decode($binary);
 
                     $version = $seq->getChildAt(0)->getValue();
-                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                    if ($version != 0) throw new KeyException('Invalid private key version: ' . $version, KeyException::INVALID_KEY_ERROR);
                     
                     $key_oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
-                    if ($key_oid != self::OID) throw new KeyException('Invalid key type: ' . $key_oid);
+                    if ($key_oid != self::OID) throw new KeyException('Invalid key type: ' . $key_oid, KeyException::INVALID_KEY_ERROR);
 
                     $private_octet_string = $seq->getChildAt(2)->getValue();
                     $private_seq = $der->decode($private_octet_string);
 
                     $jwk = self::parseASN1PrivateKey($private_seq);
                 } else {
-                    throw new KeyException('Unrecognised key format');
+                    throw new KeyException('Unrecognised key format', KeyException::INVALID_KEY_ERROR);
                 }
 
                 parent::__construct($jwk);
                 break;
             default:
-                throw new KeyException('Incorrect format');
+                throw new KeyException('Incorrect format', KeyException::INVALID_KEY_ERROR);
         }
 
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;
@@ -211,7 +211,7 @@ class RSAKey extends Key implements PEMInterface {
      */
     protected static function parseASN1PrivateKey(ASN1Value $seq): array {
         $version = $seq->getChildAt(0)->getValue();
-        if ($version != 0) throw new KeyException('Unsupported RSA private key version');
+        if ($version != 0) throw new KeyException('Unsupported RSA private key version', KeyException::UNSUPPORTED_ERROR);
 
         return [
             'kty' => self::KTY,

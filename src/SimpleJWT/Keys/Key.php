@@ -93,11 +93,11 @@ abstract class Key implements KeyInterface {
     public function __construct($data = [], string $format = 'php', ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         switch ($format) {
             case 'php':
-                if (!is_array($data)) throw new KeyException('Incorrect key data format');
+                if (!is_array($data)) throw new KeyException('Incorrect key data format', KeyException::INVALID_KEY_ERROR);
                 $this->data = $data;
                 break;
             case 'json':
-                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected', KeyException::INVALID_KEY_ERROR);
                 try {
                     $jwk = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
 
@@ -107,11 +107,11 @@ abstract class Key implements KeyInterface {
                         $this->data = $jwk;
                     }
                 } catch (JsonException $e) {
-                    throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
+                    throw new KeyException('Incorrect key data format - malformed JSON', KeyException::INVALID_KEY_ERROR, $e);
                 }
                 break;
             case 'jwe':
-                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected', KeyException::INVALID_KEY_ERROR);
                 $this->data = self::decrypt($data, $password, $alg);
                 break;
             case 'cbor':
@@ -126,7 +126,7 @@ abstract class Key implements KeyInterface {
                     if (isset($cbor_item['key_ops'])) $cbor_item['key_ops'] = Util::array_replace_values($cbor_item['key_ops'], self::$cose_key_ops_map);
                     $this->data = $cbor_item;
                 } catch (CBORException $e) {
-                    throw new KeyException('Cannot decode CBOR key', 0, $e);
+                    throw new KeyException('Cannot decode CBOR key', KeyException::INVALID_KEY_ERROR, $e);
                 }
                 break;
         }
@@ -144,16 +144,16 @@ abstract class Key implements KeyInterface {
      */
     private static function decrypt(string $data, string $password, string $alg) {
         if ($password == null) {
-            throw new KeyException('No password for encrypted key');
+            throw new KeyException('No password for encrypted key', KeyException::INVALID_KEY_ERROR);
         } else {
             $keys = KeySet::createFromSecret($password, 'bin');
             try {
                 $jwe = JWE::decrypt($data, $keys, $alg);
                 return json_decode($jwe->getPlaintext(), true, 512, JSON_THROW_ON_ERROR);
             } catch (CryptException $e) {
-                throw new KeyException('Cannot decrypt key', 0, $e);
+                throw new KeyException('Cannot decrypt key', KeyException::INVALID_KEY_ERROR, $e);
             } catch (JsonException $e) {
-                throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
+                throw new KeyException('Incorrect key data format - malformed JSON', KeyException::INVALID_KEY_ERROR, $e);
             }
         }
     }
@@ -236,7 +236,7 @@ abstract class Key implements KeyInterface {
      */
     public function toJWK(string $password = null, string $format = JWE::COMPACT_FORMAT): string {
         $json = json_encode($this->data);
-        if ($json == false) throw new KeyException('Cannot encode key');
+        if ($json == false) throw new KeyException('Cannot encode key', KeyException::INVALID_KEY_ERROR);
         if (($password == null) || $this->isPublic()) return $json;
 
         $keys = KeySet::createFromSecret($password, 'bin');
@@ -273,9 +273,14 @@ abstract class Key implements KeyInterface {
             $signing = [];
             foreach ($members as $member) $signing[$member] = strval($this->data[$member]);
             ksort($signing);
-            $hash_input = json_encode($signing);
-            if ($hash_input == false) throw new KeyException('Cannot generate thumbnail');
-            $this->thumbnail = Util::base64url_encode(hash('sha256', $hash_input, true));
+            try {
+                $hash_input = json_encode($signing);
+                if ($hash_input == false) throw new KeyException('Cannot generate thumbnail', KeyException::SYSTEM_LIBRARY_ERROR);
+                $this->thumbnail = Util::base64url_encode(hash('sha256', $hash_input, true));
+            } catch (JsonException $e) {
+                throw new KeyException('Cannot generate thumbnail', KeyException::SYSTEM_LIBRARY_ERROR, $e);
+            }
+            
         }
         
         return $this->thumbnail;

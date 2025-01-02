@@ -70,12 +70,12 @@ class SymmetricKey extends Key {
                 break;
             case 'cbor':
                 parent::__construct($data, $format, $password, $alg);
-                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type', KeyException::INVALID_KEY_ERROR);
                 $this->data['kty'] = self::KTY;
                 $this->replaceDataKeys([ -1 => 'k' ]);
                 break;
             case 'base64url':
-                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected', KeyException::INVALID_KEY_ERROR);
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => $data
@@ -83,7 +83,7 @@ class SymmetricKey extends Key {
                 parent::__construct($jwk);
                 break;
             case 'base64':
-                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected', KeyException::INVALID_KEY_ERROR);
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => trim(strtr($data, '+/', '-_'), '=')  // convert base64 to base64url
@@ -91,7 +91,7 @@ class SymmetricKey extends Key {
                 parent::__construct($jwk);
                 break;
             case 'bin':
-                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected');
+                if (!is_string($data)) throw new KeyException('Incorrect key data format - string expected', KeyException::INVALID_KEY_ERROR);
                 $jwk = [
                     'kty' => self::KTY,
                     'k' => Util::base64url_encode($data)
@@ -99,7 +99,7 @@ class SymmetricKey extends Key {
                 parent::__construct($jwk);
                 break;
             default:
-                throw new KeyException('Incorrect format');
+                throw new KeyException('Incorrect format', KeyException::INVALID_KEY_ERROR);
         }
 
         if (!isset($this->data['kty'])) $this->data['kty'] = self::KTY;

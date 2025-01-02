@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1]
+
+- Fixed: Uncaught `SodiumException` if an error occurs in functions
+  that use libsodium (#218)
+
 ## [1.0.0]
 
 - Removed: Support for PHP 7.3 and 7.4
@@ -226,6 +231,7 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+[1.0.1]: https://github.com/kelvinmo/simplejwt/compare/v0.1.0...v1.0.1
 [1.0.0]: https://github.com/kelvinmo/simplejwt/compare/v0.9.3...v1.0.0
 [0.9.3]: https://github.com/kelvinmo/simplejwt/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/kelvinmo/simplejwt/compare/v0.9.1...v0.9.2

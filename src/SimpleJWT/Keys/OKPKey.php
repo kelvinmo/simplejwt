@@ -35,6 +35,7 @@
 
 namespace SimpleJWT\Keys;
 
+use \SodiumException;
 use SimpleJWT\Util\Util;
 
 /**
@@ -121,14 +122,18 @@ class OKPKey extends Key implements ECDHKeyInterface {
             if ((strlen($d) == 0) || strlen($x) == 0) {
                 throw new KeyException('Invalid key data', KeyException::INVALID_KEY_ERROR);
             }
-            
-            switch ($this->data['crv']) {
-                case 'Ed25519':
-                    return sodium_crypto_sign_keypair_from_secretkey_and_publickey($d . $x, $x);
-                case 'X25519':
-                    return sodium_crypto_box_keypair_from_secretkey_and_publickey($d, $x);
-                default:
-                    throw new KeyException('Cannot convert to Sodium format', KeyException::INVALID_KEY_ERROR);
+
+            try {
+                switch ($this->data['crv']) {
+                    case 'Ed25519':
+                        return sodium_crypto_sign_keypair_from_secretkey_and_publickey($d . $x, $x);
+                    case 'X25519':
+                        return sodium_crypto_box_keypair_from_secretkey_and_publickey($d, $x);
+                    default:
+                        throw new KeyException('Cannot convert to Sodium format', KeyException::INVALID_KEY_ERROR);
+                }
+            } catch (SodiumException $e) {
+                throw new KeyException('Cannot convert to Sodium format: ' . $e->getMessage(), KeyException::SYSTEM_LIBRARY_ERROR, $e);
             }
         }
     }
@@ -150,16 +155,20 @@ class OKPKey extends Key implements ECDHKeyInterface {
         $crv = $this->getCurve();
         if ($crv != 'X25519') throw new \InvalidArgumentException('Curve not found');
 
-        $key = sodium_crypto_box_keypair();
-        $d = sodium_crypto_box_secretkey($key);
-        $x = sodium_crypto_box_publickey($key);
-
-        return new OKPKey([
-            'kty' => 'OKP',
-            'crv' => 'X25519',
-            'd' => Util::base64url_encode($d),
-            'x' => Util::base64url_encode($x)
-        ], 'php');
+        try {
+            $key = sodium_crypto_box_keypair();
+            $d = sodium_crypto_box_secretkey($key);
+            $x = sodium_crypto_box_publickey($key);
+    
+            return new OKPKey([
+                'kty' => 'OKP',
+                'crv' => 'X25519',
+                'd' => Util::base64url_encode($d),
+                'x' => Util::base64url_encode($x)
+            ], 'php');
+        } catch (SodiumException $e) {
+            throw new KeyException('Cannot create ephemeral key: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
@@ -174,9 +183,13 @@ class OKPKey extends Key implements ECDHKeyInterface {
         $public_key = Util::base64url_decode($public_key->data['x']);
         $secret_key = Util::base64url_decode($this->data['d']);
 
-        $result = sodium_crypto_scalarmult($secret_key, $public_key);
-        if (strlen($result) != 32) throw new KeyException('Key agreement error', KeyException::SYSTEM_LIBRARY_ERROR);
-        return $result;
+        try {
+            $result = sodium_crypto_scalarmult($secret_key, $public_key);
+            if (strlen($result) != 32) throw new KeyException('Key agreement error', KeyException::SYSTEM_LIBRARY_ERROR);
+            return $result;
+        } catch (SodiumException $e) {
+            throw new KeyException('Cannot derive agreement key: ' . $e->getMessage(), KeyException::SYSTEM_LIBRARY_ERROR, $e);
+        }
     }
 
     protected function getThumbnailMembers(): array {

@@ -36,11 +36,13 @@
 namespace SimpleJWT\Crypt\Signature;
 
 use SimpleJWT\Crypt\BaseAlgorithm;
+use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyInterface;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\OKPKey;
 use SimpleJWT\Keys\KeyException;
 use SimpleJWT\Util\Util;
+use SodiumException;
 
 /**
  * Edwards-curve Digital Signature Algorithm (EdDSA).  This class implements
@@ -71,10 +73,15 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
         }
         /** @var non-empty-string $key_pair */
         $key_pair = $key->toSodium();
-        $secret_key = sodium_crypto_sign_secretkey($key_pair);
 
-        $binary = sodium_crypto_sign_detached($data, $secret_key);
-        return Util::base64url_encode($binary);
+        try {
+            $secret_key = sodium_crypto_sign_secretkey($key_pair);
+
+            $binary = sodium_crypto_sign_detached($data, $secret_key);
+            return Util::base64url_encode($binary);
+        } catch (SodiumException $e) {
+            throw new CryptException('Cannot calculate signature: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
@@ -88,7 +95,11 @@ class EdDSA extends BaseAlgorithm implements SignatureAlgorithm {
         /** @var non-empty-string $public_key */
         $public_key = $key->toSodium();
 
-        return sodium_crypto_sign_verify_detached($binary, $data, $public_key);
+        try {
+            return sodium_crypto_sign_verify_detached($binary, $data, $public_key);
+        } catch (SodiumException $e) {
+            throw new CryptException('Cannot verify signature: ' . $e->getMessage(), 0, $e);
+        }
     }
 
 

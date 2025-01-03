@@ -40,7 +40,17 @@ namespace SimpleJWT\Util;
  * data.
  */
 class BinaryEncodingException extends \RuntimeException {
+    /**
+     * Error code indicating that the source data is invalid.
+     */
+    const INVALID_DATA_ERROR = 1;
 
+    /**
+     * Error code indicating that a feature, while possibly compliant
+     * with the encoding specification, is not currently supported by the
+     * encoder.
+     */
+    const NOT_SUPPORTED_ERROR = 2;
 }
 
 ?>

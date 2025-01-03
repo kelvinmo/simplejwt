@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Added: Error codes in BinaryEncodingException, CryptException and
+  KeyException to provide more useful error diagnosis
+
 ## [1.0.1]
 
 - Fixed: Uncaught `SodiumException` if an error occurs in functions
@@ -231,6 +236,7 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v1.0.1...HEAD
 [1.0.1]: https://github.com/kelvinmo/simplejwt/compare/v0.1.0...v1.0.1
 [1.0.0]: https://github.com/kelvinmo/simplejwt/compare/v0.9.3...v1.0.0
 [0.9.3]: https://github.com/kelvinmo/simplejwt/compare/v0.9.2...v0.9.3

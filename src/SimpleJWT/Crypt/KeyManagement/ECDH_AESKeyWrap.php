@@ -100,7 +100,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
 
         $wrapping_key = $this->selectKey($keys, $criteria);
         if (($wrapping_key == null) || !($wrapping_key instanceof SymmetricKey)) {
-            throw new CryptException('Wrapping key not found');
+            throw new CryptException('Wrapping key not found', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         return $this->wrapKey($cek, $wrapping_key->toBinary(), $headers);
@@ -115,7 +115,7 @@ class ECDH_AESKeyWrap extends ECDH implements KeyEncryptionAlgorithm {
 
         $wrapping_key = $this->selectKey($keys, $criteria);
         if (($wrapping_key == null) || !($wrapping_key instanceof SymmetricKey)) {
-            throw new CryptException('Wrapping key not found');
+            throw new CryptException('Wrapping key not found', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         return $this->unwrapKey($encrypted_key, $wrapping_key->toBinary(), $headers);

@@ -77,7 +77,7 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         $iv = Util::base64url_encode($this->generateIV());
@@ -94,10 +94,10 @@ class AESGCMKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
         if (!isset($headers['iv']) || !isset($headers['tag'])) {
-            throw new CryptException('iv or tag headers not set');
+            throw new CryptException('iv or tag headers not set', CryptException::INVALID_DATA_ERROR);
         }
 
         $cek = $this->aesgcm->decryptAndVerify($encrypted_key, $headers['tag'], $key->toBinary(), '', $headers['iv']);

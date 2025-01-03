@@ -101,14 +101,14 @@ class OpenSSLSig extends SHA2 {
     public function sign(string $data, KeySet $keys, ?string $kid = null): string {
         $key = $this->getSigningKey($keys, $kid);
         if (($key == null) || !($key instanceof PEMInterface)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
 
         $binary = '';
         if (!openssl_sign($data, $binary, $key->toPEM(), 'SHA' . $this->size)) {
             $messages = [];
             while ($message = openssl_error_string()) $messages[] = $message;
-            throw new CryptException('Cannot calculate signature: ' . implode("\n", $messages));
+            throw new CryptException('Cannot calculate signature: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
 
         if ($key->getKeyType() == \SimpleJWT\Keys\ECKey::KTY) {
@@ -131,7 +131,7 @@ class OpenSSLSig extends SHA2 {
     public function verify(string $signature, string $data, KeySet $keys, ?string $kid = null): bool {
         $key = $this->selectKey($keys, $kid, [KeyInterface::PUBLIC_PROPERTY => true, '~use' => 'sig']);
         if (($key == null) || !($key instanceof PEMInterface)) {
-            throw new KeyException('Key not found or is invalid');
+            throw new KeyException('Key not found or is invalid', KeyException::KEY_NOT_FOUND_ERROR);
         }
 
         $binary = Util::base64url_decode($signature);
@@ -157,7 +157,7 @@ class OpenSSLSig extends SHA2 {
             default:
                 $messages = [];
                 while ($message = openssl_error_string()) $messages[] = $message;
-                throw new CryptException('Cannot verify signature: ' . implode("\n", $messages));
+                throw new CryptException('Cannot verify signature: ' . implode("\n", $messages), CryptException::SYSTEM_LIBRARY_ERROR);
         }
     }
 

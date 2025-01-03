@@ -126,7 +126,7 @@ class KeyFactory {
             }
         }
 
-        if (($format == null) || ($format == 'auto')) throw new KeyException('Cannot detect key format');
+        if (($format == null) || ($format == 'auto')) throw new KeyException('Cannot detect key format', KeyException::INVALID_KEY_ERROR);
 
         // 2. Decode JSON into PHP array
         if ($format == 'json') {
@@ -140,14 +140,14 @@ class KeyFactory {
                     $format = 'php';
                 }
             } catch (JsonException $e) {
-                throw new KeyException('Incorrect key data format - malformed JSON', 0, $e);
+                throw new KeyException('Incorrect key data format - malformed JSON', KeyException::INVALID_KEY_ERROR, $e);
             }
         }
 
         // 3. JWE
         if ($format == 'jwe') {
             if ($password == null) {
-                throw new KeyException('No password for encrypted key');
+                throw new KeyException('No password for encrypted key', KeyException::KEY_DECRYPTION_ERROR);
             } else {
                 $keys = KeySet::createFromSecret($password, 'bin');
                 try {
@@ -155,7 +155,7 @@ class KeyFactory {
                     $data = json_decode($jwe->getPlaintext());
                     $format = 'php';
                 } catch (CryptException $e) {
-                    throw new KeyException('Cannot decrypt key', 0, $e);
+                    throw new KeyException('Cannot decrypt key', KeyException::INVALID_KEY_ERROR, $e);
                 }
             }
         }
@@ -170,7 +170,7 @@ class KeyFactory {
                         return $key;
                     }
                 } elseif (isset($data['keys']) && is_array($data['keys'])) {
-                    throw new KeyException('Cannot import key set as a single key');
+                    throw new KeyException('Cannot import key set as a single key', KeyException::INVALID_KEY_ERROR);
                 }
             }
         }
@@ -186,7 +186,7 @@ class KeyFactory {
                     return $key;
                 }
             } catch (CBORException $e) {
-                throw new KeyException('Cannot decode CBOR key', 0, $e);
+                throw new KeyException('Cannot decode CBOR key', KeyException::INVALID_KEY_ERROR, $e);
             }
         }
 
@@ -197,7 +197,7 @@ class KeyFactory {
             if (preg_match(Key::PEM_PUBLIC, $data, $matches)) {
                 /** @var string $binary */
                 $binary = base64_decode($matches[1]);
-                if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                 $seq = $der->decode($binary);
 
@@ -212,12 +212,12 @@ class KeyFactory {
             } elseif (preg_match(Key::PEM_PKCS8_PRIVATE, $data, $matches)) {
                 /** @var string $binary */
                 $binary = base64_decode($matches[1]);
-                if ($binary == FALSE) throw new KeyException('Cannot read PEM key');
+                if ($binary == FALSE) throw new KeyException('Cannot read PEM key', KeyException::INVALID_KEY_ERROR);
 
                 $seq = $der->decode($binary);
 
                 $version = $seq->getChildAt(0)->getValue();
-                if ($version != 0) throw new KeyException('Invalid private key version: ' . $version);
+                if ($version != 0) throw new KeyException('Invalid private key version: ' . $version, KeyException::INVALID_KEY_ERROR);
                 
                 $oid = $seq->getChildAt(1)->getChildAt(0)->getValue();
                 if (isset(self::$oid_map[$oid])) {
@@ -234,7 +234,7 @@ class KeyFactory {
                     }
                 }
 
-                throw new KeyException('PEM key format not supported');
+                throw new KeyException('PEM key format not supported', KeyException::NOT_SUPPORTED_ERROR);
             }
         }
 
@@ -243,7 +243,7 @@ class KeyFactory {
             return new SymmetricKey($data, $format);
         }
 
-        throw new KeyException('Invalid key format');
+        throw new KeyException('Invalid key format', KeyException::INVALID_KEY_ERROR);
     }
 }
 

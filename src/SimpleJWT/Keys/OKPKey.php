@@ -71,13 +71,13 @@ class OKPKey extends Key implements ECDHKeyInterface {
                 break;
             case 'cbor':
                 parent::__construct($data, $format, $password, $alg);
-                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type');
+                if ($this->data['kty'] != self::COSE_KTY) throw new KeyException('Incorrect CBOR key type', KeyException::INVALID_KEY_ERROR);
                 $this->data['kty'] = self::KTY;
                 $this->replaceDataKeys([ -1 => 'crv', -2 => 'x', -4 => 'd' ]);
                 $this->replaceDataValues('crv', [ 4 => 'X25519', 6 => 'Ed25519' ]);
                 break;
             default:
-                throw new KeyException('Incorrect format');
+                throw new KeyException('Incorrect format', KeyException::INVALID_KEY_ERROR);
         }
     }
 
@@ -120,7 +120,7 @@ class OKPKey extends Key implements ECDHKeyInterface {
             $d = Util::base64url_decode($this->data['d']);
             $x = Util::base64url_decode($this->data['x']);
             if ((strlen($d) == 0) || strlen($x) == 0) {
-                throw new KeyException('Invalid key data');
+                throw new KeyException('Invalid key data', KeyException::INVALID_KEY_ERROR);
             }
 
             try {
@@ -130,10 +130,10 @@ class OKPKey extends Key implements ECDHKeyInterface {
                     case 'X25519':
                         return sodium_crypto_box_keypair_from_secretkey_and_publickey($d, $x);
                     default:
-                        throw new KeyException('Cannot convert to Sodium format');
+                        throw new KeyException('Cannot convert to Sodium format', KeyException::INVALID_KEY_ERROR);
                 }
             } catch (SodiumException $e) {
-                throw new KeyException('Cannot convert to Sodium format: ' . $e->getMessage(), 0, $e);
+                throw new KeyException('Cannot convert to Sodium format: ' . $e->getMessage(), KeyException::SYSTEM_LIBRARY_ERROR, $e);
             }
         }
     }
@@ -177,18 +177,18 @@ class OKPKey extends Key implements ECDHKeyInterface {
     public function deriveAgreementKey(ECDHKeyInterface $public_key): string {
         assert(function_exists('sodium_crypto_scalarmult'));
 
-        if (!($public_key instanceof OKPKey)) throw new KeyException('Key type does not match');
-        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key');
+        if (!($public_key instanceof OKPKey)) throw new KeyException('Key type does not match', KeyException::INVALID_KEY_ERROR);
+        if ($this->isPublic() || !$public_key->isPublic()) throw new KeyException('Parameter is not a public key', KeyException::INVALID_KEY_ERROR);
 
         $public_key = Util::base64url_decode($public_key->data['x']);
         $secret_key = Util::base64url_decode($this->data['d']);
 
         try {
             $result = sodium_crypto_scalarmult($secret_key, $public_key);
-            if (strlen($result) != 32) throw new KeyException('Key agreement error');
+            if (strlen($result) != 32) throw new KeyException('Key agreement error', KeyException::SYSTEM_LIBRARY_ERROR);
             return $result;
         } catch (SodiumException $e) {
-            throw new KeyException('Cannot derive agreement key: ' . $e->getMessage(), 0, $e);
+            throw new KeyException('Cannot derive agreement key: ' . $e->getMessage(), KeyException::SYSTEM_LIBRARY_ERROR, $e);
         }
     }
 

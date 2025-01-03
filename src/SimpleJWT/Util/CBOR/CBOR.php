@@ -55,7 +55,7 @@ class CBOR {
         $pos = 0;
         $value = $this->decodeNext($data, $pos);
         if ($value == null) {
-            throw new CBORException('Data too short');
+            throw new CBORException('Data too short', CBORException::INVALID_DATA_ERROR);
         }
         return $value->getValue($mode);
     }
@@ -80,7 +80,7 @@ class CBOR {
         $argument_bytes = '';
 
         $size = strlen($data);
-        if ($size == 0) throw new CBORException('Data too short');
+        if ($size == 0) throw new CBORException('Data too short', CBORException::INVALID_DATA_ERROR);
         if ($pos >= $size) return null;  // End of stream
 
         // 1. Read and parse initial byte
@@ -135,14 +135,14 @@ class CBOR {
             } elseif ($additional <= 27) {
                 $argument_length = 2 ** ($additional - 24);
             } elseif ($additional == 31) {
-                throw new CBORException('Indefinite length items not supported');
+                throw new CBORException('Indefinite length items not supported', CBORException::NOT_SUPPORTED_ERROR);
             }
         }
 
         // 4. Read additional bytes for argument
         if ($argument_length > 0) {
             $argument_bytes = substr($data, $pos, $argument_length);
-            if (strlen($argument_bytes) != $argument_length) throw new CBORException('Invalid argument size: expected ' . $argument_length . ' bytes, got ' . strlen($argument_bytes));
+            if (strlen($argument_bytes) != $argument_length) throw new CBORException('Invalid argument size: expected ' . $argument_length . ' bytes, got ' . strlen($argument_bytes), CBORException::INVALID_DATA_ERROR);
             $pos += $argument_length;
         }
 
@@ -200,14 +200,14 @@ class CBOR {
                 // Do nothing, as we've already done all that is required in 2.
                 break;
             default:
-                throw new CBORException('Major type not supported: ' . ($major_type >> 5));
+                throw new CBORException('Major type not supported: ' . ($major_type >> 5), CBORException::NOT_SUPPORTED_ERROR);
         }
 
         // 6. Parse contents (for major types which have a content stream)
         if ($content_length > 0) {
             // bstr, tstr
             $contents = substr($data, $pos, $content_length);
-            if (strlen($contents) != $content_length) throw new CBORException('Invalid content length: expected ' . $content_length . ', got ' . strlen($contents));
+            if (strlen($contents) != $content_length) throw new CBORException('Invalid content length: expected ' . $content_length . ', got ' . strlen($contents), CBORException::INVALID_DATA_ERROR);
             $value = $contents;
             $pos += $content_length;
         } elseif ($item_count > 0) {
@@ -217,7 +217,7 @@ class CBOR {
                     for ($i = 0; $i < $item_count; $i++) {
                         $child = $this->decodeNext($data, $pos);
                         $value[] = $child;
-                        if ($child == null) throw new CBORException('Unexpected end of list');
+                        if ($child == null) throw new CBORException('Unexpected end of list', CBORException::INVALID_DATA_ERROR);
                     }
                     break;
                 case DataItem::MAP_TYPE:
@@ -225,15 +225,15 @@ class CBOR {
                         $map_key = $this->decodeNext($data, $pos); // $pos is off by 2
                         $map_value = $this->decodeNext($data, $pos);
                         
-                        if (($map_key == null) || ($map_value == null)) throw new CBORException('Unexpected end of map');
+                        if (($map_key == null) || ($map_value == null)) throw new CBORException('Unexpected end of map', CBORException::INVALID_DATA_ERROR);
                         $key = $map_key->getValue();
-                        if (!is_int($key) && !is_string($key)) throw new CBORException('Only integer and string map keys are supported');
-                        if (isset($value[$key])) throw new CBORException('Duplicate key in map: ' . $key);
+                        if (!is_int($key) && !is_string($key)) throw new CBORException('Only integer and string map keys are supported', CBORException::NOT_SUPPORTED_ERROR);
+                        if (isset($value[$key])) throw new CBORException('Duplicate key in map: ' . $key, CBORException::INVALID_DATA_ERROR);
                         $value[$key] = $map_value;
                     }
                     break;
                 default:
-                    throw new CBORException('Invalid major type: expected list or map, got ' . ($major_type >> 5));;
+                    throw new CBORException('Invalid major type: expected list or map, got ' . ($major_type >> 5), CBORException::INVALID_DATA_ERROR);
             }
         }
 
@@ -298,7 +298,7 @@ class CBOR {
                 $result .= $this->encodeUInt($type, $item_count) . $contents;
                 break;
             case DataItem::TAG_TYPE:
-                throw new CBORException('Tags cannot be encoded separately');
+                throw new CBORException('Tags cannot be encoded separately', CBORException::INVALID_DATA_ERROR);
             case DataItem::FLOAT16_TYPE:
             case DataItem::FLOAT32_TYPE:
             case DataItem::FLOAT64_TYPE:
@@ -313,12 +313,12 @@ class CBOR {
                 break;
             case DataItem::SIMPLE_VALUE_TYPE:
                 if (($value >= 20) && ($value <= 31)) {
-                    throw new CBORException('Cannot encode reserved simple value');
+                    throw new CBORException('Cannot encode reserved simple value', CBORException::INVALID_DATA_ERROR);
                 }
                 $result .= $this->encodeUInt($type, $value);
                 break;
             default:
-                throw new CBORException('Type not supported: ' . $type);
+                throw new CBORException('Type not supported: ' . $type, CBORException::NOT_SUPPORTED_ERROR);
         }
 
         return $result;
@@ -424,7 +424,7 @@ class CBOR {
         } elseif ($allow_gmp) {
             return gmp_import($data, GMP_MSW_FIRST | GMP_BIG_ENDIAN);
         } else {
-            throw new CBORException('Cannot decode integer');
+            throw new CBORException('Cannot decode integer', CBORException::INVALID_DATA_ERROR);
         }
     }
 
@@ -449,7 +449,7 @@ class CBOR {
         } elseif ($value <= 4294967295) {
             return chr($type | 26) . pack('N', $value);
         } else {
-            if (PHP_INT_SIZE < 8) throw new CBORException('64-bit values not supported by this system');
+            if (PHP_INT_SIZE < 8) throw new CBORException('64-bit values not supported by this system', CBORException::NOT_SUPPORTED_ERROR);
             return chr($type | 27) . pack('J', $value);
         }
     }
@@ -476,7 +476,7 @@ class CBOR {
      */
     protected function unpack(string $format, string $data) {
         $result = unpack($format, $data);
-        if ($result === false) throw new CBORException('Cannot unpack binary string into expected format: ' . $format);
+        if ($result === false) throw new CBORException('Cannot unpack binary string into expected format: ' . $format, CBORException::INVALID_DATA_ERROR);
         return $result[1];
     }
 }

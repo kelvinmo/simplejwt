@@ -123,7 +123,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
 
         $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
@@ -137,10 +137,10 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         /** @var SymmetricKey $key */
         $key = $this->selectKey($keys, $kid);
         if ($key == null) {
-            throw new CryptException('Key not found or is invalid');
+            throw new CryptException('Key not found or is invalid', CryptException::KEY_NOT_FOUND_ERROR);
         }
         if (!isset($headers['p2s']) || !isset($headers['p2c'])) {
-            throw new CryptException('p2s or p2c headers not set');
+            throw new CryptException('p2s or p2c headers not set', CryptException::INVALID_DATA_ERROR);
         }
 
         $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);

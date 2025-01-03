@@ -39,7 +39,41 @@ namespace SimpleJWT\Keys;
  * An exception associated with processing JSON web keys.
  */
 class KeyException extends \RuntimeException {
+    /**
+     * Error code indicating that the source data is invalid.
+     */
+    const INVALID_KEY_ERROR = 1;
 
+    /**
+     * Error code indicating that a feature, while possibly compliant
+     * with the encoding specification, is not currently supported by the
+     * encoder.
+     */
+    const NOT_SUPPORTED_ERROR = 2;
+
+    /**
+     * Error code indicating that a key matching the required criteria
+     * cannot be found in the supplied keyset
+     */
+    const KEY_NOT_FOUND_ERROR = 3;
+
+    /**
+     * Error code indicating that an error occurred in an underlying
+     * system library (such as openssl or libsodium).
+     */
+    const SYSTEM_LIBRARY_ERROR = 4;
+
+    /**
+     * Error code indicating that the key is encrypted and cannot be
+     * decrypted.
+     */
+    const KEY_DECRYPTION_ERROR = 5;
+
+    /**
+     * Error code indicating that the specified key already exists
+     * in the key set.
+     */
+    const KEY_ALREADY_EXISTS_ERROR = 6;
 }
 
 ?>

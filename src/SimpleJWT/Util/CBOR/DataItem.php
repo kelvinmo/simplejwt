@@ -275,7 +275,7 @@ class DataItem {
         } elseif (is_null($value)) {
             return static::null();
         } else {
-            throw new CBORException('Cannot represent as CBOR value');
+            throw new CBORException('Cannot represent as CBOR value', CBORException::NOT_SUPPORTED_ERROR);
         }
     }
 

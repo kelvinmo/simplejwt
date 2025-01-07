@@ -12,18 +12,21 @@ jobs:
     if: github.event.pull_request.merged == true && !(contains(github.event.pull_request.labels.*.name, 'backport'))
     runs-on: ubuntu-latest
     steps:
+      - name: Check labels for prefix
+        id: preview_label_check
+        uses: docker://agilepathway/pull-request-label-checker:v1.6.55
+        with:
+          allow_failure: true
+          prefix_mode: true
+          one_of: backport-to-
+          repo_token: ${{ secrets.BACKPORT_TOKEN }}
+
       - name: Backporting
         uses: sorenlouv/backport-github-action@v9.5.1
+        if: steps.preview_label_check.outputs.label_check == 'success'
         with:
           # github_token requires a token that has write permissions to the following:
           # Contents, Pull Requests, Workflows
           github_token: ${{ secrets.BACKPORT_TOKEN }}
           auto_backport_label_prefix: backport-to-
 
-      - name: Log output on success
-        if: ${{ success() }}
-        run: cat ~/.backport/backport.info.log
-
-      - name: Log output on failure
-        if: ${{ failure() }}
-        run: cat ~/.backport/backport.debug.log

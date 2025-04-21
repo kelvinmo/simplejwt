@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 - Added: Error codes in BinaryEncodingException, CryptException and
   KeyException to provide more useful error diagnosis
 
+## [Unreleased]
+
+- Fixed: Incorrect `RSAKey::getSize()` if leading zero byte is not
+  present in two's complement encoding (#225)
+
 ## [1.0.1]
 
 - Fixed: Uncaught `SodiumException` if an error occurs in functions

@@ -104,9 +104,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         $params = self::$alg_params[$this->getAlg()];
 
         if (isset($params['encoding']) && ($params['encoding'] == 'oaep')) {
-            // $key->getSize() ignores the first octet when calculating the key size,
-            // therefore we need to add it back in
-            $cek = $this->oaep_encode($cek, 1 + $key->getSize() / 8, $params['hash']);
+            $cek = $this->oaep_encode($cek, $key->getSize() / 8, $params['hash']);
         }
 
         $encrypted_key = '';
@@ -138,9 +136,7 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         }
 
         if (isset($params['encoding']) && ($params['encoding'] == 'oaep')) {
-            // $key->getSize() ignores the first octet when calculating the key size,
-            // therefore we need to add it back in
-            $cek = $this->oaep_decode($cek, 1 + $key->getSize() / 8, $params['hash']);
+            $cek = $this->oaep_decode($cek, $key->getSize() / 8, $params['hash']);
         }
 
         return $cek;

@@ -139,8 +139,13 @@ class RSAKey extends Key implements PEMInterface {
     }
 
     public function getSize(): int {
-        // The modulus is a signed integer, therefore ignore the first byte
-        return 8 * (strlen(Util::base64url_decode($this->data['n'])) - 1);
+        $n = Util::base64url_decode($this->data['n']);
+        $length = strlen($n);
+        // $n may have a leading zero byte due to two's complements encoding - ignore
+        if ($n[0] == "\x00") {
+            $length -= 1;
+        }
+        return 8 * $length;
     }
 
     public function isPublic(): bool {

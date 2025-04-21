@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added: Error codes in BinaryEncodingException, CryptException and
   KeyException to provide more useful error diagnosis
 
-## [Unreleased]
+## [1.0.2]
 
 - Fixed: Incorrect `RSAKey::getSize()` if leading zero byte is not
   present in two's complement encoding (#225)
@@ -241,7 +241,8 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
-[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/kelvinmo/simplejwt/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/kelvinmo/simplejwt/compare/v0.1.0...v1.0.1
 [1.0.0]: https://github.com/kelvinmo/simplejwt/compare/v0.9.3...v1.0.0
 [0.9.3]: https://github.com/kelvinmo/simplejwt/compare/v0.9.2...v0.9.3

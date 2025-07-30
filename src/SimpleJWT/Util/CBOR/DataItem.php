@@ -124,7 +124,7 @@ class DataItem {
      * @param mixed $value the native PHP value
      * @param int $tag the tag number (i.e. excluding the class and constructed bit masks)
      */
-    function __construct(int $type, $value, int $tag = null) {
+    function __construct(int $type, $value, ?int $tag = null) {
         $this->type = $type;
         $this->value = $value;
         $this->tag = $tag;

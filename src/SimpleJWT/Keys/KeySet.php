@@ -92,7 +92,7 @@ class KeySet {
      * @param string $format the serialisation format for the JWE
      * @return string the key set
      */
-    function toJWKS(string $password = null, string $format = JWE::COMPACT_FORMAT): string {
+    function toJWKS(?string $password = null, string $format = JWE::COMPACT_FORMAT): string {
         $result = array_map(function($key) {
             return $key->getKeyData();
         }, $this->keys);

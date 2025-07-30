@@ -234,7 +234,7 @@ abstract class Key implements KeyInterface {
      * @return string the JSON web key
      * @throws KeyException if the key cannot be converted
      */
-    public function toJWK(string $password = null, string $format = JWE::COMPACT_FORMAT): string {
+    public function toJWK(?string $password = null, string $format = JWE::COMPACT_FORMAT): string {
         $json = json_encode($this->data);
         if ($json == false) throw new KeyException('Cannot encode key', KeyException::INVALID_KEY_ERROR);
         if (($password == null) || $this->isPublic()) return $json;

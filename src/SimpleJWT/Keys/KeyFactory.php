@@ -103,7 +103,7 @@ class KeyFactory {
      * @return KeyInterface the key object
      * @throws KeyException if an error occurs in reading the data
      */
-    static public function create($data, string $format = null, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
+    static public function create($data, ?string $format = null, ?string $password = null, ?string $alg = 'PBES2-HS256+A128KW') {
         $cbor = new CBOR();
         $cbor_item = null;
 

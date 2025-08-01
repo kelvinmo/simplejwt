@@ -96,7 +96,7 @@ class JWT extends Token {
      * @return JWT the decoded JWT
      * @throws InvalidTokenException if the token is invalid for any reason
      */
-    public static function decode(string $token, KeySet $keys, string $expected_alg, string $kid = null, $skip_validation = []) {
+    public static function decode(string $token, KeySet $keys, string $expected_alg, ?string $kid = null, $skip_validation = []) {
         if ($skip_validation === false) $skip_validation = [];
 
         $headers = [];
@@ -204,7 +204,7 @@ class JWT extends Token {
      * to sign the JWT
      * @throws \SimpleJWT\Crypt\CryptException if there is a cryptographic error
      */
-    public function encode(KeySet $keys, ?string $kid = null, $auto_complete = ['iat', 'kid'], string $alg = null, string $format = self::COMPACT_FORMAT): string {
+    public function encode(KeySet $keys, ?string $kid = null, $auto_complete = ['iat', 'kid'], ?string $alg = null, string $format = self::COMPACT_FORMAT): string {
         if ($auto_complete === false) $auto_complete = [];
         if ($alg != null) $this->headers['alg'] = $alg;
         if (in_array('iat', $auto_complete) && !isset($this->claims['iat'])) $this->claims['iat'] = time();

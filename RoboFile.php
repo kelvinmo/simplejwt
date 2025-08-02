@@ -62,7 +62,7 @@ class RoboFile extends RoboTasks {
         }
 
         // 2. Get the current tag
-        $version_task = $this->taskExec('git describe --tags --abbrev=0 HEAD')->run();
+        $version_task = $this->taskExec('git describe --tags --abbrev=0 HEAD')->printOutput(false)->run();
         if (!$version_task->wasSuccessful()) {
             return $version_task;
         }

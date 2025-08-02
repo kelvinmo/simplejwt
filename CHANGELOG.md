@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.0.3]
 
 - Added: Error codes in BinaryEncodingException, CryptException and
   KeyException to provide more useful error diagnosis

@@ -306,7 +306,7 @@ abstract class Key implements KeyInterface {
     protected function replaceDataValues(string $key, array $replacements) {
         if (!isset($this->data[$key])) return;
 
-        if (is_scalar($this->data[$key])) {
+        if (is_int($this->data[$key]) || is_string($this->data[$key])) {
             if (isset($replacements[$this->data[$key]]))
                 $this->data[$key] = $replacements[$this->data[$key]];
         } elseif (is_array($this->data[$key])) {

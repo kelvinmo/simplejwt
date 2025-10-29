@@ -147,6 +147,10 @@ class AESKeyWrap extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         $A = array_shift($R);
         $n = count($R);
 
+        if ($A == null) {
+            throw new CryptException('Encrypted key is too short', CryptException::INVALID_DATA_ERROR);
+        }
+
         for ($j = 5; $j >= 0; $j--) {
             for ($i = $n - 1; $i >= 0; $i--) {
                 $t = $n * $j + ($i + 1);

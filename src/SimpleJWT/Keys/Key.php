@@ -163,7 +163,7 @@ abstract class Key implements KeyInterface {
      */
     public function getKeyId(bool $generate = false): ?string {
         if (!isset($this->data['kid']) && $generate) {
-            $this->data['kid'] = substr($this->getThumbnail(), 0, 7);
+            $this->data['kid'] = $this->getThumbnail();
         }
         return isset($this->data['kid']) ? $this->data['kid'] : null;
     }

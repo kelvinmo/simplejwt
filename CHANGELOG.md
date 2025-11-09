@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.3]
+## [Unreleased]
 
 - Added: Error codes in BinaryEncodingException, CryptException and
   KeyException to provide more useful error diagnosis
+- Changed: Changed algorithm that automatically generate key IDs
+  (`kid`) to use full RFC7517 thumbnail
 
 ## [1.0.3]
 

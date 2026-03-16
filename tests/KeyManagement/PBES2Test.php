@@ -3,6 +3,7 @@
 namespace SimpleJWT\Crypt\KeyManagement;
 
 use SimpleJWT\Util\Util;
+use SimpleJWT\Crypt\CryptException;
 use PHPUnit\Framework\TestCase;
 
 class PBES2Test extends TestCase {
@@ -52,6 +53,44 @@ class PBES2Test extends TestCase {
         $cek = $alg->decryptKey($encrypted_key, $keys, $headers);
 
         $this->assertEquals('bxsZNEIdFE5csDjwQdBScKGDJDfK7LmsgReZwsMw_bY', Util::base64url_encode($cek));
+    }
+
+    function testp2cToLow() {
+        $this->expectException('SimpleJWT\Crypt\CryptException');
+        $this->expectExceptionCode(CryptException::INVALID_DATA_ERROR);
+
+        $encrypted_key = 'TrqXOwuNUfDV9VPTNbyGvEJ9JMjefAVn-TR1uIxR9p6hsRQh9Tk7BA';
+
+        $password = 'Thus from my lips, by yours, my sin is purged.';
+        $keys = $this->getKeySet($password);
+
+        $headers = [
+            'alg' => 'PBES2-HS256+A128KW',
+            'p2c' => 5,
+            'p2s' => '2WCTcJZ1Rvd_CJuJripQ1w'
+        ];
+
+        $alg = new PBES2('PBES2-HS256+A128KW');
+        $cek = $alg->decryptKey($encrypted_key, $keys, $headers);
+    }
+
+    function testp2cToHigh() {
+        $this->expectException('SimpleJWT\Crypt\CryptException');
+        $this->expectExceptionCode(CryptException::INVALID_DATA_ERROR);
+
+        $encrypted_key = 'TrqXOwuNUfDV9VPTNbyGvEJ9JMjefAVn-TR1uIxR9p6hsRQh9Tk7BA';
+
+        $password = 'Thus from my lips, by yours, my sin is purged.';
+        $keys = $this->getKeySet($password);
+
+        $headers = [
+            'alg' => 'PBES2-HS256+A128KW',
+            'p2c' => 409123223136,
+            'p2s' => '2WCTcJZ1Rvd_CJuJripQ1w'
+        ];
+
+        $alg = new PBES2('PBES2-HS256+A128KW');
+        $cek = $alg->decryptKey($encrypted_key, $keys, $headers);
     }
 }
 

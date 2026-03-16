@@ -161,7 +161,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         $headers['p2c'] = $this->checkIterations($headers['p2c']);
         if ($headers['p2c'] == null) {
             throw new CryptException('p2c header out of acceptable range', CryptException::INVALID_DATA_ERROR);
-        }
+        };
 
         $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
         return $this->unwrapKey($encrypted_key, $derived_key, $headers);
@@ -188,8 +188,10 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      */
     protected function checkIterations(int $iterations): ?int {
         return filter_var($iterations, FILTER_VALIDATE_INT, [ 
-            'min_range' => self::MIN_ITERATIONS,
-            'max_range' => self::MAX_ITERATIONS,
+            'options' => [
+                'min_range' => self::MIN_ITERATIONS,
+                'max_range' => self::MAX_ITERATIONS,
+            ],
             'flags' => FILTER_NULL_ON_FAILURE
         ]);
     }

@@ -2,7 +2,7 @@
 /*
  * SimpleJWT
  *
- * Copyright (C) Kelvin Mo 2015-2025
+ * Copyright (C) Kelvin Mo 2015-2026
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,6 +49,18 @@ use SimpleJWT\Util\Util;
  */
 class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
     use AESKeyWrapTrait;
+
+    /** 
+     * Minimum number of iterations, as recommended by
+     * https://datatracker.ietf.org/doc/html/rfc7518#section-4.8.1.2
+     */
+    const MIN_ITERATIONS = 1000;
+
+    /** 
+     * Maximum number of iterations to prevent denial of service
+     * attacks
+     */
+    const MAX_ITERATIONS = 300000;
 
     /** @var array<string, mixed> $alg_params */
     static protected $alg_params = [
@@ -109,7 +121,11 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * @return void
      */
     public function setIterations(int $iterations) {
-        $this->iterations = $iterations;
+        $validated_iterations = $this->checkIterations($iterations);
+        if ($validated_iterations == null) {
+            throw new \InvalidArgumentException('Iterations parameter out of acceptable range');
+        }
+        $this->iterations = $validated_iterations;
     }
 
     /**
@@ -142,6 +158,10 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         if (!isset($headers['p2s']) || !isset($headers['p2c'])) {
             throw new CryptException('p2s or p2c headers not set', CryptException::INVALID_DATA_ERROR);
         }
+        $headers['p2c'] = $this->checkIterations($headers['p2c']);
+        if ($headers['p2c'] == null) {
+            throw new CryptException('p2c header out of acceptable range', CryptException::INVALID_DATA_ERROR);
+        };
 
         $derived_key = $this->generateKeyFromPassword($key->toBinary(), $headers);
         return $this->unwrapKey($encrypted_key, $derived_key, $headers);
@@ -155,6 +175,25 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      */
     protected function generateSaltInput(): string {
         return Util::random_bytes(8);
+    }
+
+    /**
+     * Validates an iteration parameter.  This checks that `$iterations`
+     * is an integer and is between the MIN_ITERATIONS and MAX_ITERATIONS
+     * constant.
+     * 
+     * @param int $iterations the input iteration parameter
+     * @return ?int the validated iteration parameter, or null if the
+     * parameter is invalid.
+     */
+    protected function checkIterations(int $iterations): ?int {
+        return filter_var($iterations, FILTER_VALIDATE_INT, [ 
+            'options' => [
+                'min_range' => self::MIN_ITERATIONS,
+                'max_range' => self::MAX_ITERATIONS,
+            ],
+            'flags' => FILTER_NULL_ON_FAILURE
+        ]);
     }
 
     /**

@@ -184,7 +184,7 @@ class PBES2 extends BaseAlgorithm implements KeyEncryptionAlgorithm {
      * 
      * @param int $iterations the input iteration parameter
      * @return ?int the validated iteration parameter, or null if the
-     * parameter is valid.
+     * parameter is invalid.
      */
     protected function checkIterations(int $iterations): ?int {
         return filter_var($iterations, FILTER_VALIDATE_INT, [ 

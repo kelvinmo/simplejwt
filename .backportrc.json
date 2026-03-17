@@ -1,7 +1,7 @@
 {
     "repoOwner": "kelvinmo",
     "repoName": "simplejwt",
-    "targetBranchChoices": [ "1.0" ],
+    "targetBranchChoices": [ "1.0", "1.1" ],
     "targetPRLabels": [ "backport" ],
     "branchLabelMapping": {
         "^backport-to-(.+)$": "$1"

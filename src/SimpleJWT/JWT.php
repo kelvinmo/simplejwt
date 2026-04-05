@@ -134,6 +134,7 @@ class JWT extends Token {
         }
 
         // Check signatures
+        if (!isset($headers['alg'])) throw new InvalidTokenException('alg parameter missing', InvalidTokenException::TOKEN_PARSE_ERROR);
         if ($headers['alg'] != $expected_alg) throw new InvalidTokenException('Unexpected algorithm', InvalidTokenException::SIGNATURE_VERIFICATION_ERROR);
         /** @var SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($expected_alg);

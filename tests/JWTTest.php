@@ -335,6 +335,16 @@ class JWTTest extends TestCase {
         $this->assertTrue($jwt->getClaim('iss'));
     }
 
+    function testMissingAlg() {
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::TOKEN_PARSE_ERROR);
+
+        $set = $this->getPublicKeySet();
+        $token = 'eyJ0eXAiOiAiSldUIn0.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODB9.lLajjIbnhRpthOPhbJTaxoQ8JHYSAwSUl1Vxc4eQcIU';
+        $jwt = JWT::decode($token, $set, 'HS256');
+        $this->assertTrue($jwt->getClaim('iss'));
+    }
+
     function testInvalidToken() {
         $this->expectException('SimpleJWT\InvalidTokenException');
 

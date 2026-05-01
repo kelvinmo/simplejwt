@@ -324,7 +324,7 @@ class KeySet {
                     break;
                 }
             }
-            if ($found) $results[$kid] = $key_data;
+            if ($found) $results[$kid ?? ''] = $key_data;
         }
 
         // 3. If zero or one key is found after allowing for mandatory and

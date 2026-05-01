@@ -286,7 +286,7 @@ class DER {
         $data = gmp_export($int);
 
         if (strlen($data) == 0) return "\0";
-        if (ord($data) > 127) return "\0" . $data;
+        if (ord($data[0]) > 127) return "\0" . $data;
         return $data;
     }
 

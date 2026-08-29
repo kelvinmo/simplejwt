@@ -59,6 +59,9 @@ use SimpleJWT\Util\Util;
  * can then be retrieved using the {@link getPlaintext()} function.
  */
 class JWE extends Token {
+    /** The maximum length, in bytes, of decompressed plaintext when the `zip` header is `DEF`. */
+    const GZINFLATE_MAX_LENGTH = 1048576;
+
     /** @var array<string, mixed> $headers */
     protected $headers = ['typ' => 'JWE'];
 
@@ -215,8 +218,8 @@ class JWE extends Token {
             if (isset($headers['zip'])) {
                 switch ($headers['zip']) {
                     case 'DEF':
-                        $plaintext = gzinflate($plaintext);
-                        if ($plaintext == false) throw new InvalidTokenException('Cannot decompress plaintext', InvalidTokenException::TOKEN_PARSE_ERROR);
+                        $plaintext = gzinflate($plaintext, self::GZINFLATE_MAX_LENGTH);
+                        if ($plaintext == false || strlen($plaintext) > self::GZINFLATE_MAX_LENGTH) throw new InvalidTokenException('Decompression error: invalid data or decompressed data too large', InvalidTokenException::TOKEN_PARSE_ERROR);
                         break;
                     default:
                         throw new InvalidTokenException('Unsupported zip header:' . $headers['zip'], InvalidTokenException::UNSUPPORTED_ERROR);

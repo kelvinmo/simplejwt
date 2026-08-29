@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Fixed: Added validation for length of decompressed data where `zip:DEF`
+
 ## [1.1.2]
 
 - Fixed: PHP 8.5 compatibility (#241)
@@ -257,6 +261,7 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v1.1.2...HEAD
 [1.1.2]: https://github.com/kelvinmo/simplejwt/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/kelvinmo/simplejwt/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/kelvinmo/simplejwt/compare/v1.0.3...v1.1.0

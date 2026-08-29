@@ -235,6 +235,30 @@ class JWETest extends TestCase {
     }
 
 
+    public function testEncryptDecryptZipDEF() {
+        $plaintext = 'Some compressible plaintext ' . str_repeat('A', 8192);
+        $public_set = $this->getDirectKeySet();
+
+        $jwe = new JWE(["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK", "zip" => "DEF"], $plaintext);
+        $token = $jwe->encrypt($public_set);
+
+        $test_jwe = JWE::decrypt($token, $public_set, 'dir');
+        $this->assertEquals($plaintext, $test_jwe->getPlaintext());
+    }
+
+    public function testDecryptZIPBomb() {
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::TOKEN_PARSE_ERROR);
+
+        $plaintext = str_repeat('A', JWE::GZINFLATE_MAX_LENGTH + 1);
+        $public_set = $this->getDirectKeySet();
+
+        $jwe = new JWE(["alg" => "dir", "enc" => "A128CBC-HS256", "kid" => "YI3EoIK", "zip" => "DEF"], $plaintext);
+        $token = $jwe->encrypt($public_set);
+
+        $test_jwe = JWE::decrypt($token, $public_set, 'dir');
+    }
+
     public function testDecryptECDHAESKW() {
         // https://github.com/kelvinmo/simplejwt/issues/159
         $algs = Crypt\AlgorithmFactory::getSupportedAlgs('key');

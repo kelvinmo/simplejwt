@@ -1,9 +1,13 @@
 {
 	"name": "PHP",
-	"image": "mcr.microsoft.com/devcontainers/php:8.3",
+	"image": "mcr.microsoft.com/devcontainers/php:8-bookworm",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"features": {
+		"ghcr.io/opencodeco/devcontainers/install-php-extensions:0": {
+			"extensions": "bz2, gmp"
+		}
+	},
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -21,10 +25,10 @@
 				"mrmlnc.vscode-apache"
 			]
 		}
-	},
+	}
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && sudo chmod +x /usr/local/bin/install-php-extensions && sudo PHP_INI_DIR=/usr/local/etc/php install-php-extensions bz2 gmp"
+	//"postCreateCommand": ""
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"

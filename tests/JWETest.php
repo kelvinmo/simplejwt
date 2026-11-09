@@ -2,6 +2,7 @@
 
 namespace SimpleJWT;
 
+use SimpleJWT\Crypt\KeyManagement\RSAES;
 use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Keys\ECKey;
 use SimpleJWT\Keys\RSAKey;
@@ -127,6 +128,34 @@ class JWETest extends TestCase {
         $private_set = $this->getPrivateKeySet();
         $test_jwe = JWE::decrypt($token, $private_set, 'RSA1_5');
         $this->assertEquals($plaintext, $test_jwe->getPlaintext());
+    }
+
+    public function testDecryptRSA1_5InvalidPadding() {
+        // An encrypted key with invalid PKCS#1 v1.5 padding must fail in the same way
+        // as a correctly padded key with the wrong value (RFC 7516 section 11.5),
+        // otherwise the error becomes a Bleichenbacher padding oracle.
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
+        $this->expectExceptionMessage('Authentication tag does not match');
+
+        // Block type 01 with no zero separator: never valid for decryption
+        $encrypted_key = Util::base64url_encode("\x00\x01" . str_repeat("\xff", 254));
+        $token = 'eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.' . $encrypted_key . '.AxY8DCtDaGlsbGljb3RoZQ.KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.9hH0vgRfYgPnAHOd8stkvw';
+        JWE::decrypt($token, $this->getPrivateKeySet(), 'RSA1_5');
+    }
+
+    public function testDecryptRSA1_5WrongKeyLength() {
+        // A correctly padded CEK of the wrong length must also fail at the
+        // authentication tag, not with a separate key length error.
+        $this->expectException('SimpleJWT\InvalidTokenException');
+        $this->expectExceptionCode(InvalidTokenException::DECRYPTION_ERROR);
+        $this->expectExceptionMessage('Authentication tag does not match');
+
+        $headers = [];
+        $alg = new RSAES('RSA1_5');
+        $encrypted_key = $alg->encryptKey(str_repeat("\x2a", 16), $this->getPublicKeySet(), $headers, '2011-04-29');
+        $token = 'eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.' . $encrypted_key . '.AxY8DCtDaGlsbGljb3RoZQ.KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.9hH0vgRfYgPnAHOd8stkvw';
+        JWE::decrypt($token, $this->getPrivateKeySet(), 'RSA1_5');
     }
 
     public function testEncryptAESKW() {

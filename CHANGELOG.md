@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Fixed: Use implicit rejection for RSA1_5 key decryption
+
 ## [1.1.3]
 
 - Fixed: Added validation for length of decompressed data where `zip:DEF`
@@ -261,6 +265,7 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+[Unreleased]: https://github.com/kelvinmo/simplejwt/compare/v1.1.3...HEAD
 [1.1.3]: https://github.com/kelvinmo/simplejwt/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/kelvinmo/simplejwt/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/kelvinmo/simplejwt/compare/v1.1.0...v1.1.1

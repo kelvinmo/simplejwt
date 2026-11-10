@@ -35,6 +35,8 @@
 
 namespace SimpleJWT\Crypt\KeyManagement;
 
+use SimpleJWT\Crypt\AlgorithmInterface;
+use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Crypt\BaseAlgorithm;
 use SimpleJWT\Crypt\CryptException;
 use SimpleJWT\Keys\KeyInterface;
@@ -128,6 +130,10 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
 
         $params = self::$alg_params[$this->getAlg()];
 
+        if (($this->getAlg() == 'RSA1_5') && isset($headers['enc'])) {
+            return $this->decryptKeyWithImplicitRejection($encrypted_key, $key, $headers['enc']);
+        }
+
         $cek = '';
         if (!openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), $params['openssl_padding'])) {
             $messages = [];
@@ -140,6 +146,47 @@ class RSAES extends BaseAlgorithm implements KeyEncryptionAlgorithm {
         }
 
         return $cek;
+    }
+
+    /**
+     * Decrypts a content encryption key wrapped using `RSA1_5`, without revealing
+     * whether the PKCS #1 v1.5 padding was valid.
+     *
+     * A random CEK of the length required by the content encryption algorithm is
+     * generated first.  If the decryption fails, or the decrypted CEK has the wrong
+     * length, the random CEK is returned instead of throwing an exception.  The
+     * subsequent content decryption then fails at the authentication tag, the
+     * same way as for a correctly padded but incorrect key.  Reporting the padding
+     * error separately would give an attacker a Bleichenbacher padding oracle.
+     *
+     * @param string $encrypted_key the encrypted key, base64url encoded
+     * @param PEMInterface $key the RSA private key
+     * @param string $enc the content encryption algorithm (the `enc` header)
+     * @return string the decrypted CEK, or a random CEK of the same length
+     * @throws CryptException if `$enc` is not a supported content encryption algorithm
+     * @see https://tools.ietf.org/html/rfc7516#section-11.5
+     * @see https://tools.ietf.org/html/rfc3218#section-2.3.2
+     */
+    private function decryptKeyWithImplicitRejection(string $encrypted_key, PEMInterface $key, string $enc): string {
+        try {
+            /** @var \SimpleJWT\Crypt\Encryption\EncryptionAlgorithm $content_enc */
+            $content_enc = AlgorithmFactory::create($enc, AlgorithmInterface::ENCRYPTION_ALGORITHM);
+            $cek_length = intdiv($content_enc->getCEKSize(), 8);
+        } catch (\UnexpectedValueException $e) {
+            throw new CryptException('Unexpected enc algorithm', CryptException::INVALID_DATA_ERROR, $e);
+        }
+        if ($cek_length < 1) throw new CryptException('Unexpected enc algorithm', CryptException::INVALID_DATA_ERROR);
+
+        // Generate the substitute before decrypting, so both outcomes do the same work
+        $random_cek = Util::random_bytes($cek_length);
+
+        $cek = '';
+        $decrypted = openssl_private_decrypt(Util::base64url_decode($encrypted_key), $cek, $key->toPEM(), OPENSSL_PKCS1_PADDING);
+
+        // Clear the OpenSSL error queue so that a padding error is not left behind
+        while (openssl_error_string() !== false);
+
+        return ($decrypted && (strlen($cek) == $cek_length)) ? $cek : $random_cek;
     }
 
     /**

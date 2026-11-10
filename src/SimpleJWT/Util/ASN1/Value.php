@@ -98,7 +98,7 @@ class Value {
     /** @var bool $is_constructed */
     protected $is_constructed;
 
-    /** @var int $class */
+    /** @var int<0, 255> $class */
     protected $class;
 
     /**
@@ -108,7 +108,7 @@ class Value {
      * @param mixed $value the native PHP value
      * @param array<string, mixed> $additional type-dependent additional data
      * @param bool|null $is_constructed whether the type is a constructed type
-     * @param int $class the class number
+     * @param int<0, 255> $class the class number
      * @throws InvalidArgumentException
      */
     function __construct(int $tag, $value, array $additional = [], ?bool $is_constructed = null, int $class = self::UNIVERSAL_CLASS) {
@@ -219,7 +219,7 @@ class Value {
      * 
      * @param int $tag the tag
      * @param Value $value the underlying value
-     * @param int $class the class
+     * @param int<0, 255> $class the class
      * @return Value
      */
     static public function explicit(int $tag, Value $value, int $class = self::CONTEXT_CLASS): self {
@@ -283,6 +283,8 @@ class Value {
 
     /**
      * Returns the class of this type
+     * 
+     * @return int<0, 255>
      */
     public function getClass(): int {
         return $this->class;

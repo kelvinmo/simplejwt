@@ -231,7 +231,9 @@ class DER {
         if ($value->isConstructed()) $type_header |= 0x20;
 
         if ($tag < 0x1f) {
-            $id = chr($type_header | $tag);
+            /** @var int<0, 255> $x */
+            $x = $type_header | $tag;
+            $id = chr($x);
         } else {
             throw new ASN1Exception('Long form tags not supported', ASN1Exception::NOT_SUPPORTED_ERROR);
         }
@@ -366,7 +368,11 @@ class DER {
         $numbers = explode('.', $str);
 
         // First octet
-        $oid = chr(intval(array_shift($numbers)) * 40 + intval(array_shift($numbers)));
+        /** @var int<0, 2> $arc1 */
+        $arc1 = intval(array_shift($numbers));
+        /** @var int<0, 39> $arc2 */
+        $arc2 = intval(array_shift($numbers));
+        $oid = chr($arc1 * 40 + $arc2);
 
         // Subsequent octets
         foreach ($numbers as $num) {

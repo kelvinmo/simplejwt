@@ -434,13 +434,14 @@ class CBOR {
      * For integers between 0 and 23 (inclusive), this means encoding the value
      * along with the major type.
      * 
-     * @param int $type the encoded major type
+     * @param int<0, 255> $type the encoded major type
      * @param int $value the value to encode
      * @return string
      * @see https://www.rfc-editor.org/rfc/rfc8949.html#name-core-deterministic-encoding
      */
     protected function encodeUInt($type, $value) {
         if ($value <= 23) {
+            /** @var int<0, 23> $value */
             return chr($type | $value);
         } elseif ($value <= 255) {
             return chr($type | 24) . chr($value);
